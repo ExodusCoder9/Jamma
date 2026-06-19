@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.jamma'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation platform("org.lwjgl:lwjgl-bom:3.4.1")
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-shaderc"
+    implementation "org.lwjgl:lwjgl-vulkan"
+    implementation "org.lwjgl:lwjgl-vma"
+    runtimeOnly "org.lwjgl:lwjgl:natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl:natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl:natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-vma:natives-linux"
+    runtimeOnly "org.lwjgl:lwjgl-vma:natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-vma:natives-macos"
+    runtimeOnly "org.lwjgl:lwjgl-vma:natives-macos-arm64"
+}
+
+test {
+    useJUnitPlatform()
+}
