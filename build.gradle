@@ -5,6 +5,12 @@ plugins {
 group = 'com.jamma'
 version = '1.0-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -13,25 +19,27 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:6.0.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation platform("org.lwjgl:lwjgl-bom:3.4.1")
-    implementation "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-shaderc"
-    implementation "org.lwjgl:lwjgl-vulkan"
-    implementation "org.lwjgl:lwjgl-vma"
-    runtimeOnly "org.lwjgl:lwjgl:natives-linux"
-    runtimeOnly "org.lwjgl:lwjgl:natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl:natives-macos"
-    runtimeOnly "org.lwjgl:lwjgl:natives-macos-arm64"
-    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-linux"
-    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-macos"
-    runtimeOnly "org.lwjgl:lwjgl-shaderc:natives-macos-arm64"
-    runtimeOnly "org.lwjgl:lwjgl-vma:natives-linux"
-    runtimeOnly "org.lwjgl:lwjgl-vma:natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-vma:natives-macos"
-    runtimeOnly "org.lwjgl:lwjgl-vma:natives-macos-arm64"
 }
 
-test {
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+        '--add-modules', 'jdk.incubator.vector',
+        '--enable-preview'
+    ]
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs += [
+        '--add-modules', 'jdk.incubator.vector',
+        '--enable-preview',
+        '--enable-native-access=com.jamma.math'
+    ]
     useJUnitPlatform()
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += [
+        '--add-modules', 'jdk.incubator.vector',
+        '--enable-preview'
+    ]
 }
