@@ -1,1 +1,3 @@
 rootProject.name = 'Jamma'
+include 'math-core'
+include 'math-incubator'
