@@ -11,10 +11,10 @@ public class Matrix2f implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private float m00;
-    private float m01;
-    private float m10;
-    private float m11;
+    public float m00;
+    public float m01;
+    public float m10;
+    public float m11;
 
     public Matrix2f() {
         identity();
@@ -139,13 +139,7 @@ public class Matrix2f implements Serializable {
         );
     }
 
-    public Vector2f transform(Vector2f v, Vector2f dest) {
-        dest = new Vector2f(
-            Math.fma(m00, v.x(), m10 * v.y()),
-            Math.fma(m01, v.x(), m11 * v.y())
-        );
-        return dest;
-    }
+
 
     public float m00() { return m00; }
     public float m01() { return m01; }
@@ -156,6 +150,23 @@ public class Matrix2f implements Serializable {
     public Matrix2f m01(float m01) { this.m01 = m01; return this; }
     public Matrix2f m10(float m10) { this.m10 = m10; return this; }
     public Matrix2f m11(float m11) { this.m11 = m11; return this; }
+
+    public float get(int col, int row) {
+        return switch (row * 2 + col) {
+            case 0 -> m00; case 1 -> m01;
+            case 2 -> m10; case 3 -> m11;
+            default -> throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        };
+    }
+
+    public Matrix2f set(int col, int row, float value) {
+        switch (row * 2 + col) {
+            case 0: m00 = value; break; case 1: m01 = value; break;
+            case 2: m10 = value; break; case 3: m11 = value; break;
+            default: throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        }
+        return this;
+    }
 
     public float[] get(float[] dest, int offset) {
         dest[offset]     = m00;

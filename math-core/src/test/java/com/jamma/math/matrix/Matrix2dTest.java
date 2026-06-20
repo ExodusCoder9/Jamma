@@ -139,7 +139,7 @@ class Matrix2dTest {
     void transformDest() {
         Matrix2d m = new Matrix2d();
         m.scale(2.0, 3.0);
-        Vector2D result = m.transform(new Vector2D(1, 1), new Vector2D(0, 0));
+        Vector2D result = m.transform(new Vector2D(1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
     }

@@ -1,6 +1,9 @@
 package com.jamma.math.quaternion;
 
+import com.jamma.math.AxisAngle4f;
 import com.jamma.math.Vector3f;
+import com.jamma.math.matrix.Matrix3f;
+import com.jamma.math.matrix.Matrix4f;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -56,6 +59,43 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         return IDENTITY;
     }
 
+    public static Quaternionf fromEulerAnglesXYZ(float xAngle, float yAngle, float zAngle) {
+        float sx = (float) Math.sin(xAngle * 0.5f);
+        float cx = (float) Math.cos(xAngle * 0.5f);
+        float sy = (float) Math.sin(yAngle * 0.5f);
+        float cy = (float) Math.cos(yAngle * 0.5f);
+        float sz = (float) Math.sin(zAngle * 0.5f);
+        float cz = (float) Math.cos(zAngle * 0.5f);
+        return new Quaternionf(
+            Math.fma(sx, Math.fma(cy, cz, sy * sz), cx * Math.fma(sy, cz, -cy * sz)),
+            Math.fma(cx, Math.fma(sy, cz, cy * sz), sx * Math.fma(-cy, cz, sy * sz)),
+            Math.fma(cx, Math.fma(cy, sz, -sy * cz), sx * Math.fma(sy, sz, cy * cz)),
+            Math.fma(cx, Math.fma(cy, cz, -sy * sz), sx * Math.fma(-sy, cz, -cy * sz))
+        );
+    }
+
+    public static Quaternionf rotateTo(Vector3f from, Vector3f to) {
+        float d = from.dot(to);
+        float x, y, z, w;
+        if (d < -1.0f + 1e-6f) {
+            Vector3f axis = from.cross(new Vector3f(1, 0, 0));
+            if (axis.lengthSquared() < 1e-6f) {
+                axis = from.cross(new Vector3f(0, 1, 0));
+            }
+            axis = axis.normalize();
+            x = axis.x(); y = axis.y(); z = axis.z(); w = 0.0f;
+        } else {
+            float s = (float) Math.sqrt((1.0f + d) * 2.0f);
+            float invS = 1.0f / s;
+            Vector3f c = from.cross(to);
+            x = c.x() * invS;
+            y = c.y() * invS;
+            z = c.z() * invS;
+            w = s * 0.5f;
+        }
+        return new Quaternionf(x, y, z, w).normalize();
+    }
+
     public static Quaternionf fromAxisAngle(Vector3f axis, float angle) {
         float halfAngle = angle * 0.5f;
         float sinHalf = (float) Math.sin(halfAngle);
@@ -86,6 +126,27 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         return new Quaternionf(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 
+    public Quaternionf conjugate() {
+        return new Quaternionf(-x, -y, -z, w);
+    }
+
+    public Quaternionf invert() {
+        float invLenSq = 1.0f / lengthSquared();
+        return new Quaternionf(-x * invLenSq, -y * invLenSq, -z * invLenSq, w * invLenSq);
+    }
+
+    public Quaternionf difference(Quaternionf q) {
+        return invert().mul(q);
+    }
+
+    public float dot(Quaternionf q) {
+        return Math.fma(x, q.x, Math.fma(y, q.y, Math.fma(z, q.z, w * q.w)));
+    }
+
+    public float angle() {
+        return 2.0f * (float) Math.acos(w);
+    }
+
     public Quaternionf mul(Quaternionf q) {
         return new Quaternionf(
             Math.fma(w, q.x, Math.fma(x, q.w, Math.fma(y, q.z, -z * q.y))),
@@ -93,6 +154,15 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
             Math.fma(w, q.z, Math.fma(x, q.y, Math.fma(-y, q.x, z * q.w))),
             Math.fma(w, q.w, Math.fma(-x, q.x, Math.fma(-y, q.y, -z * q.z)))
         );
+    }
+
+    public Quaternionf nlerp(Quaternionf target, float t) {
+        return new Quaternionf(
+            Math.fma(1.0f - t, x, t * target.x),
+            Math.fma(1.0f - t, y, t * target.y),
+            Math.fma(1.0f - t, z, t * target.z),
+            Math.fma(1.0f - t, w, t * target.w)
+        ).normalize();
     }
 
     public Quaternionf slerp(Quaternionf target, float t) {
@@ -131,6 +201,54 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         return s1.slerp(s2, 2.0f * t * (1.0f - t));
     }
 
+    public Matrix4f toMatrix() {
+        float xx = x * x, yy = y * y, zz = z * z;
+        float xy = x * y, xz = x * z, xw = x * w;
+        float yz = y * z, yw = y * w, zw = z * w;
+        return new Matrix4f(
+            Math.fma(-2.0f, yy + zz, 1.0f), Math.fma(2.0f, xy + zw, 0.0f), Math.fma(2.0f, xz - yw, 0.0f), 0.0f,
+            Math.fma(2.0f, xy - zw, 0.0f), Math.fma(-2.0f, xx + zz, 1.0f), Math.fma(2.0f, yz + xw, 0.0f), 0.0f,
+            Math.fma(2.0f, xz + yw, 0.0f), Math.fma(2.0f, yz - xw, 0.0f), Math.fma(-2.0f, xx + yy, 1.0f), 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        );
+    }
+
+    public Matrix3f toMatrix3() {
+        float xx = x * x, yy = y * y, zz = z * z;
+        float xy = x * y, xz = x * z, xw = x * w;
+        float yz = y * z, yw = y * w, zw = z * w;
+        return new Matrix3f(new float[] {
+            Math.fma(-2.0f, yy + zz, 1.0f), Math.fma(2.0f, xy + zw, 0.0f), Math.fma(2.0f, xz - yw, 0.0f),
+            Math.fma(2.0f, xy - zw, 0.0f), Math.fma(-2.0f, xx + zz, 1.0f), Math.fma(2.0f, yz + xw, 0.0f),
+            Math.fma(2.0f, xz + yw, 0.0f), Math.fma(2.0f, yz - xw, 0.0f), Math.fma(-2.0f, xx + yy, 1.0f)
+        });
+    }
+
+    public Vector3f transform(Vector3f v) {
+        float xx = x * x, yy = y * y, zz = z * z;
+        float xy = x * y, xz = x * z, xw = x * w;
+        float yz = y * z, yw = y * w, zw = z * w;
+        float vx = v.x(), vy = v.y(), vz = v.z();
+        return new Vector3f(
+            Math.fma(2.0f, xx - 0.5f * (yy + zz), vx) + Math.fma(2.0f, xy - zw, vy) + Math.fma(2.0f, xz + yw, vz),
+            Math.fma(2.0f, xy + zw, vx) + Math.fma(2.0f, yy - 0.5f * (xx + zz), vy) + Math.fma(2.0f, yz - xw, vz),
+            Math.fma(2.0f, xz - yw, vx) + Math.fma(2.0f, yz + xw, vy) + Math.fma(2.0f, zz - 0.5f * (xx + yy), vz)
+        );
+    }
+
+    public Vector3f positiveX() {
+        float xz = x * z, yw = y * w;
+        return new Vector3f(Math.fma(-2.0f, y * y + z * z, 1.0f), Math.fma(2.0f, x * y + z * w, 0.0f), Math.fma(2.0f, xz - yw, 0.0f));
+    }
+
+    public Vector3f positiveY() {
+        return new Vector3f(Math.fma(2.0f, x * y - z * w, 0.0f), Math.fma(-2.0f, x * x + z * z, 1.0f), Math.fma(2.0f, y * z + x * w, 0.0f));
+    }
+
+    public Vector3f positiveZ() {
+        return new Vector3f(Math.fma(2.0f, x * z + y * w, 0.0f), Math.fma(2.0f, y * z - x * w, 0.0f), Math.fma(-2.0f, x * x + y * y, 1.0f));
+    }
+
     public Vector3f getEulerAnglesXYZ() {
         float m00 = Math.fma(2.0f, -y*y - z*z, 1.0f);
         float m10 = Math.fma(2.0f, x*y + z*w, 0.0f);
@@ -152,5 +270,291 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
             zAngle = 0.0f;
         }
         return new Vector3f(xAngle, yAngle, zAngle);
+    }
+
+    public Quaternionf() {
+        this(0.0f, 0.0f, 0.0f, 1.0f);
+    }
+
+    public Quaternionf(Quaternionf q) {
+        this(q.x, q.y, q.z, q.w);
+    }
+
+    public Quaternionf(float[] values) {
+        this(values[0], values[1], values[2], values[3]);
+    }
+
+    public Quaternionf(Vector3f axis, float angle) {
+        this(fromAxisAngle(axis, angle));
+    }
+
+    public Quaternionf(AxisAngle4f axisAngle) {
+        this(axisAngle.x(), axisAngle.y(), axisAngle.z(), axisAngle.angle());
+    }
+
+    public Quaternionf(Matrix3f m) {
+        this(fromMatrix3(m));
+    }
+
+    public Quaternionf(Matrix4f m) {
+        this(fromMatrix3(new Matrix3f(new float[] {
+            m.m00(), m.m01(), m.m02(),
+            m.m10(), m.m11(), m.m12(),
+            m.m20(), m.m21(), m.m22()
+        })));
+    }
+
+    public Quaternionf add(Quaternionf q) {
+        return new Quaternionf(x + q.x, y + q.y, z + q.z, w + q.w);
+    }
+
+    public Quaternionf sub(Quaternionf q) {
+        return new Quaternionf(x - q.x, y - q.y, z - q.z, w - q.w);
+    }
+
+    public Quaternionf mul(float scalar) {
+        return new Quaternionf(x * scalar, y * scalar, z * scalar, w * scalar);
+    }
+
+    public Quaternionf div(Quaternionf q) {
+        return mul(q.invert());
+    }
+
+    public Quaternionf premul(Quaternionf q) {
+        return q.mul(this);
+    }
+
+    public Quaternionf negate() {
+        return new Quaternionf(-x, -y, -z, -w);
+    }
+
+    public float angle(Quaternionf q) {
+        float cosHalfAngle = Math.abs(dot(q)) / (length() * q.length());
+        return 2.0f * (float) Math.acos(Math.min(1.0f, cosHalfAngle));
+    }
+
+    public Quaternionf log() {
+        float vLen = (float) Math.sqrt(x * x + y * y + z * z);
+        float len = length();
+        if (vLen < 1e-6f) {
+            return new Quaternionf(0.0f, 0.0f, 0.0f, (float) Math.log(len));
+        }
+        float a = (float) Math.acos(Math.min(1.0f, Math.max(-1.0f, w / len)));
+        float inv = a / vLen;
+        return new Quaternionf(x * inv, y * inv, z * inv, (float) Math.log(len));
+    }
+
+    public Quaternionf exp() {
+        float vLen = (float) Math.sqrt(x * x + y * y + z * z);
+        float e = (float) Math.exp(w);
+        if (vLen < 1e-6f) {
+            return new Quaternionf(0.0f, 0.0f, 0.0f, e);
+        }
+        float s = e * (float) Math.sin(vLen) / vLen;
+        return new Quaternionf(x * s, y * s, z * s, e * (float) Math.cos(vLen));
+    }
+
+    public Quaternionf pow(float exponent) {
+        return log().mul(exponent).exp();
+    }
+
+    public Quaternionf pow(Quaternionf exponent) {
+        return exponent.mul(log()).exp();
+    }
+
+    public Quaternionf sqrt() {
+        return pow(0.5f);
+    }
+
+    public Quaternionf lerp(Quaternionf target, float t) {
+        return new Quaternionf(
+            Math.fma(1.0f - t, x, t * target.x),
+            Math.fma(1.0f - t, y, t * target.y),
+            Math.fma(1.0f - t, z, t * target.z),
+            Math.fma(1.0f - t, w, t * target.w)
+        );
+    }
+
+    public Vector3f transform(float x, float y, float z) {
+        return transform(new Vector3f(x, y, z));
+    }
+
+    public Vector3f positiveX(Vector3f dest) {
+        return positiveX();
+    }
+
+    public Vector3f positiveY(Vector3f dest) {
+        return positiveY();
+    }
+
+    public Vector3f positiveZ(Vector3f dest) {
+        return positiveZ();
+    }
+
+    public static Quaternionf fromAxisAngle(float axisX, float axisY, float axisZ, float angle) {
+        return fromAxisAngle(new Vector3f(axisX, axisY, axisZ), angle);
+    }
+
+    public static Quaternionf fromAxisAngleDeg(Vector3f axis, float angleDeg) {
+        return fromAxisAngle(axis, angleDeg * (float) Math.PI / 180.0f);
+    }
+
+    public static Quaternionf fromAxisAngleDeg(float axisX, float axisY, float axisZ, float angleDeg) {
+        return fromAxisAngleDeg(new Vector3f(axisX, axisY, axisZ), angleDeg);
+    }
+
+    public static Quaternionf fromEulerAnglesZYX(float angleZ, float angleY, float angleX) {
+        float sx = (float) Math.sin(angleX * 0.5f);
+        float cx = (float) Math.cos(angleX * 0.5f);
+        float sy = (float) Math.sin(angleY * 0.5f);
+        float cy = (float) Math.cos(angleY * 0.5f);
+        float sz = (float) Math.sin(angleZ * 0.5f);
+        float cz = (float) Math.cos(angleZ * 0.5f);
+        return new Quaternionf(
+            Math.fma(sx, cy * cz, cx * sy * sz),
+            Math.fma(cx, sy * cz, -sx * cy * sz),
+            Math.fma(cx, cy * sz, sx * sy * cz),
+            Math.fma(cx, cy * cz, -sx * sy * sz)
+        );
+    }
+
+    public static Quaternionf fromEulerAnglesYXZ(float angleY, float angleX, float angleZ) {
+        float sx = (float) Math.sin(angleX * 0.5f);
+        float cx = (float) Math.cos(angleX * 0.5f);
+        float sy = (float) Math.sin(angleY * 0.5f);
+        float cy = (float) Math.cos(angleY * 0.5f);
+        float sz = (float) Math.sin(angleZ * 0.5f);
+        float cz = (float) Math.cos(angleZ * 0.5f);
+        return new Quaternionf(
+            Math.fma(cz, sx * cy, sz * cx * sy),
+            Math.fma(cz, cx * sy, sz * cx * cy),
+            -sx * sy * sz,
+            Math.fma(cz, cx * cy, -sz * cx * sy)
+        );
+    }
+
+    public static Quaternionf fromAngleAxis(float angle, Vector3f axis) {
+        return fromAxisAngle(axis, angle);
+    }
+
+    public static Quaternionf rotationTo(Vector3f from, Vector3f to) {
+        return rotateTo(from, to);
+    }
+
+    public static Quaternionf lookAt(Vector3f dir, Vector3f up) {
+        Vector3f forward = dir.normalize();
+        Vector3f right = up.normalize().cross(forward).normalize();
+        Vector3f newUp = forward.cross(right);
+        Matrix3f m = new Matrix3f();
+        m.m00 = right.x(); m.m01 = newUp.x(); m.m02 = forward.x();
+        m.m10 = right.y(); m.m11 = newUp.y(); m.m12 = forward.y();
+        m.m20 = right.z(); m.m21 = newUp.z(); m.m22 = forward.z();
+        return new Quaternionf(m);
+    }
+
+    public static Quaternionf lookAt(float dirX, float dirY, float dirZ, float upX, float upY, float upZ) {
+        return lookAt(new Vector3f(dirX, dirY, dirZ), new Vector3f(upX, upY, upZ));
+    }
+
+    public AxisAngle4f toAxisAngle() {
+        return new AxisAngle4f(this);
+    }
+
+    public float[] get(float[] dest) {
+        dest[0] = x;
+        dest[1] = y;
+        dest[2] = z;
+        dest[3] = w;
+        return dest;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ", " + z + ", " + w + ")";
+    }
+
+    public boolean equals(Quaternionf other, float delta) {
+        return Math.abs(x - other.x) <= delta &&
+               Math.abs(y - other.y) <= delta &&
+               Math.abs(z - other.z) <= delta &&
+               Math.abs(w - other.w) <= delta;
+    }
+
+    public boolean isFinite() {
+        return Float.isFinite(x) && Float.isFinite(y) && Float.isFinite(z) && Float.isFinite(w);
+    }
+
+    public static Quaternionf spline(Quaternionf q0, Quaternionf q1, Quaternionf q2, Quaternionf q3, float t) {
+        return squad(q0, q1, q2, q3, t);
+    }
+
+    public static Quaternionf squad(Quaternionf q0, Quaternionf q1, Quaternionf q2, Quaternionf q3, float t) {
+        return q0.squad(q1, q2, q3, t);
+    }
+
+    public static Quaternionf squadInner(Quaternionf q0, Quaternionf q1, Quaternionf q2) {
+        Quaternionf inv = q1.invert();
+        return q1.mul(inv.mul(q2).log().add(inv.mul(q0).log()).mul(-0.25f).exp());
+    }
+
+    public static Quaternionf nlerp(Quaternionf[] path, float t) {
+        int len = path.length;
+        if (len == 0) return IDENTITY;
+        if (len == 1) return path[0];
+        float step = 1.0f / (len - 1);
+        int index = (int) Math.floor(t / step);
+        float local = (t - index * step) / step;
+        index = Math.min(index, len - 2);
+        return path[index].nlerp(path[index + 1], local);
+    }
+
+    public void write(MemorySegment segment, long offset) {
+        segment.set(ValueLayout.JAVA_FLOAT, offset, x);
+        segment.set(ValueLayout.JAVA_FLOAT, offset + 4, y);
+        segment.set(ValueLayout.JAVA_FLOAT, offset + 8, z);
+        segment.set(ValueLayout.JAVA_FLOAT, offset + 12, w);
+    }
+
+    public static Quaternionf read(MemorySegment segment, long offset) {
+        return new Quaternionf(
+            segment.get(ValueLayout.JAVA_FLOAT, offset),
+            segment.get(ValueLayout.JAVA_FLOAT, offset + 4),
+            segment.get(ValueLayout.JAVA_FLOAT, offset + 8),
+            segment.get(ValueLayout.JAVA_FLOAT, offset + 12)
+        );
+    }
+
+    private static Quaternionf fromMatrix3(Matrix3f m) {
+        float m00 = m.m00(), m01 = m.m01(), m02 = m.m02();
+        float m10 = m.m10(), m11 = m.m11(), m12 = m.m12();
+        float m20 = m.m20(), m21 = m.m21(), m22 = m.m22();
+        float t = m00 + m11 + m22;
+        float x, y, z, w;
+        if (t > 0.0f) {
+            float s = (float) Math.sqrt(t + 1.0f) * 2.0f;
+            w = s * 0.25f;
+            x = (m21 - m12) / s;
+            y = (m02 - m20) / s;
+            z = (m10 - m01) / s;
+        } else if (m00 > m11 && m00 > m22) {
+            float s = (float) Math.sqrt(1.0f + m00 - m11 - m22) * 2.0f;
+            w = (m21 - m12) / s;
+            x = s * 0.25f;
+            y = (m01 + m10) / s;
+            z = (m02 + m20) / s;
+        } else if (m11 > m22) {
+            float s = (float) Math.sqrt(1.0f + m11 - m00 - m22) * 2.0f;
+            w = (m02 - m20) / s;
+            x = (m01 + m10) / s;
+            y = s * 0.25f;
+            z = (m12 + m21) / s;
+        } else {
+            float s = (float) Math.sqrt(1.0f + m22 - m00 - m11) * 2.0f;
+            w = (m10 - m01) / s;
+            x = (m02 + m20) / s;
+            y = (m12 + m21) / s;
+            z = s * 0.25f;
+        }
+        return new Quaternionf(x, y, z, w);
     }
 }

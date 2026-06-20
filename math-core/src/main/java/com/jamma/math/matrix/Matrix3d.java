@@ -10,15 +10,15 @@ public class Matrix3d implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private double m00;
-    private double m01;
-    private double m02;
-    private double m10;
-    private double m11;
-    private double m12;
-    private double m20;
-    private double m21;
-    private double m22;
+    public double m00;
+    public double m01;
+    public double m02;
+    public double m10;
+    public double m11;
+    public double m12;
+    public double m20;
+    public double m21;
+    public double m22;
 
     public Matrix3d() {
         identity();
@@ -255,14 +255,7 @@ public class Matrix3d implements Serializable {
         );
     }
 
-    public Vector3D transform(Vector3D v, Vector3D dest) {
-        dest = new Vector3D(
-            Math.fma(m00, v.x(), Math.fma(m10, v.y(), m20 * v.z())),
-            Math.fma(m01, v.x(), Math.fma(m11, v.y(), m21 * v.z())),
-            Math.fma(m02, v.x(), Math.fma(m12, v.y(), m22 * v.z()))
-        );
-        return dest;
-    }
+
 
     public double m00() { return m00; }
     public double m01() { return m01; }
@@ -284,6 +277,25 @@ public class Matrix3d implements Serializable {
     public Matrix3d m21(double m21) { this.m21 = m21; return this; }
     public Matrix3d m22(double m22) { this.m22 = m22; return this; }
 
+    public double get(int col, int row) {
+        return switch (row * 3 + col) {
+            case 0 -> m00; case 1 -> m01; case 2 -> m02;
+            case 3 -> m10; case 4 -> m11; case 5 -> m12;
+            case 6 -> m20; case 7 -> m21; case 8 -> m22;
+            default -> throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        };
+    }
+
+    public Matrix3d set(int col, int row, double value) {
+        switch (row * 3 + col) {
+            case 0: m00 = value; break; case 1: m01 = value; break; case 2: m02 = value; break;
+            case 3: m10 = value; break; case 4: m11 = value; break; case 5: m12 = value; break;
+            case 6: m20 = value; break; case 7: m21 = value; break; case 8: m22 = value; break;
+            default: throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        }
+        return this;
+    }
+
     public double[] get(double[] dest, int offset) {
         dest[offset]     = m00;
         dest[offset + 1] = m01;
@@ -301,24 +313,22 @@ public class Matrix3d implements Serializable {
         return get(dest, 0);
     }
 
-    public Vector3D row(int index, Vector3D dest) {
-        switch (index) {
-            case 0: dest = new Vector3D(m00, m10, m20); break;
-            case 1: dest = new Vector3D(m01, m11, m21); break;
-            case 2: dest = new Vector3D(m02, m12, m22); break;
-            default: throw new IndexOutOfBoundsException("Row index: " + index);
-        }
-        return dest;
+    public Vector3D row(int index) {
+        return switch (index) {
+            case 0 -> new Vector3D(m00, m10, m20);
+            case 1 -> new Vector3D(m01, m11, m21);
+            case 2 -> new Vector3D(m02, m12, m22);
+            default -> throw new IndexOutOfBoundsException("Row index: " + index);
+        };
     }
 
-    public Vector3D col(int index, Vector3D dest) {
-        switch (index) {
-            case 0: dest = new Vector3D(m00, m01, m02); break;
-            case 1: dest = new Vector3D(m10, m11, m12); break;
-            case 2: dest = new Vector3D(m20, m21, m22); break;
-            default: throw new IndexOutOfBoundsException("Column index: " + index);
-        }
-        return dest;
+    public Vector3D col(int index) {
+        return switch (index) {
+            case 0 -> new Vector3D(m00, m01, m02);
+            case 1 -> new Vector3D(m10, m11, m12);
+            case 2 -> new Vector3D(m20, m21, m22);
+            default -> throw new IndexOutOfBoundsException("Column index: " + index);
+        };
     }
 
     public Matrix4d get(Matrix4d dest) {

@@ -216,13 +216,13 @@ class Matrix4dTest {
     }
 
     @Test void row() {
-        assertEquals(1.0, new Matrix4d().row(0, null).x(), 1e-12);
-        assertEquals(0.0, new Matrix4d().row(1, null).x(), 1e-12);
+        assertEquals(1.0, new Matrix4d().row(0).x(), 1e-12);
+        assertEquals(0.0, new Matrix4d().row(1).x(), 1e-12);
     }
 
     @Test void column() {
-        assertEquals(1.0, new Matrix4d().column(0, null).x(), 1e-12);
-        assertEquals(0.0, new Matrix4d().column(1, null).x(), 1e-12);
+        assertEquals(1.0, new Matrix4d().column(0).x(), 1e-12);
+        assertEquals(0.0, new Matrix4d().column(1).x(), 1e-12);
     }
 
     @Test void hashCode_eq() {
@@ -320,13 +320,13 @@ class Matrix4dTest {
     @Test void getTranslation_setTranslation() {
         Matrix4d m = new Matrix4d().setTranslation(3, 4, 5);
         assertEquals(3.0, m.m30, 1e-12); assertEquals(4.0, m.m31, 1e-12); assertEquals(5.0, m.m32, 1e-12);
-        assertEquals(3.0, m.getTranslation(new Vector3D(0, 0, 0)).x(), 1e-12);
-        assertEquals(4.0, m.getTranslation(new Vector3D(0, 0, 0)).y(), 1e-12);
-        assertEquals(5.0, m.getTranslation(new Vector3D(0, 0, 0)).z(), 1e-12);
+        assertEquals(3.0, m.getTranslation().x(), 1e-12);
+        assertEquals(4.0, m.getTranslation().y(), 1e-12);
+        assertEquals(5.0, m.getTranslation().z(), 1e-12);
     }
 
     @Test void getScale() {
-        Vector3D s = new Matrix4d().scale(2, 3, 4).getScale(new Vector3D(0, 0, 0));
+        Vector3D s = new Matrix4d().scale(2, 3, 4).getScale();
         assertEquals(2.0, s.x(), 1e-12); assertEquals(3.0, s.y(), 1e-12); assertEquals(4.0, s.z(), 1e-12);
     }
 

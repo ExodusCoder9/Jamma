@@ -9,10 +9,10 @@ public class Matrix2d implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private double m00;
-    private double m01;
-    private double m10;
-    private double m11;
+    public double m00;
+    public double m01;
+    public double m10;
+    public double m11;
 
     public Matrix2d() {
         identity();
@@ -137,13 +137,7 @@ public class Matrix2d implements Serializable {
         );
     }
 
-    public Vector2D transform(Vector2D v, Vector2D dest) {
-        dest = new Vector2D(
-            m00 * v.x() + m10 * v.y(),
-            m01 * v.x() + m11 * v.y()
-        );
-        return dest;
-    }
+
 
     public double m00() { return m00; }
     public double m01() { return m01; }
@@ -154,6 +148,23 @@ public class Matrix2d implements Serializable {
     public Matrix2d m01(double m01) { this.m01 = m01; return this; }
     public Matrix2d m10(double m10) { this.m10 = m10; return this; }
     public Matrix2d m11(double m11) { this.m11 = m11; return this; }
+
+    public double get(int col, int row) {
+        return switch (row * 2 + col) {
+            case 0 -> m00; case 1 -> m01;
+            case 2 -> m10; case 3 -> m11;
+            default -> throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        };
+    }
+
+    public Matrix2d set(int col, int row, double value) {
+        switch (row * 2 + col) {
+            case 0: m00 = value; break; case 1: m01 = value; break;
+            case 2: m10 = value; break; case 3: m11 = value; break;
+            default: throw new IndexOutOfBoundsException("(" + col + ", " + row + ")");
+        }
+        return this;
+    }
 
     public double[] get(double[] dest, int offset) {
         dest[offset]     = m00;
