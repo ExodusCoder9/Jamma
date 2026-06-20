@@ -2,9 +2,12 @@ package com.jamma.math.matrix;
 
 import com.jamma.math.Vector2D;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Matrix2d {
+public class Matrix2d implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private double m00;
     private double m01;

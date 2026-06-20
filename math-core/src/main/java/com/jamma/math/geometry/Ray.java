@@ -2,8 +2,11 @@ package com.jamma.math.geometry;
 
 import com.jamma.math.Vector3D;
 import com.jamma.math.matrix.Matrix4d;
+import java.io.Serializable;
 
-public class Ray {
+public class Ray implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     public Vector3D origin;
     public Vector3D direction;
 

@@ -1,8 +1,6 @@
 package com.jamma.math.matrix;
 
-import com.jamma.math.Vector3D;
 import com.jamma.math.Vector4D;
-import com.jamma.math.Vector3f;
 import com.jamma.math.Vector4f;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

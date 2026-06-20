@@ -1,11 +1,14 @@
 package com.jamma.math.matrix;
 
 import com.jamma.math.Vector3D;
+import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
-public class Matrix3d {
+public class Matrix3d implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private double m00;
     private double m01;

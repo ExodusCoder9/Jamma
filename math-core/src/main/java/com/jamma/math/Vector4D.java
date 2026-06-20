@@ -1,9 +1,12 @@
 package com.jamma.math;
 
+import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-public record Vector4D(double x, double y, double z, double w) {
+public record Vector4D(double x, double y, double z, double w) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     public static Vector4D fromMemorySegment(MemorySegment src, long byteOffset) {
         return new Vector4D(
             src.get(ValueLayout.JAVA_DOUBLE, byteOffset),

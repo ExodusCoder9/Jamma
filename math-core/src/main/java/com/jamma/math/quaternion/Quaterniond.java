@@ -1,8 +1,54 @@
 package com.jamma.math.quaternion;
 
 import com.jamma.math.Vector3D;
+import java.io.Serializable;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.DoubleBuffer;
 
-public record Quaterniond(double x, double y, double z, double w) {
+public record Quaterniond(double x, double y, double z, double w) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public static Quaterniond fromMemorySegment(MemorySegment src, long byteOffset) {
+        return new Quaterniond(
+            src.get(ValueLayout.JAVA_DOUBLE, byteOffset),
+            src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 8),
+            src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 16),
+            src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 24)
+        );
+    }
+
+    public void writeToMemorySegment(MemorySegment dest, long byteOffset) {
+        dest.set(ValueLayout.JAVA_DOUBLE, byteOffset, x);
+        dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 8, y);
+        dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 16, z);
+        dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 24, w);
+    }
+
+    public static Quaterniond fromBuffer(DoubleBuffer src) {
+        return new Quaterniond(src.get(), src.get(), src.get(), src.get());
+    }
+
+    public static Quaterniond fromBuffer(int index, DoubleBuffer src) {
+        return new Quaterniond(src.get(index), src.get(index + 1), src.get(index + 2), src.get(index + 3));
+    }
+
+    public DoubleBuffer writeToBuffer(DoubleBuffer dest) {
+        dest.put(x);
+        dest.put(y);
+        dest.put(z);
+        dest.put(w);
+        return dest;
+    }
+
+    public DoubleBuffer writeToBuffer(int index, DoubleBuffer dest) {
+        dest.put(index, x);
+        dest.put(index + 1, y);
+        dest.put(index + 2, z);
+        dest.put(index + 3, w);
+        return dest;
+    }
 
     public static final Quaterniond IDENTITY = new Quaterniond(0.0, 0.0, 0.0, 1.0);
 

@@ -1,12 +1,15 @@
 package com.jamma.math.matrix;
 
 import com.jamma.math.Vector3f;
+import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.FloatBuffer;
 import java.util.Objects;
 
-public class Matrix3f {
+public class Matrix3f implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private float m00;
     private float m01;

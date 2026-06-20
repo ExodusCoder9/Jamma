@@ -1,10 +1,13 @@
 package com.jamma.math;
 
+import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.FloatBuffer;
 
-public record Vector4f(float x, float y, float z, float w) {
+public record Vector4f(float x, float y, float z, float w) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static Vector4f fromMemorySegment(MemorySegment src, long byteOffset) {
         return new Vector4f(

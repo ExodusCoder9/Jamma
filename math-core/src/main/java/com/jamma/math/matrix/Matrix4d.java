@@ -3,10 +3,13 @@ package com.jamma.math.matrix;
 import com.jamma.math.Vector3D;
 import com.jamma.math.Vector4D;
 import com.jamma.math.quaternion.Quaterniond;
+import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
-public class Matrix4d {
+public class Matrix4d implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public double m00, m01, m02, m03;
     public double m10, m11, m12, m13;

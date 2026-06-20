@@ -2,8 +2,11 @@ package com.jamma.math.geometry;
 
 import com.jamma.math.Vector3D;
 import com.jamma.math.matrix.Matrix4d;
+import java.io.Serializable;
 
-public class AABB {
+public class AABB implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     public double minX, minY, minZ, maxX, maxY, maxZ;
 
     public AABB() {

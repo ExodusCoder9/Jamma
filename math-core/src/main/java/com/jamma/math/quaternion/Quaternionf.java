@@ -1,8 +1,54 @@
 package com.jamma.math.quaternion;
 
 import com.jamma.math.Vector3f;
+import java.io.Serializable;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.nio.FloatBuffer;
 
-public record Quaternionf(float x, float y, float z, float w) {
+public record Quaternionf(float x, float y, float z, float w) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public static Quaternionf fromMemorySegment(MemorySegment src, long byteOffset) {
+        return new Quaternionf(
+            src.get(ValueLayout.JAVA_FLOAT, byteOffset),
+            src.get(ValueLayout.JAVA_FLOAT, byteOffset + 4),
+            src.get(ValueLayout.JAVA_FLOAT, byteOffset + 8),
+            src.get(ValueLayout.JAVA_FLOAT, byteOffset + 12)
+        );
+    }
+
+    public void writeToMemorySegment(MemorySegment dest, long byteOffset) {
+        dest.set(ValueLayout.JAVA_FLOAT, byteOffset, x);
+        dest.set(ValueLayout.JAVA_FLOAT, byteOffset + 4, y);
+        dest.set(ValueLayout.JAVA_FLOAT, byteOffset + 8, z);
+        dest.set(ValueLayout.JAVA_FLOAT, byteOffset + 12, w);
+    }
+
+    public static Quaternionf fromBuffer(FloatBuffer src) {
+        return new Quaternionf(src.get(), src.get(), src.get(), src.get());
+    }
+
+    public static Quaternionf fromBuffer(int index, FloatBuffer src) {
+        return new Quaternionf(src.get(index), src.get(index + 1), src.get(index + 2), src.get(index + 3));
+    }
+
+    public FloatBuffer writeToBuffer(FloatBuffer dest) {
+        dest.put(x);
+        dest.put(y);
+        dest.put(z);
+        dest.put(w);
+        return dest;
+    }
+
+    public FloatBuffer writeToBuffer(int index, FloatBuffer dest) {
+        dest.put(index, x);
+        dest.put(index + 1, y);
+        dest.put(index + 2, z);
+        dest.put(index + 3, w);
+        return dest;
+    }
 
     public static final Quaternionf IDENTITY = new Quaternionf(0.0f, 0.0f, 0.0f, 1.0f);
 
