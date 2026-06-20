@@ -1,5 +1,6 @@
 package com.jamma.math;
 
+import com.jamma.math.matrix.Matrix2f;
 import com.jamma.math.matrix.Matrix3f;
 import com.jamma.math.matrix.Matrix4f;
 import com.jamma.math.quaternion.Quaternionf;
@@ -11,6 +12,25 @@ import java.nio.FloatBuffer;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FloatApiTest {
+
+    @Test
+    public void testMatrix2f() {
+        Matrix2f m = new Matrix2f();
+        m.m00(1.0f).m01(2.0f).m10(3.0f).m11(4.0f);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segment = arena.allocate(16);
+            m.get(segment, 0);
+            Matrix2f restored = new Matrix2f().set(segment, 0);
+            assertEquals(m, restored);
+        }
+
+        FloatBuffer buffer = FloatBuffer.allocate(4);
+        m.writeToBuffer(buffer);
+        buffer.flip();
+        Matrix2f restoredBuf = Matrix2f.fromBuffer(buffer);
+        assertEquals(m, restoredBuf);
+    }
 
     @Test
     public void testVector2f() {

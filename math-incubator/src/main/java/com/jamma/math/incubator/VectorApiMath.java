@@ -45,10 +45,16 @@ public final class VectorApiMath {
     }
 
     public static void batchAdd(Vector4D[] results, Vector4D[] a, Vector4D[] b) {
+        double[] arrayA = new double[4];
+        double[] arrayB = new double[4];
         for (int i = 0; i < a.length; i++) {
-            DoubleVector va = DoubleVector.fromArray(SPECIES, new double[]{a[i].x(), a[i].y(), a[i].z(), a[i].w()}, 0);
-            DoubleVector vb = DoubleVector.fromArray(SPECIES, new double[]{b[i].x(), b[i].y(), b[i].z(), b[i].w()}, 0);
-            DoubleVector vr = va.add(vb);
+            Vector4D va = a[i];
+            Vector4D vb = b[i];
+            arrayA[0] = va.x(); arrayA[1] = va.y(); arrayA[2] = va.z(); arrayA[3] = va.w();
+            arrayB[0] = vb.x(); arrayB[1] = vb.y(); arrayB[2] = vb.z(); arrayB[3] = vb.w();
+            DoubleVector vecA = DoubleVector.fromArray(SPECIES, arrayA, 0);
+            DoubleVector vecB = DoubleVector.fromArray(SPECIES, arrayB, 0);
+            DoubleVector vr = vecA.add(vecB);
             results[i] = new Vector4D(vr.lane(0), vr.lane(1), vr.lane(2), vr.lane(3));
         }
     }
