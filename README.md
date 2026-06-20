@@ -1,0 +1,706 @@
+# Jamma Math Library
+
+> A modern, immutable-first Java math library for graphics, simulation, and game development. Designed as a ground-up replacement for JOML with Java records, Foreign Function & Memory API support, SIMD acceleration, and a vastly broader mathematical scope.
+
+## Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| **Java** | 26+ (for `--enable-preview` and `jdk.incubator.vector`) |
+| **Math Core** | Java 26+ |
+| **Math Incubator** | Java 26+ with `--add-modules jdk.incubator.vector --enable-preview` |
+| **Build** | Gradle 8.x+ (included wrapper) |
+
+---
+
+## Table of Contents
+
+- [Core Design Philosophy](#core-design-philosophy)
+- [Modules](#modules)
+- [Vector Types](#vector-types)
+- [Matrix Types](#matrix-types)
+- [Quaternion Types](#quaternion-types)
+- [Axis-Angle](#axis-angle)
+- [Dual Numbers](#dual-numbers)
+- [Scalar Math](#scalar-math)
+- [Interpolation / Easing](#interpolation--easing)
+- [Geometry Types](#geometry-types)
+- [Intersection Tests](#intersection-tests)
+- [Frustum Culling](#frustum-culling)
+- [Geometry Utilities](#geometry-utilities)
+- [Frustum Ray Builder](#frustum-ray-builder)
+- [Math Utility Facade](#math-utility-facade)
+- [Incubator: SIMD Vector API](#incubator-simd-vector-api)
+- [Incubator: Parallel Operations](#incubator-parallel-operations)
+- [Incubator: Off-Heap Memory](#incubator-off-heap-memory)
+- [Memory & Buffer I/O](#memory--buffer-io)
+- [JOML Comparison](#joml-comparison)
+- [Why Not JOML?](#why-not-joml)
+
+---
+
+## Core Design Philosophy
+
+### Immutability by Default
+Vectors, quaternions, dual numbers, axis-angle, planes, and spheres are **Java records** — fully immutable, with correct `equals`/`hashCode` out of the box. This eliminates entire categories of bugs:
+
+- No defensive copies needed
+- Thread-safe without synchronization
+- Safe to use as map keys or in sets
+- Predictable, side-effect-free chaining: `v1.add(v2).normalize().scale(2.0)`
+
+### Mutability Where It Matters
+Matrices (`Matrix4d`, `Matrix4f`, etc.), `AABB`, `Ray`, and `FrustumIntersection` are **mutable classes** with fluent `return this` setters. Matrix operations are the performance-critical path where mutation avoids allocation, and matrices are rarely shared across threads.
+
+### `Math.fma` Everywhere
+All dot products, lerps, and matrix multiply accumulations use `Math.fma` (fused multiply-add) for higher precision and (where available) hardware acceleration.
+
+### Modern Java
+- `java.lang.foreign.MemorySegment` for off-heap memory I/O
+- `java.lang.foreign.ValueLayout` for typed memory access
+- `jdk.incubator.vector.DoubleVector` for SIMD
+- `StructuredTaskScope` for parallel decomposition
+- JPMS `module-info.java` for proper encapsulation
+
+---
+
+## Modules
+
+### `math-core`
+The main library. No dependencies beyond the JDK. All production types: vectors, matrices, quaternions, dual numbers, geometry, intersection tests, scalar math, interpolation.
+
+### `math-incubator`
+Experimental features requiring `--add-modules jdk.incubator.vector` and `--enable-preview`. SIMD-accelerated vector ops, parallel batch processing, and off-heap memory management.
+
+---
+
+## Vector Types
+
+### Precision Variants
+
+Each vector type exists in three precision variants:
+
+| 2D | 3D | 4D | Precision |
+|----|----|----|-----------|
+| `Vector2d` | `Vector3d` | `Vector4d` | `double` |
+| `Vector2f` | `Vector3f` | `Vector4f` | `float` |
+| `Vector2i` | `Vector3i` | `Vector4i` | `int` |
+
+### Common Operations (all vector types)
+
+**Arithmetic**
+- `add(v)`, `add(x, y, ...)`, `sub(v)`, `sub(x, y, ...)`
+- `mul(v)`, `mul(s)`, `mul(x, y, ...)`, `div(v)`, `div(s)`, `div(x, y, ...)`
+- `scale(s)`, `negate()`, `abs()`, `sign()`
+
+**Geometry**
+- `dot(v)`, `cross(v)` (2D cross returns scalar; 3D returns vector; 4D has no cross)
+- `length()`, `lengthSquared()`
+- `distance(v)`, `distance(x, y, ...)`, `distanceSquared(v)`, `distanceSquared(x, y, ...)`
+- `normalize()`, `normalize(length)`, `safeNormalize(fallback)`, `setLength(len)`
+
+**Reflection & Projection** (2D/3D vectors)
+- `reflect(normal)`, `refract(normal, eta)`, `project(onto)`, `reject(onto)`
+
+**Rotation** (2D/3D)
+- 2D: `rotate(angle)`, `perpendicular()`
+- 3D: `rotate(axis, angle)`, `angleSigned(v, normal)` (3D only)
+
+**Interpolation**
+- `lerp(other, t)`, `midpoint(other)`
+
+**Component-wise**
+- `min(v)`, `max(v)`, `clamp(min, max)`
+- `ceil()`, `floor()`, `round()` (float/double)
+- `minComponent()`, `maxComponent()`, `minComponentIndex()`, `maxComponentIndex()`
+- `fma(a, b)`, `fma(scalar, b)`
+
+**Vector-specific**
+- 2D: `angle(v)`, `angleSigned(v)`, `halfway(v)`, `rotate(angle)`, `perpendicular()`, `isPerpendicular(v, eps)`
+- 3D: `angle(v)`
+- 4D: `fromMemorySegment`, `writeToMemorySegment`, `read`, `write`
+
+**Conversion**
+- `toVector2d/3d/4d()`, `toVector2f/3f/4f()`
+- `xy()` (4D→2D), `xyz()` (4D→3D)
+- `toArray(dest)`, `get(double[])`
+
+**Buffer / Memory I/O**
+- `fromBuffer(Buffer)`, `fromBuffer(index, Buffer)`, `writeToBuffer(Buffer)`, `writeToBuffer(index, Buffer)`
+- `fromMemorySegment(MemorySegment, offset)`, `writeToMemorySegment(MemorySegment, offset)`
+- Aliases: `read(MemorySegment, offset)`, `write(MemorySegment, offset)`
+
+**Predicates**
+- `isFinite()`, `isNaN()`, `equals(v, delta)`
+
+---
+
+## Matrix Types
+
+### Variants
+
+| Type | Size | Precision | Mutable |
+|------|------|-----------|---------|
+| `Matrix2d` | 2×2 | `double` | Yes |
+| `Matrix2f` | 2×2 | `float` | Yes |
+| `Matrix3d` | 3×3 | `double` | Yes |
+| `Matrix3f` | 3×3 | `float` | Yes |
+| `Matrix4d` | 4×4 | `double` | Yes |
+| `Matrix4f` | 4×4 | `float` | Yes |
+| `Matrix4x3d` | 4×3 | `double` | Yes (affine) |
+| `Matrix4x3f` | 4×3 | `float` | Yes (affine) |
+
+### Common Operations (all matrix types)
+
+**Constructors**
+- Default (identity), copy, from array, from components, from smaller/larger matrix
+
+**Arithmetic**
+- `add(m)`, `sub(m)`, `mul(m)`, `mul(s)`, `mulComponentWise(m)`
+- `lerp(other, t)`
+
+**Properties**
+- `determinant()`, `trace()`
+- `isIdentity()`, `isIdentity(epsilon)`, `isFinite()`, `isAffine()` (4×4)
+
+**Transformations**
+- `identity()`, `zero()`
+- `scale(x, y, z)`, `scale(v)`, `scale(s)`
+- `translate(x, y, z)`, `translate(v)` (4×4, 4×3)
+
+**Rotation** (3×3, 4×4, 4×3)
+- `rotate(angle, axisX, axisY, axisZ)`, `rotate(q)`
+- `rotateX(angle)`, `rotateY(angle)`, `rotateZ(angle)`
+- `rotateXYZ(angleX, angleY, angleZ)`, `rotateZYX(angleZ, angleY, angleX)`
+- `rotateLocalX/Y/Z(angle)` (4×4 only)
+- Static: `rotationX/Y/Z(angle)`, `scaling(x, y, z)`, `translation(x, y, z)`
+
+**Inverse / Transpose**
+- `invert()`, `invertAffine()` (4×4 only)
+- `transpose()`, `transpose3x3()` (4×4 only)
+- `adjugate()`, `normal()` (4×4 only)
+
+**Transform Vectors**
+- `transform(v)` (full 4-component)
+- `transformPosition(v)` (position, w=1)
+- `transformDirection(v)` (direction, w=0)
+- `transformProject(v)` (projected position, divide by w)
+
+**Projection / View** (4×4, 4×3)
+- `perspective(fovY, aspect, zNear, zFar)`
+- `perspectiveVulkan(fovY, aspect, zNear, zFar)`
+- `ortho(left, right, bottom, top, zNear, zFar)`
+- `orthoVulkan(left, right, bottom, top, zNear, zFar)`
+- `ortho2D(left, right, bottom, top)`
+- `frustum(left, right, bottom, top, zNear, zFar)`
+- `lookAt(eye, center, up)`, `lookAt(eyeX, ...)`
+- `lookAlong(dir, up)`
+
+**Specialized** (4×4)
+- `billboard(objPos, target, up)` — billboard matrix
+- `shadow(light, nx, ny, nz, d)` — shadow matrix
+- `reflection(nx, ny, nz, d)` — reflection matrix
+- `reflect(nx, ny, nz)` — reflect (multiply current)
+
+**Component Access**
+- `get(col, row)`, `set(col, row, value)`
+- `row(index)`, `column(index)`
+- `setRow(row, v)`, `setColumn(col, v)`
+- `m00()` through `m33()` getters (4×4)
+- `m00(v)` through `m33(v)` fluent setters (4×4)
+- `getScale()`, `getTranslation()`, `setTranslation()`
+- `getEulerAnglesZYX()`
+- `positiveX/Y/Z()`, `normalizedPositiveX/Y/Z()`
+- `get(double[], offset)` — bulk copy to array
+
+**Buffer / Memory I/O**
+- `fromBuffer(Buffer)`, `fromBuffer(index, Buffer)`, `writeToBuffer(Buffer)`, `writeToBuffer(index, Buffer)`
+- `get(MemorySegment, offset)` / `set(MemorySegment, offset)` (4×4, 4×3)
+- `read(MemorySegment, offset)` / `write(MemorySegment, offset)` (4×3)
+
+---
+
+## Quaternion Types
+
+### `Quaterniond` / `Quaternionf` — Record (immutable)
+
+**Constructors & Factories**
+- Default (identity), copy, from array, from axis-angle, from `Matrix3d/f`, from `Matrix4d/f`
+- `fromAxisAngle(axis, angle)`, `fromAxisAngleDeg(axis, angleDeg)`
+- `fromEulerAnglesXYZ(xAngle, yAngle, zAngle)`
+- `fromEulerAnglesZYX(zAngle, yAngle, xAngle)`
+- `fromEulerAnglesYXZ(yAngle, xAngle, zAngle)`
+- `rotateTo(from, to)` — rotation aligning two vectors
+- `lookAt(dir, up)` — quaternion look-at
+- `identity()` — static identity constant
+
+**Arithmetic**
+- `add(q)`, `sub(q)`, `mul(q)`, `mul(s)`, `div(q)`
+- `premul(q)` — q * this
+- `negate()`, `conjugate()`, `invert()`
+- `log()`, `exp()`, `pow(exp)`, `sqrt()`
+
+**Properties**
+- `length()`, `lengthSquared()`, `norm()`
+- `normalize()`, `dot(q)`
+- `angle()`, `angle(q)`, `difference(q)`
+
+**Interpolation**
+- `lerp(target, t)` — linear interpolation (no normalization)
+- `nlerp(target, t)` — normalized linear interpolation
+- `slerp(target, t)` — spherical linear interpolation
+- `squad(a, b, q2, t)` — cubic spline interpolation
+- Static: `squad(q0, q1, q2, q3, t)`, `spline(q0, q1, q2, q3, t)`
+- Static: `nlerp(Quaterniond[] path, double t)` — array-based nlerp
+
+**Conversions**
+- `toMatrix()` / `toMatrix4()` — converts to 4×4 matrix
+- `toMatrix3()` — converts to 3×3 matrix
+- `toAxisAngle()` — converts to AxisAngle
+- `getEulerAnglesXYZ()` — extracts Euler angles
+
+**Vector Transform**
+- `transform(v)` — applies rotation to vector
+- `positiveX/Y/Z()` — basis vectors after rotation
+
+**Buffer / Memory I/O**
+- `fromBuffer(Buffer)`, `writeToBuffer(Buffer)`
+- `fromMemorySegment(MemorySegment, offset)`, `writeToMemorySegment(MemorySegment, offset)`
+- `read(MemorySegment, offset)`, `write(MemorySegment, offset)`
+
+**Predicates**
+- `isFinite()`, `equals(q, delta)`
+
+---
+
+## Axis-Angle
+
+### `AxisAngle4d` / `AxisAngle4f` — Record (immutable)
+
+- Fields: `x`, `y`, `z` (axis), `angle` (radians)
+- Constructors: from components, from quaternion
+- `toQuaternion()` — converts to Quaterniond/f
+- `rotate(v)` — rotates a vector
+
+---
+
+## Dual Numbers
+
+### `DualNumberd` / `DualNumberf` — Record (immutable)
+
+For automatic differentiation in one variable. Dual numbers encode a value and its derivative simultaneously.
+
+**Arithmetic**
+- `add(dn)`, `sub(dn)`, `mul(dn)` (uses `Math.fma`), `div(dn)`
+- `negate()`, `conjugate()`
+
+**Functions**
+- `pow(n)` — power via dual expansion
+- `sqrt()` — sqrt via dual expansion
+- `sin()`, `cos()`, `exp()`, `log()` — elementary functions with auto-diff
+
+**Fields**
+- `real()` — the value
+- `dual()` — the derivative
+
+---
+
+## Scalar Math
+
+### `ScalarMath` — Static utility (final, private constructor)
+
+A comprehensive scalar math library with **~80+ methods** across 20+ categories. Far beyond what `Math` or JOML provide.
+
+**Constants** (12)
+- `PI`, `E`, `TAU`, `PHI` (golden ratio), `LN2`, `LN10`, `LOG2E`, `LOG10E`, `SQRT2`, `SQRT3`, `EPSILON`, `FLT_EPSILON`
+
+**Trigonometric** (15)
+- Standard: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`
+- Reciprocal: `sec`, `csc`, `cot`, `asec`, `acsc`, `acot`
+- Historical: `versin`, `coversin`, `haversin`, `exsec`, `excsc`, `vercosin`, `covercosin`, `havercosin`, `hacoversin`, `hacovercosin`
+- Misc: `chord`, `sinc`
+
+**Hyperbolic** (8)
+- `sinh`, `cosh`, `tanh`, `sech`, `csch`, `coth`, `asinh`, `acosh`, `atanh`
+
+**Exponential & Logarithmic** (9)
+- `exp`, `exp2`, `expm1`, `log`, `log10`, `log2`, `log1p`, `logb`, `pow`
+
+**Roots & Powers** (4)
+- `sqrt`, `invSqrt`, `cbrt`, `pow`
+
+**Arithmetic Utilities** (8)
+- `abs` (double, float, int, long), `min`, `max`, `clamp`, `saturate`
+- `mod`, `wrap`, `pingPong`, `sawtooth`, `triangle`, `square`
+- `fma`, `hypot`, `hypot3`
+
+**Rounding** (5)
+- `floor`, `ceil`, `round`, `trunc`, `frac`
+- `roundTo`, `floorTo`, `ceilTo`, `snap`
+
+**Sign / Comparison** (4)
+- `signum`, `copySign`
+- `nextUp`, `nextDown`, `ulp`
+- `isFinite`, `isNaN`, `isInfinite`
+
+**Interpolation** (8)
+- `lerp`, `lerpAngle`, `inverseLerp`, `map`
+- `bilinear`, `smoothstep`, `smootherstep`, `cosineInterpolation`
+
+**Spline Interpolation** (3)
+- `catmullRom`, `hermite`, `bezier`
+
+**Easing / Waves** (4)
+- `step`, `pulse`, `ramp`
+- `pingPong`, `sawtooth`, `triangle`, `square`
+
+**Angle Conversions** (4)
+- `toRadians`, `toDegrees`, `normalizeAngle`, `degrees`, `radians`
+
+**Activation Functions** (10)
+- `gaussian`, `logistic`, `logit`, `softplus`, `relu`, `leakyRelu`
+- `elu`, `gelu`, `softsign`, `swish`, `hardSigmoid`, `selu`
+
+**Special Functions** (5)
+- `erf`, `erfc`, `invErf`, `gamma`, `lgamma`
+- `beta`, `riemannZeta`, `lambertW0`
+- `fresnelC`, `fresnelS`
+
+**Combinatorics** (6)
+- `factorial`, `factorialLong`, `binomial`
+- `permutations`, `stirlingFirstKind`, `stirlingSecondKind`
+
+**Number Theory** (7)
+- `gcd`, `lcm`, `isPrime`, `isCoprime`, `nextPrime`, `totient`, `radical`
+
+**Bit Operations** (4)
+- `isPowerOfTwo`, `nextPowerOfTwo`, `prevPowerOfTwo`, `roundUpToPowerOfTwo`
+
+**Integer Sequences** (3)
+- `fibonacci`, `lucas`, `catalan`, `bellNumber`
+
+**Statistics** (20)
+- `sum`, `product`, `mean`, `median`, `percentile`
+- `geometricMean`, `harmonicMean`, `quadraticMean`, `weightedMean`, `trimmedMean`
+- `variance`, `populationVariance`, `stddev`, `populationStddev`
+- `skewness`, `kurtosis`, `mode`, `standardError`, `zScore`
+- `entropy`, `movingAverage`, `exponentialMovingAverage`, `normalizeData`, `standardize`
+- `covariance`, `correlation`
+- `arrayMin`, `arrayMax`, `argmin`, `argmax`
+
+**Distance Metrics** (4)
+- `distanceManhattan`, `distanceChebyshev`, `distanceMinkowski`, `haversineDistance`
+
+**Geometry** (2)
+- `areaTriangleHeron`, `signedArea2D`
+
+### `MathLib` — Facade
+
+A convenience class re-exposing every `ScalarMath` method as a static call. Use `MathLib.sin(x)` instead of `ScalarMath.sin(x)`.
+
+---
+
+## Interpolation / Easing
+
+### `Interpolationd` / `Interpolationf` — Static utility
+
+34 easing functions each in double and float precision:
+
+| Category | Functions |
+|----------|-----------|
+| Linear | `linear` |
+| Quadratic | `quadraticIn`, `quadraticOut`, `quadraticInOut` |
+| Cubic | `cubicIn`, `cubicOut`, `cubicInOut` |
+| Quartic | `quarticIn`, `quarticOut`, `quarticInOut` |
+| Quintic | `quinticIn`, `quinticOut`, `quinticInOut` |
+| Sinusoidal | `sinusoidalIn`, `sinusoidalOut`, `sinusoidalInOut` |
+| Exponential | `exponentialIn`, `exponentialOut`, `exponentialInOut` |
+| Circular | `circularIn`, `circularOut`, `circularInOut` |
+| Elastic | `elasticIn`, `elasticOut`, `elasticInOut` |
+| Back | `backIn`, `backOut`, `backInOut` |
+| Bounce | `bounceIn`, `bounceOut`, `bounceInOut` |
+| Misc | `smoothStep`, `smootherStep` |
+
+---
+
+## Geometry Types
+
+### `AABB` — Axis-Aligned Bounding Box (mutable)
+
+- Constructors: default (empty), from min/max vectors, from single point, from sphere
+- `center()`, `extent()`, `size()` — Vector3d accessors
+- `contains(point)`, `contains(aabb)` — containment tests
+- `intersects(aabb)` — overlap test
+- `union(aabb)`, `union(point)` — expand to enclose
+- `intersection(aabb)` — intersection volume (new AABB)
+- `transform(matrix)` — transform and return new AABB
+- `isEmpty()`, `isInfinite()`
+
+### `Ray` — Ray (mutable)
+
+- Fields: `origin`, `direction` (Vector3d)
+- `pointAt(t)` — parametric point
+- `distanceTo(point)` — closest distance
+- `closestPoint(point)` — closest point on ray
+- `intersects(AABB)`, `intersects(Sphere)`, `intersects(Plane)` — intersection boolean tests
+- `intersectsTriangle(v0, v1, v2)` — Möller-Trumbore ray-triangle (returns t or null)
+- `transform(matrix)` — transforms ray
+
+### `Plane` — Plane (record, immutable)
+
+- Fields: `a`, `b`, `c`, `d` (plane: ax + by + cz + d = 0)
+- Constructors: from normal + point, from three points, from coefficients
+- `normal()` — returns the normal (Vector3d)
+- `signedDistance(point)` — signed distance
+- `distance(point)` — absolute distance
+- `intersects(Ray)` — ray intersection (returns t)
+- `intersects(Plane)` — plane-plane intersection (returns Ray)
+- `normalize()` — returns normalized Plane
+
+### `Sphere` — Sphere (record, immutable)
+
+- Fields: `center` (Vector3d), `radius` (double)
+- `contains(point)` — point containment
+- `intersects(Sphere)`, `intersects(Ray)`, `intersects(AABB)` — intersection tests
+
+---
+
+## Intersection Tests
+
+### `Intersectiond` — Static utility (double precision)
+
+- `intersectRayTriangle(Ray, v0, v1, v2, result)` — Möller-Trumbore
+- `intersectRayAABB(origin, dir, aabb)` — slab method
+- `intersectRaySphere(origin, dir, sphere)`
+- `intersectRayPlane(origin, dir, plane)`
+- `intersectSegmentTriangle(p0, p1, v0, v1, v2, result)`
+- `intersectSegmentAABB(p0, p1, aabb)` — boolean
+- `intersectSegmentSphere(p0, p1, sphere)`
+- `intersectSegmentPlane(p0, p1, plane)`
+- `intersectTriangleTriangle(v0, v1, v2, v3, v4, v5)` — boolean
+- `intersectAABBAABB(aabb1, aabb2)` — boolean
+- `intersectSphereSphere(s1, s2)` — boolean
+- `distancePointSegment(point, p0, p1)` — double
+- `distancePointTriangle(point, v0, v1, v2)` — double
+- `closestPointSegmentSegment(p0, p1, q0, q1, dest1, dest2)`
+- `closestPointPointTriangle(point, v0, v1, v2)` — Vector3d
+
+### `Intersection` — Simplified static utility
+
+- Subset of `Intersectiond` using Vector3d-based parameters
+
+---
+
+## Frustum Culling
+
+### `FrustumIntersection` — Mutable class
+
+- Constructors: `FrustumIntersection()` (OpenGL, z=[-1,1]), `FrustumIntersection(clipSpace)` (Vulkan: clipSpace=true, z=[0,1])
+- `set(Matrix4f)` — extracts 6 frustum planes from projection-view matrix
+- `intersects(AABB)` — AABB-frustum test (returns INSIDE/INTERSECT/OUTSIDE)
+- `intersects(Sphere)` — sphere-frustum test (returns same enum)
+- `intersects(Vector3f)` — point-frustum test (returns boolean)
+- `plane(index)` — access individual frustum planes
+
+---
+
+## Geometry Utilities
+
+### `GeometryUtils` — Static utility
+
+- `computeTangent(v0, v1, v2, uv0, uv1, uv2)` — tangent from triangle + UVs (float/double)
+- `computeBitangent(v0, v1, v2, uv0, uv1, uv2)` — bitangent from triangle + UVs (float/double)
+- `computeNormal(v0, v1, v2)` — normalized face normal (float/double)
+- `computeTangentBitangent(v0, v1, v2, uv0, uv1, uv2)` — returns Vector3[2] (float/double)
+- `rotationMatrix(from, to)` — Matrix3 from two direction vectors (float/double)
+- `barycentric(point, v0, v1, v2)` — barycentric coordinates (float/double)
+- `interpolateBarycentric(v0, v1, v2, u, v, w)` — scalar barycentric interpolation
+- `areaTriangle(v0, v1, v2)` — triangle area (float/double)
+- `centroid(v0, v1, v2)` — triangle centroid (float/double)
+- `orthonormalBasis(normal)` — returns Vector3[3] {tangent, bitangent, normal} (float/double)
+- `transformNormal(matrix, v)` — normal transform via inverse-transpose (Matrix3/Matrix4, float/double)
+
+---
+
+## Frustum Ray Builder
+
+### `FrustumRayBuilder` — Mutable class
+
+- `set(Matrix4d invProjView)` — computes corner rays from inverse projection-view matrix
+- `getRay(x, y)` — bilinear interpolation of ray direction (normalized coords)
+- `getRay(x, y, dest)` — no-alloc version
+- `normalize()` — normalizes all four corner directions
+
+---
+
+## Math Utility Facade
+
+### `MathLib` — Static convenience
+
+Re-exports all `ScalarMath` methods and constants under a single namespace: `MathLib.sin(x)`, `MathLib.exp(x)`, `MathLib.erf(x)`, etc.
+
+---
+
+## Incubator: SIMD Vector API
+
+### `VectorApiMath` — Static utility (package `com.jamma.math.incubator`)
+
+Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) for SIMD-accelerated operations on `Vector4d`:
+
+- `add(a, b)`, `sub(a, b)`, `mul(a, b)`, `scale(v, s)`
+- `dot(a, b)` — uses `reduceLanes(ADD)`
+- `batchAdd(results, a, b)` — batch add for arrays of Vector4d
+
+---
+
+## Incubator: Parallel Operations
+
+### `ParallelOps` — Static utility (package `com.jamma.math.incubator`)
+
+- `batchAddParallel(a, b)` — parallel batch vector addition using `StructuredTaskScope`
+  - Threshold: 4096 elements
+  - Work divided across `availableProcessors()` cores
+  - Falls back to sequential `VectorMath.add` below threshold
+
+---
+
+## Incubator: Off-Heap Memory
+
+### `MemoryOps` — Static utility (package `com.jamma.math.incubator`)
+
+- `allocateVec4(Arena)` — allocates single vec4 in off-heap memory
+- `allocateVec4Array(Arena, count)` — allocates array of vec4
+- `setVec4(segment, x, y, z, w)` — writes components
+- `getVec4X/Y/Z/W(segment)` — reads individual components
+
+---
+
+## Memory & Buffer I/O
+
+Every vector and matrix type supports multiple I/O backends:
+
+| Backend | Read | Write |
+|---------|------|-------|
+| **NIO Buffer** | `fromBuffer(Buffer)`, `fromBuffer(idx, Buffer)` | `writeToBuffer(Buffer)`, `writeToBuffer(idx, Buffer)` |
+| **MemorySegment** | `fromMemorySegment(seg, offset)`, `read(seg, offset)` | `writeToMemorySegment(seg, offset)`, `write(seg, offset)` |
+
+Supported buffer types:
+- `DoubleBuffer` — Vector*d, Matrix*d, Quaterniond
+- `FloatBuffer` — Vector*f, Matrix*f, Quaternionf
+- `IntBuffer` — Vector*i
+
+---
+
+## JOML Comparison
+
+| Feature | Jamma | JOML 1.10.8 |
+|---------|-------|-------------|
+| **Vector mutability** | Immutable (records) | Mutable |
+| **Vector types** | 2d/f/i, 3d/f/i, 4d/f/i | 2d/f, 3d/f, 4d/f |
+| **Integer vectors** | `Vector2i`, `Vector3i`, `Vector4i` | ❌ |
+| **Matrix types** | 2x2, 3x3, 4x4, 4x3 (d/f) | 2x2, 3x3, 4x4, 4x3 (d/f) |
+| **Quaternion** | Record (immutable) | Mutable class |
+| **SLERP / SQUAD** | ✅ | ✅ |
+| **Quaternion log/exp/pow** | ✅ | ✅ |
+| **AxisAngle** | Record (immutable) | Mutable class |
+| **Dual numbers** | `DualNumberd/f` | ❌ |
+| **ScalarMath** | 80+ methods, stats, special functions, combinatorics, activation functions | ❌ (only basic `Math`) |
+| **Easing functions** | 34 functions, double + float | ❌ |
+| **Integer vector types** | ✅ 2i/3i/4i | ❌ |
+| **Java records** | ✅ All vectors and quaternions | ❌ |
+| **JPMS module-info** | ✅ Both modules | ❌ |
+| **MemorySegment I/O** | ✅ All types (vectors, matrices, quaternions) | Partial (NIO only) |
+| **NIO Buffer I/O** | ✅ All types | ✅ |
+| **SIMD (Vector API)** | ✅ Incubator module (`VectorApiMath`) | ✅ (later versions) |
+| **Parallel batch ops** | ✅ `ParallelOps` with `StructuredTaskScope` | ❌ |
+| **Off-heap memory** | ✅ `MemoryOps` | ❌ |
+| **`Math.fma` usage** | ✅ All dot products, lerps, matrix mul | Partial |
+| **Frustum culling** | ✅ AABB, sphere, point (OpenGL + Vulkan) | ✅ (more variants) |
+| **Ray casting** | ✅ Ray-AABB, Ray-Sphere, Ray-Plane, Ray-Triangle | ✅ |
+| **AABB** | ✅ Union, intersection, containment, transform | ✅ |
+| **Plane** | ✅ Record (immutable) | ✅ Mutable class |
+| **Sphere** | ✅ Record (immutable) | ✅ Mutable class |
+| **Intersection tests** | 15+ static methods | 15+ static methods |
+| **Geometry utilities** | ✅ Tangents, normals, barycentrics, orthonormal basis | Partial |
+| **Frustum ray builder** | ✅ | ❌ (manual) |
+| **Thread safety** | ✅ Trivially safe (records) | ❌ Not safe |
+| **`equals`/`hashCode`** | ✅ Correct (records) | ❌ Often omitted/incomplete |
+| **Serialization** | ✅ `Serializable` on all core types | Partial |
+| **License** | MIT | MIT |
+| **Documentation** | This README | Extensive Javadoc |
+| **Maturity** | New | Battle-tested (10+ years) |
+| **LWJGL integration** | None | ✅ Native |
+| **GC pressure** | Minor (short-lived records) | None (mutable in-place) |
+
+---
+
+## Why Not JOML?
+
+### 1. Immutability
+JOML uses mutable objects everywhere. This is a legacy design from the Java 6 era. `v.add(w)` mutates `v` instead of returning a new vector. This means:
+- You must defensively copy before passing to other code
+- Concurrent access is unsafe
+- `equals`/`hashCode` are unreliable (inherited from `Object`)
+- Chaining mutates intermediate state: `v.add(w).normalize()` changes `v` as a side effect
+
+Jamma's records fix all of this. `v.add(w)` returns a new vector; `v` is untouched.
+
+### 2. No Scalar Math
+JOML provides vector and matrix types and nothing else. Need a smoothstep? Write it yourself. Need erf, gamma, Fibonacci, or a moving average? Write it yourself. Jamma's `ScalarMath` covers **80+ functions** from trig to special functions to statistics to combinatorics.
+
+### 3. No Integer Vectors
+JOML has no `Vector2i`, `Vector3i`, or `Vector4i`. If you work with integer coordinates (chunks, voxels, screen coords, texture atlases), you're converting to float.
+
+### 4. No Dual Numbers
+Automatic differentiation is essential for gradient-based optimization, physics, and numerical methods. JOML doesn't support it.
+
+### 5. No JPMS
+JOML ships without `module-info.java`. In modern Java, this means `--add-exports` flags or classpath pollution. Jamma is fully modular.
+
+### 6. No MemorySegment Support
+JOML relies on NIO buffers. Jamma supports both NIO buffers and the modern `java.lang.foreign.MemorySegment` API, making it compatible with off-heap memory, GPU interop, and the Foreign Function & Memory API.
+
+### 7. No Parallel / SIMD Incubator
+JOML has some SIMD support, but Jamma's incubator module includes batch parallel operations using `StructuredTaskScope` and explicit Vector API usage.
+
+### 8. Immutable Vectors Are Fast Enough
+Modern JVMs eliminate short-lived allocations via escape analysis. Even when allocations survive, generational ZGC collects them at sub-millisecond cost. The safety and correctness wins of immutability far outweigh the theoretical performance difference.
+
+---
+
+## Static Utility Classes (legacy)
+
+### `VectorMath` / `VectorMathf`
+Static utility classes mirroring all instance methods on the record types. These exist for compatibility and cases where a functional-style `VectorMath.add(a, b)` is preferred over `a.add(b)`. Note that the instance methods on the records themselves are the primary API.
+
+---
+
+## Building
+
+```bash
+# Build math-core only
+./gradlew :math-core:build
+
+# Build math-incubator (requires --enable-preview)
+./gradlew :math-incubator:build
+
+# Build everything
+./gradlew build
+
+# Run tests
+./gradlew test
+```
+
+### JVM Flags for Incubator Module
+
+```bash
+--add-modules jdk.incubator.vector --enable-preview
+```
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE).
+
+Copyright (c) 2026 ExodusCoder9
