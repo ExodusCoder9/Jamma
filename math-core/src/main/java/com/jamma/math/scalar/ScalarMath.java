@@ -54,10 +54,25 @@ public final class ScalarMath {
     public static double coversin(double x) { return 1.0 - Math.sin(x); }
     public static double haversin(double x) { return (1.0 - Math.cos(x)) / 2.0; }
     public static double exsec(double x) { return sec(x) - 1.0; }
+    public static double excsc(double x) { return csc(x) - 1.0; }
+    public static double vercosin(double x) { return 1.0 + Math.cos(x); }
+    public static double covercosin(double x) { return 1.0 + Math.sin(x); }
+    public static double havercosin(double x) { return (1.0 + Math.cos(x)) / 2.0; }
+    public static double hacoversin(double x) { return (1.0 - Math.sin(x)) / 2.0; }
+    public static double hacovercosin(double x) { return (1.0 + Math.sin(x)) / 2.0; }
+    public static double chord(double x) { return 2.0 * Math.sin(x / 2.0); }
     public static double sinc(double x) {
         if (x == 0.0) return 1.0;
         return Math.sin(x) / x;
     }
+
+    public static double hypot(double a, double b) { return Math.hypot(a, b); }
+    public static double hypot3(double a, double b, double c) { return Math.sqrt(a * a + b * b + c * c); }
+
+    public static double roundTo(double value, double multiple) { return Math.round(value / multiple) * multiple; }
+    public static double floorTo(double value, double multiple) { return Math.floor(value / multiple) * multiple; }
+    public static double ceilTo(double value, double multiple) { return Math.ceil(value / multiple) * multiple; }
+    public static double snap(double value, double grid) { return Math.round(value / grid) * grid; }
 
     public static double sinh(double x) { return Math.sinh(x); }
     public static double cosh(double x) { return Math.cosh(x); }
@@ -281,6 +296,37 @@ public final class ScalarMath {
         return stirlingSecondKind(n - 1, k - 1) + k * stirlingSecondKind(n - 1, k);
     }
 
+    public static long fibonacci(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative fibonacci");
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        long a = 0, b = 1;
+        for (int i = 2; i <= n; i++) { long t = a + b; a = b; b = t; }
+        return b;
+    }
+    public static long lucas(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative lucas");
+        if (n == 0) return 2;
+        if (n == 1) return 1;
+        long a = 2, b = 1;
+        for (int i = 2; i <= n; i++) { long t = a + b; a = b; b = t; }
+        return b;
+    }
+    public static long catalan(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative catalan");
+        return Math.round(binomial(2 * n, n) / (n + 1.0));
+    }
+    public static long bellNumber(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative bell");
+        long[][] bell = new long[n + 1][n + 1];
+        bell[0][0] = 1;
+        for (int i = 1; i <= n; i++) {
+            bell[i][0] = bell[i - 1][i - 1];
+            for (int j = 1; j <= i; j++) bell[i][j] = bell[i - 1][j - 1] + bell[i][j - 1];
+        }
+        return bell[n][0];
+    }
+
     public static int gcd(int a, int b) {
         while (b != 0) {
             int t = b;
@@ -300,6 +346,52 @@ public final class ScalarMath {
         int sqrt = (int) Math.sqrt(n);
         for (int i = 3; i <= sqrt; i += 2) if (n % i == 0) return false;
         return true;
+    }
+    public static boolean isCoprime(int a, int b) { return gcd(a, b) == 1; }
+    public static int nextPrime(int n) {
+        if (n < 2) return 2;
+        int c = n + 1;
+        while (!isPrime(c)) c++;
+        return c;
+    }
+    public static int totient(int n) {
+        int r = n;
+        for (int p = 2; p * p <= n; p++) {
+            if (n % p == 0) {
+                while (n % p == 0) n /= p;
+                r -= r / p;
+            }
+        }
+        if (n > 1) r -= r / n;
+        return r;
+    }
+    public static int radical(int n) {
+        int r = 1;
+        for (int p = 2; p * p <= n; p++) {
+            if (n % p == 0) {
+                r *= p;
+                while (n % p == 0) n /= p;
+            }
+        }
+        if (n > 1) r *= n;
+        return r;
+    }
+
+    public static boolean isPowerOfTwo(int n) { return n > 0 && (n & (n - 1)) == 0; }
+    public static int nextPowerOfTwo(int n) {
+        if (n <= 1) return 1;
+        n--;
+        n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
+        return n + 1;
+    }
+    public static int prevPowerOfTwo(int n) {
+        if (n < 1) return 0;
+        n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
+        return n - (n >> 1);
+    }
+    public static int roundUpToPowerOfTwo(int n) {
+        if (n < 1) return 1;
+        return nextPowerOfTwo(n);
     }
 
     public static double sum(double[] a) {
@@ -350,6 +442,91 @@ public final class ScalarMath {
     public static double correlation(double[] a, double[] b) {
         return covariance(a, b) / (stddev(a) * stddev(b));
     }
+    public static double geometricMean(double[] a) {
+        double logSum = 0.0;
+        for (double v : a) logSum += Math.log(v);
+        return Math.exp(logSum / a.length);
+    }
+    public static double harmonicMean(double[] a) {
+        double s = 0.0;
+        for (double v : a) s += 1.0 / v;
+        return a.length / s;
+    }
+    public static double quadraticMean(double[] a) {
+        double s = 0.0;
+        for (double v : a) s += v * v;
+        return Math.sqrt(s / a.length);
+    }
+    public static double weightedMean(double[] values, double[] weights) {
+        double sumW = 0.0, sumVW = 0.0;
+        for (int i = 0; i < values.length; i++) { sumVW += values[i] * weights[i]; sumW += weights[i]; }
+        return sumVW / sumW;
+    }
+    public static double trimmedMean(double[] a, double trim) {
+        double[] s = a.clone();
+        java.util.Arrays.sort(s);
+        int k = (int) Math.floor(s.length * trim);
+        double sum = 0.0;
+        for (int i = k; i < s.length - k; i++) sum += s[i];
+        return sum / (s.length - 2 * k);
+    }
+    public static double[] mode(double[] a) {
+        java.util.Map<Double, Integer> freq = new java.util.LinkedHashMap<>();
+        for (double v : a) freq.merge(v, 1, Integer::sum);
+        int max = freq.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+        return freq.entrySet().stream().filter(e -> e.getValue() == max).mapToDouble(e -> e.getKey()).toArray();
+    }
+    public static double skewness(double[] a) {
+        double m = mean(a);
+        double s = 0.0, n = a.length;
+        for (double v : a) { double d = v - m; s += d * d * d; }
+        return s / (n * Math.pow(stddev(a), 3));
+    }
+    public static double kurtosis(double[] a) {
+        double m = mean(a);
+        double s = 0.0, n = a.length;
+        double sd = stddev(a);
+        for (double v : a) { double d = v - m; s += d * d * d * d; }
+        return s / (n * sd * sd * sd * sd) - 3.0;
+    }
+    public static double standardError(double[] a) { return stddev(a) / Math.sqrt(a.length); }
+    public static double zScore(double value, double mean, double stddev) { return (value - mean) / stddev; }
+    public static double entropy(double[] probabilities) {
+        double e = 0.0;
+        for (double p : probabilities) { if (p > 0) e -= p * Math.log(p); }
+        return e;
+    }
+    public static double distanceManhattan(double[] a, double[] b) {
+        double s = 0.0;
+        for (int i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]);
+        return s;
+    }
+    public static double distanceChebyshev(double[] a, double[] b) {
+        double m = 0.0;
+        for (int i = 0; i < a.length; i++) m = Math.max(m, Math.abs(a[i] - b[i]));
+        return m;
+    }
+    public static double distanceMinkowski(double[] a, double[] b, double p) {
+        double s = 0.0;
+        for (int i = 0; i < a.length; i++) s += Math.pow(Math.abs(a[i] - b[i]), p);
+        return Math.pow(s, 1.0 / p);
+    }
+    public static double haversineDistance(double lat1, double lon1, double lat2, double lon2, double radius) {
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2.0) * Math.sin(dLat / 2.0) +
+                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                   Math.sin(dLon / 2.0) * Math.sin(dLon / 2.0);
+        return radius * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
+    }
+    public static double areaTriangleHeron(double a, double b, double c) {
+        double s = (a + b + c) / 2.0;
+        return Math.sqrt(s * (s - a) * (s - b) * (s - c));
+    }
+    public static double signedArea2D(double x1, double y1, double x2, double y2, double x3, double y3) {
+        return ((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1)) / 2.0;
+    }
+
     public static double arrayMin(double[] a) {
         double m = a[0];
         for (int i = 1; i < a.length; i++) if (a[i] < m) m = a[i];
@@ -369,6 +546,78 @@ public final class ScalarMath {
         int idx = 0;
         for (int i = 1; i < a.length; i++) if (a[i] > a[idx]) idx = i;
         return idx;
+    }
+
+    public static double[] movingAverage(double[] data, int window) {
+        double[] r = new double[data.length - window + 1];
+        double sum = 0.0;
+        for (int i = 0; i < window; i++) sum += data[i];
+        r[0] = sum / window;
+        for (int i = window; i < data.length; i++) { sum += data[i] - data[i - window]; r[i - window + 1] = sum / window; }
+        return r;
+    }
+    public static double[] exponentialMovingAverage(double[] data, double alpha) {
+        double[] r = new double[data.length];
+        r[0] = data[0];
+        for (int i = 1; i < data.length; i++) r[i] = alpha * data[i] + (1.0 - alpha) * r[i - 1];
+        return r;
+    }
+    public static double[] normalizeData(double[] data) {
+        double min = arrayMin(data), max = arrayMax(data), range = max - min;
+        double[] r = new double[data.length];
+        for (int i = 0; i < data.length; i++) r[i] = (data[i] - min) / range;
+        return r;
+    }
+    public static double[] standardize(double[] data) {
+        double m = mean(data), sd = stddev(data);
+        double[] r = new double[data.length];
+        for (int i = 0; i < data.length; i++) r[i] = (data[i] - m) / sd;
+        return r;
+    }
+
+    public static double invErf(double x) {
+        if (x < -1.0 || x > 1.0) throw new IllegalArgumentException("invErf domain [-1, 1]");
+        if (x == 0.0) return 0.0;
+        double y = x;
+        for (int i = 0; i < 100; i++) {
+            double e = erf(y) - x;
+            if (Math.abs(e) < 1e-15) break;
+            y -= e * Math.sqrt(PI) * 0.5 / Math.exp(-y * y);
+        }
+        return y;
+    }
+    public static double lambertW0(double x) {
+        if (x < -1.0 / E) throw new IllegalArgumentException("lambertW0 domain x >= -1/e");
+        double w = x < 0.0 ? 0.0 : Math.log(1.0 + x);
+        for (int i = 0; i < 20; i++) {
+            double ew = Math.exp(w);
+            double dw = (w * ew - x) / (ew * (w + 1.0) - (w + 2.0) * (w * ew - x) / (2.0 * w + 2.0));
+            w -= dw;
+            if (Math.abs(dw) < 1e-14) break;
+        }
+        return w;
+    }
+    public static double riemannZeta(double s) {
+        if (s == 1.0) throw new IllegalArgumentException("Zeta pole at s=1");
+        double sum = 0.0;
+        for (int n = 1; n < 20000; n++) sum += 1.0 / Math.pow(n, s);
+        return sum;
+    }
+    public static double fresnelC(double x) {
+        double sum = 0.0, term = x;
+        for (int n = 0; n < 20; n++) {
+            sum += term / (4.0 * n + 1.0);
+            term *= -(x * x * x * x) * (4.0 * n + 1.0) / (4.0 * n + 5.0);
+        }
+        return sum;
+    }
+    public static double fresnelS(double x) {
+        double sum = 0.0, term = x * x * x / 3.0;
+        for (int n = 0; n < 20; n++) {
+            sum += term / (4.0 * n + 3.0);
+            term *= -(x * x * x * x) * (4.0 * n + 3.0) / (4.0 * n + 7.0);
+        }
+        return sum;
     }
 
     public static boolean isFinite(double x) { return Double.isFinite(x); }

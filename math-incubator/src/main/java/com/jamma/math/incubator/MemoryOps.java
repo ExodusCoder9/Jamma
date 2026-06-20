@@ -5,14 +5,8 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 
 public final class MemoryOps {
-
-    private static final ValueLayout.OfDouble DOUBLE_0 = ValueLayout.JAVA_DOUBLE;
-    private static final ValueLayout.OfDouble DOUBLE_1 = ValueLayout.JAVA_DOUBLE;
-    private static final ValueLayout.OfDouble DOUBLE_2 = ValueLayout.JAVA_DOUBLE;
-    private static final ValueLayout.OfDouble DOUBLE_3 = ValueLayout.JAVA_DOUBLE;
 
     private static final MemoryLayout VEC4_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_DOUBLE.withName("x"),

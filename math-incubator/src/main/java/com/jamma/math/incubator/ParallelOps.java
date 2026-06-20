@@ -1,7 +1,6 @@
 package com.jamma.math.incubator;
 
 import com.jamma.math.Vector3D;
-
 import java.util.concurrent.StructuredTaskScope;
 
 public final class ParallelOps {
@@ -20,31 +19,28 @@ public final class ParallelOps {
             }
             return result;
         }
-        int mid = n / 2;
-        try (var scope = StructuredTaskScope.open()) {
-            var leftFuture = scope.fork(() -> {
-                Vector3D[] left = new Vector3D[mid];
-                for (int i = 0; i < mid; i++) {
-                    left[i] = VectorMath.add(a[i], b[i]);
+
+        int cores = Runtime.getRuntime().availableProcessors();
+        int chunkSize = (n + cores - 1) / cores;
+
+        try (var scope = StructuredTaskScope.open(StructuredTaskScope.Joiner.allSuccessfulOrThrow())) {
+            for (int c = 0; c < cores; c++) {
+                final int start = c * chunkSize;
+                final int end = Math.min(start + chunkSize, n);
+                if (start < end) {
+                    scope.fork(() -> {
+                        for (int i = start; i < end; i++) {
+                            result[i] = VectorMath.add(a[i], b[i]);
+                        }
+                        return null;
+                    });
                 }
-                return left;
-            });
-            var rightFuture = scope.fork(() -> {
-                Vector3D[] right = new Vector3D[n - mid];
-                for (int i = mid; i < n; i++) {
-                    right[i - mid] = VectorMath.add(a[i], b[i]);
-                }
-                return right;
-            });
+            }
             scope.join();
-            Vector3D[] left = leftFuture.get();
-            Vector3D[] right = rightFuture.get();
-            System.arraycopy(left, 0, result, 0, left.length);
-            System.arraycopy(right, 0, result, mid, right.length);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Parallel batch add interrupted", e);
+        } catch (Throwable e) {
+            throw new RuntimeException("Parallel batch add failed", e);
         }
         return result;
     }
 }
+

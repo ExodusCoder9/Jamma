@@ -35,7 +35,21 @@ public final class MathLib {
     public static double coversin(double x) { return ScalarMath.coversin(x); }
     public static double haversin(double x) { return ScalarMath.haversin(x); }
     public static double exsec(double x) { return ScalarMath.exsec(x); }
+    public static double excsc(double x) { return ScalarMath.excsc(x); }
+    public static double vercosin(double x) { return ScalarMath.vercosin(x); }
+    public static double covercosin(double x) { return ScalarMath.covercosin(x); }
+    public static double havercosin(double x) { return ScalarMath.havercosin(x); }
+    public static double hacoversin(double x) { return ScalarMath.hacoversin(x); }
+    public static double hacovercosin(double x) { return ScalarMath.hacovercosin(x); }
+    public static double chord(double x) { return ScalarMath.chord(x); }
     public static double sinc(double x) { return ScalarMath.sinc(x); }
+    public static double hypot(double a, double b) { return ScalarMath.hypot(a, b); }
+    public static double hypot3(double a, double b, double c) { return ScalarMath.hypot3(a, b, c); }
+
+    public static double roundTo(double value, double multiple) { return ScalarMath.roundTo(value, multiple); }
+    public static double floorTo(double value, double multiple) { return ScalarMath.floorTo(value, multiple); }
+    public static double ceilTo(double value, double multiple) { return ScalarMath.ceilTo(value, multiple); }
+    public static double snap(double value, double grid) { return ScalarMath.snap(value, grid); }
 
     public static double sinh(double x) { return ScalarMath.sinh(x); }
     public static double cosh(double x) { return ScalarMath.cosh(x); }
@@ -135,12 +149,52 @@ public final class MathLib {
     public static int gcd(int a, int b) { return ScalarMath.gcd(a, b); }
     public static int lcm(int a, int b) { return ScalarMath.lcm(a, b); }
     public static boolean isPrime(int n) { return ScalarMath.isPrime(n); }
+    public static boolean isCoprime(int a, int b) { return ScalarMath.isCoprime(a, b); }
+    public static int nextPrime(int n) { return ScalarMath.nextPrime(n); }
+    public static int totient(int n) { return ScalarMath.totient(n); }
+    public static int radical(int n) { return ScalarMath.radical(n); }
+
+    public static boolean isPowerOfTwo(int n) { return ScalarMath.isPowerOfTwo(n); }
+    public static int nextPowerOfTwo(int n) { return ScalarMath.nextPowerOfTwo(n); }
+    public static int prevPowerOfTwo(int n) { return ScalarMath.prevPowerOfTwo(n); }
+    public static int roundUpToPowerOfTwo(int n) { return ScalarMath.roundUpToPowerOfTwo(n); }
+
+    public static long fibonacci(int n) { return ScalarMath.fibonacci(n); }
+    public static long lucas(int n) { return ScalarMath.lucas(n); }
+    public static long catalan(int n) { return ScalarMath.catalan(n); }
+    public static long bellNumber(int n) { return ScalarMath.bellNumber(n); }
 
     public static double sum(double[] a) { return ScalarMath.sum(a); }
     public static double product(double[] a) { return ScalarMath.product(a); }
     public static double mean(double[] a) { return ScalarMath.mean(a); }
     public static double median(double[] a) { return ScalarMath.median(a); }
     public static double percentile(double[] a, double p) { return ScalarMath.percentile(a, p); }
+    public static double distanceManhattan(double[] a, double[] b) { return ScalarMath.distanceManhattan(a, b); }
+    public static double distanceChebyshev(double[] a, double[] b) { return ScalarMath.distanceChebyshev(a, b); }
+    public static double distanceMinkowski(double[] a, double[] b, double p) { return ScalarMath.distanceMinkowski(a, b, p); }
+    public static double haversineDistance(double lat1, double lon1, double lat2, double lon2, double radius) { return ScalarMath.haversineDistance(lat1, lon1, lat2, lon2, radius); }
+    public static double areaTriangleHeron(double a, double b, double c) { return ScalarMath.areaTriangleHeron(a, b, c); }
+    public static double signedArea2D(double x1, double y1, double x2, double y2, double x3, double y3) { return ScalarMath.signedArea2D(x1, y1, x2, y2, x3, y3); }
+    public static double geometricMean(double[] a) { return ScalarMath.geometricMean(a); }
+    public static double harmonicMean(double[] a) { return ScalarMath.harmonicMean(a); }
+    public static double quadraticMean(double[] a) { return ScalarMath.quadraticMean(a); }
+    public static double weightedMean(double[] values, double[] weights) { return ScalarMath.weightedMean(values, weights); }
+    public static double trimmedMean(double[] a, double trim) { return ScalarMath.trimmedMean(a, trim); }
+    public static double[] mode(double[] a) { return ScalarMath.mode(a); }
+    public static double skewness(double[] a) { return ScalarMath.skewness(a); }
+    public static double kurtosis(double[] a) { return ScalarMath.kurtosis(a); }
+    public static double standardError(double[] a) { return ScalarMath.standardError(a); }
+    public static double zScore(double value, double mean, double stddev) { return ScalarMath.zScore(value, mean, stddev); }
+    public static double entropy(double[] probabilities) { return ScalarMath.entropy(probabilities); }
+    public static double[] movingAverage(double[] data, int window) { return ScalarMath.movingAverage(data, window); }
+    public static double[] exponentialMovingAverage(double[] data, double alpha) { return ScalarMath.exponentialMovingAverage(data, alpha); }
+    public static double[] normalizeData(double[] data) { return ScalarMath.normalizeData(data); }
+    public static double[] standardize(double[] data) { return ScalarMath.standardize(data); }
+    public static double invErf(double x) { return ScalarMath.invErf(x); }
+    public static double lambertW0(double x) { return ScalarMath.lambertW0(x); }
+    public static double riemannZeta(double s) { return ScalarMath.riemannZeta(s); }
+    public static double fresnelC(double x) { return ScalarMath.fresnelC(x); }
+    public static double fresnelS(double x) { return ScalarMath.fresnelS(x); }
     public static double covariance(double[] a, double[] b) { return ScalarMath.covariance(a, b); }
     public static double correlation(double[] a, double[] b) { return ScalarMath.correlation(a, b); }
     public static double variance(double[] a) { return ScalarMath.variance(a); }
