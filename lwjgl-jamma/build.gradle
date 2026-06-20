@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
+}
+
+group = rootProject.group
+version = rootProject.version
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':math-core')
+
+    // LWJGL BOM for version alignment
+    implementation platform('org.lwjgl:lwjgl-bom:3.4.1')
+
+    // Core LWJGL
+    implementation 'org.lwjgl:lwjgl'
+
+    // Bindings (user picks what they need, this module just enables it)
+    compileOnly 'org.lwjgl:lwjgl-opengl'
+    compileOnly 'org.lwjgl:lwjgl-vulkan'
+    compileOnly 'org.lwjgl:lwjgl-assimp'
+    compileOnly 'org.lwjgl:lwjgl-glfw'
+
+    // Natives for testing
+    testRuntimeOnly 'org.lwjgl:lwjgl::natives-windows'
+
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

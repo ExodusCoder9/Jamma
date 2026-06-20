@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/lwjgl-jamma" />
             <option value="$PROJECT_DIR$/math-core" />
             <option value="$PROJECT_DIR$/math-incubator" />
           </set>
