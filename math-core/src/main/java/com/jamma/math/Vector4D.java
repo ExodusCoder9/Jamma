@@ -19,4 +19,28 @@ public record Vector4D(double x, double y, double z, double w) {
         dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 16, z);
         dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 24, w);
     }
+
+    public static Vector4D fromBuffer(java.nio.DoubleBuffer src) {
+        return new Vector4D(src.get(), src.get(), src.get(), src.get());
+    }
+
+    public static Vector4D fromBuffer(int index, java.nio.DoubleBuffer src) {
+        return new Vector4D(src.get(index), src.get(index + 1), src.get(index + 2), src.get(index + 3));
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(java.nio.DoubleBuffer dest) {
+        dest.put(x);
+        dest.put(y);
+        dest.put(z);
+        dest.put(w);
+        return dest;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(int index, java.nio.DoubleBuffer dest) {
+        dest.put(index, x);
+        dest.put(index + 1, y);
+        dest.put(index + 2, z);
+        dest.put(index + 3, w);
+        return dest;
+    }
 }

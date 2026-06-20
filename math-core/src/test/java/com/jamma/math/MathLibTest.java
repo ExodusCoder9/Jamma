@@ -2,6 +2,7 @@ package com.jamma.math;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import com.jamma.math.scalar.ScalarMath;
 
 class MathLibTest {
 
@@ -94,7 +95,11 @@ class MathLibTest {
     @Test void trunc() { assertEquals(3.0, MathLib.trunc(3.7), 1e-15); assertEquals(-3.0, MathLib.trunc(-3.7), 1e-15); }
     @Test void frac() { assertEquals(0.7, MathLib.frac(3.7), 1e-15); }
     @Test void copySign() { assertEquals(-5.0, MathLib.copySign(5.0, -1.0), 1e-15); }
-    @Test void constants() { assertEquals(Math.PI, MathLib.PI, 1e-15); }
+    @Test void constants() {
+        assertEquals(Math.PI, MathLib.PI, 1e-15);
+        assertEquals(ScalarMath.LOG2E, MathLib.LOG2E, 1e-15);
+        assertEquals(ScalarMath.LOG10E, MathLib.LOG10E, 1e-15);
+    }
 
     @Test void expm1() { assertEquals(0.0, MathLib.expm1(0.0), 1e-15); }
     @Test void log1p() { assertEquals(0.0, MathLib.log1p(0.0), 1e-15); }

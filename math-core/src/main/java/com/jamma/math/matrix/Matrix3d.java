@@ -412,4 +412,34 @@ public class Matrix3d {
         m22 = src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 80);
         return this;
     }
+
+    public static Matrix3d fromBuffer(java.nio.DoubleBuffer src) {
+        Matrix3d m = new Matrix3d();
+        m.m00 = src.get(); m.m01 = src.get(); m.m02 = src.get();
+        m.m10 = src.get(); m.m11 = src.get(); m.m12 = src.get();
+        m.m20 = src.get(); m.m21 = src.get(); m.m22 = src.get();
+        return m;
+    }
+
+    public static Matrix3d fromBuffer(int index, java.nio.DoubleBuffer src) {
+        Matrix3d m = new Matrix3d();
+        m.m00 = src.get(index);     m.m01 = src.get(index + 1); m.m02 = src.get(index + 2);
+        m.m10 = src.get(index + 3); m.m11 = src.get(index + 4); m.m12 = src.get(index + 5);
+        m.m20 = src.get(index + 6); m.m21 = src.get(index + 7); m.m22 = src.get(index + 8);
+        return m;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(java.nio.DoubleBuffer dest) {
+        dest.put(m00); dest.put(m01); dest.put(m02);
+        dest.put(m10); dest.put(m11); dest.put(m12);
+        dest.put(m20); dest.put(m21); dest.put(m22);
+        return dest;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(int index, java.nio.DoubleBuffer dest) {
+        dest.put(index, m00);     dest.put(index + 1, m01); dest.put(index + 2, m02);
+        dest.put(index + 3, m10); dest.put(index + 4, m11); dest.put(index + 5, m12);
+        dest.put(index + 6, m20); dest.put(index + 7, m21); dest.put(index + 8, m22);
+        return dest;
+    }
 }

@@ -361,6 +361,28 @@ public class Matrix4d {
         return this;
     }
 
+    public Matrix4d perspectiveVulkan(double fovYRad, double aspect, double zNear, double zFar) {
+        double f = 1.0 / Math.tan(fovYRad * 0.5);
+        double invFn = 1.0 / (zNear - zFar);
+        m00 = f / aspect;
+        m01 = 0.0;
+        m02 = 0.0;
+        m03 = 0.0;
+        m10 = 0.0;
+        m11 = -f;
+        m12 = 0.0;
+        m13 = 0.0;
+        m20 = 0.0;
+        m21 = 0.0;
+        m22 = zFar * invFn;
+        m23 = -1.0;
+        m30 = 0.0;
+        m31 = 0.0;
+        m32 = zFar * zNear * invFn;
+        m33 = 0.0;
+        return this;
+    }
+
     public Matrix4d ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
         double invRL = 1.0 / (right - left);
         double invTB = 1.0 / (top - bottom);
@@ -380,6 +402,29 @@ public class Matrix4d {
         m30 = -(right + left) * invRL;
         m31 = -(top + bottom) * invTB;
         m32 = -(zFar + zNear) * invFN;
+        m33 = 1.0;
+        return this;
+    }
+
+    public Matrix4d orthoVulkan(double left, double right, double bottom, double top, double zNear, double zFar) {
+        double invRL = 1.0 / (right - left);
+        double invTB = 1.0 / (top - bottom);
+        double invFN = 1.0 / (zFar - zNear);
+        m00 = 2.0 * invRL;
+        m01 = 0.0;
+        m02 = 0.0;
+        m03 = 0.0;
+        m10 = 0.0;
+        m11 = -2.0 * invTB;
+        m12 = 0.0;
+        m13 = 0.0;
+        m20 = 0.0;
+        m21 = 0.0;
+        m22 = -invFN;
+        m23 = 0.0;
+        m30 = -(right + left) * invRL;
+        m31 = (top + bottom) * invTB;
+        m32 = -zNear * invFN;
         m33 = 1.0;
         return this;
     }
@@ -1042,5 +1087,39 @@ public class Matrix4d {
         m32 = src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 112);
         m33 = src.get(ValueLayout.JAVA_DOUBLE, byteOffset + 120);
         return this;
+    }
+
+    public static Matrix4d fromBuffer(java.nio.DoubleBuffer src) {
+        Matrix4d m = new Matrix4d();
+        m.m00 = src.get(); m.m01 = src.get(); m.m02 = src.get(); m.m03 = src.get();
+        m.m10 = src.get(); m.m11 = src.get(); m.m12 = src.get(); m.m13 = src.get();
+        m.m20 = src.get(); m.m21 = src.get(); m.m22 = src.get(); m.m23 = src.get();
+        m.m30 = src.get(); m.m31 = src.get(); m.m32 = src.get(); m.m33 = src.get();
+        return m;
+    }
+
+    public static Matrix4d fromBuffer(int index, java.nio.DoubleBuffer src) {
+        Matrix4d m = new Matrix4d();
+        m.m00 = src.get(index);      m.m01 = src.get(index + 1);  m.m02 = src.get(index + 2);  m.m03 = src.get(index + 3);
+        m.m10 = src.get(index + 4);  m.m11 = src.get(index + 5);  m.m12 = src.get(index + 6);  m.m13 = src.get(index + 7);
+        m.m20 = src.get(index + 8);  m.m21 = src.get(index + 9);  m.m22 = src.get(index + 10); m.m23 = src.get(index + 11);
+        m.m30 = src.get(index + 12); m.m31 = src.get(index + 13); m.m32 = src.get(index + 14); m.m33 = src.get(index + 15);
+        return m;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(java.nio.DoubleBuffer dest) {
+        dest.put(m00); dest.put(m01); dest.put(m02); dest.put(m03);
+        dest.put(m10); dest.put(m11); dest.put(m12); dest.put(m13);
+        dest.put(m20); dest.put(m21); dest.put(m22); dest.put(m23);
+        dest.put(m30); dest.put(m31); dest.put(m32); dest.put(m33);
+        return dest;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(int index, java.nio.DoubleBuffer dest) {
+        dest.put(index, m00);      dest.put(index + 1, m01);  dest.put(index + 2, m02);  dest.put(index + 3, m03);
+        dest.put(index + 4, m10);  dest.put(index + 5, m11);  dest.put(index + 6, m12);  dest.put(index + 7, m13);
+        dest.put(index + 8, m20);  dest.put(index + 9, m21);  dest.put(index + 10, m22); dest.put(index + 11, m23);
+        dest.put(index + 12, m30); dest.put(index + 13, m31); dest.put(index + 14, m32); dest.put(index + 15, m33);
+        return dest;
     }
 }

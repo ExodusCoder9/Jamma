@@ -15,4 +15,24 @@ public record Vector2D(double x, double y) {
         dest.set(ValueLayout.JAVA_DOUBLE, byteOffset, x);
         dest.set(ValueLayout.JAVA_DOUBLE, byteOffset + 8, y);
     }
+
+    public static Vector2D fromBuffer(java.nio.DoubleBuffer src) {
+        return new Vector2D(src.get(), src.get());
+    }
+
+    public static Vector2D fromBuffer(int index, java.nio.DoubleBuffer src) {
+        return new Vector2D(src.get(index), src.get(index + 1));
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(java.nio.DoubleBuffer dest) {
+        dest.put(x);
+        dest.put(y);
+        return dest;
+    }
+
+    public java.nio.DoubleBuffer writeToBuffer(int index, java.nio.DoubleBuffer dest) {
+        dest.put(index, x);
+        dest.put(index + 1, y);
+        return dest;
+    }
 }

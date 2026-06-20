@@ -3,6 +3,7 @@ package com.jamma.math.incubator;
 import com.jamma.math.Vector3D;
 import java.util.concurrent.StructuredTaskScope;
 
+@SuppressWarnings("preview")
 public final class ParallelOps {
 
     private static final int PARALLEL_THRESHOLD = 1 << 12;

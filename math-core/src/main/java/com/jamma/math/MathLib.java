@@ -13,6 +13,8 @@ public final class MathLib {
     public static final double PHI = ScalarMath.PHI;
     public static final double LN2 = ScalarMath.LN2;
     public static final double LN10 = ScalarMath.LN10;
+    public static final double LOG2E = ScalarMath.LOG2E;
+    public static final double LOG10E = ScalarMath.LOG10E;
     public static final double SQRT2 = ScalarMath.SQRT2;
     public static final double SQRT3 = ScalarMath.SQRT3;
     public static final double EPSILON = ScalarMath.EPSILON;
