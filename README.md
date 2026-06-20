@@ -72,6 +72,9 @@ The main library. No dependencies beyond the JDK. All production types: vectors,
 ### `math-incubator`
 Experimental features requiring `--add-modules jdk.incubator.vector` and `--enable-preview`. SIMD-accelerated vector ops, parallel batch processing, and off-heap memory management.
 
+### `lwjgl-jamma`
+LWJGL 3 interop module. Provides zero-allocation `put`/`get` methods that write Jamma types directly into `FloatBuffer`, `DoubleBuffer`, and `MemorySegment` — ready for GL/Vulkan native calls. Integrates with `MemoryStack` for fast stack-allocated uniforms and vertex buffers.
+
 ---
 
 ## Vector Types
@@ -629,7 +632,7 @@ Supported buffer types:
 | **License** | MIT | MIT |
 | **Documentation** | This README | Extensive Javadoc |
 | **Maturity** | New | Battle-tested (10+ years) |
-| **LWJGL integration** | None | ✅ Native |
+| **LWJGL integration** | ✅ Native (`lwjgl-jamma` module) | ✅ Native |
 | **GC pressure** | Minor (short-lived records) | None (mutable in-place) |
 
 ---
@@ -668,6 +671,85 @@ Modern JVMs eliminate short-lived allocations via escape analysis. Even when all
 
 ---
 
+---
+
+## LWJGL Interop (`lwjgl-jamma`)
+
+### Dependency
+
+```groovy
+// build.gradle
+dependencies {
+    implementation 'com.jamma:lwjgl-jamma:1.0-SNAPSHOT'
+    implementation platform('org.lwjgl:lwjgl-bom:3.4.1')
+    implementation 'org.lwjgl:lwjgl'
+}
+```
+
+### Uploading a matrix to an OpenGL shader uniform
+
+```java
+import static com.jamma.lwjgl.JammaLWJGL.*;
+import static org.lwjgl.opengl.GL20.*;
+
+try (var stack = MemoryStack.stackPush()) {
+    FloatBuffer buf = stack.mallocFloat(16);
+    put(matrix, buf);
+    buf.flip();
+    glUniformMatrix4fv(location, false, buf);
+}
+```
+
+### Uploading to a Vulkan uniform buffer
+
+```java
+import static com.jamma.lwjgl.JammaLWJGL.*;
+
+try (var arena = Arena.ofConfined()) {
+    MemorySegment seg = arena.allocate(16 * 4); // 16 floats
+    put(matrix, seg, 0);
+    // pass seg.address() to vkCmdPushConstants or vkMapMemory
+}
+```
+
+### Writing vertex data
+
+```java
+FloatBuffer buf = stack.mallocFloat(9); // 3 vertices × 3 components
+put(new Vector3f(1, 0, 0), buf);
+put(new Vector3f(0, 1, 0), buf);
+put(new Vector3f(0, 0, 1), buf);
+buf.flip();
+glBufferSubData(GL_ARRAY_BUFFER, 0, buf);
+```
+
+### Reading from an Assimp struct
+
+```java
+// AIAIBone.mOffsetMatrix is stored column-major as floats
+Matrix4f boneMatrix = new Matrix4f();
+get(aiBone.mOffsetMatrix().asFloatBuffer(), boneMatrix);
+```
+
+### Available methods
+
+| Method | Input | Output |
+|--------|-------|--------|
+| `put(Matrix4f, FloatBuffer)` | Jamma type | LWJGL buffer (column-major) |
+| `put(Matrix4f, MemorySegment, long)` | Jamma type | Off-heap memory |
+| `get(FloatBuffer, Matrix4f)` | LWJGL buffer | Jamma type |
+| `put(Matrix4d, DoubleBuffer)` | Jamma type | LWJGL buffer |
+| `put(Vector3f, FloatBuffer)` | Jamma type | xyz in buffer |
+| `put(Vector3f, MemorySegment, long)` | Jamma type | Off-heap memory |
+| `put(Vector4f, FloatBuffer)` | Jamma type | xyzw in buffer |
+| `put(Vector2f, FloatBuffer)` | Jamma type | xy in buffer |
+| `put(Quaternionf, FloatBuffer)` | Jamma type | xyzw in buffer |
+| `segment(ByteBuffer/FloatBuffer/DoubleBuffer)` | NIO buffer | `MemorySegment` |
+
+All methods are zero-allocation — they write directly into the provided buffer.
+
+---
+
 ## Static Utility Classes (legacy)
 
 ### `VectorMath` / `VectorMathf`
@@ -683,6 +765,9 @@ Static utility classes mirroring all instance methods on the record types. These
 
 # Build math-incubator (requires --enable-preview)
 ./gradlew :math-incubator:build
+
+# Build lwjgl-jamma (requires LWJGL dependencies on classpath)
+./gradlew :lwjgl-jamma:build
 
 # Build everything
 ./gradlew build
