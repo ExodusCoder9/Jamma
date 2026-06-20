@@ -120,7 +120,7 @@ public record Vector4f(float x, float y, float z, float w) implements Serializab
     public Vector3f xyz() { return new Vector3f(x, y, z); }
     public Vector2f toVector2f() { return new Vector2f(x, y); }
     public Vector3f toVector3f() { return new Vector3f(x, y, z); }
-    public Vector4D toVector4D() { return new Vector4D(x, y, z, w); }
+    public Vector4d toVector4d() { return new Vector4d(x, y, z, w); }
     public float[] get(float[] dest) { dest[0] = x; dest[1] = y; dest[2] = z; dest[3] = w; return dest; }
 
     @Override

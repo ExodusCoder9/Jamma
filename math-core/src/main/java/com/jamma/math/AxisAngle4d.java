@@ -15,7 +15,7 @@ public record AxisAngle4d(double angle, double x, double y, double z) implements
         this(0.0, 0.0, 0.0, 1.0);
     }
 
-    public AxisAngle4d(double angle, Vector3D axis) {
+    public AxisAngle4d(double angle, Vector3d axis) {
         this(angle, axis.x(), axis.y(), axis.z());
     }
 
@@ -70,11 +70,11 @@ public record AxisAngle4d(double angle, double x, double y, double z) implements
         return new AxisAngle4d(angle, x, y, z);
     }
 
-    public AxisAngle4d set(Vector3D axis) {
+    public AxisAngle4d set(Vector3d axis) {
         return new AxisAngle4d(angle, axis);
     }
 
-    public AxisAngle4d set(double angle, Vector3D axis) {
+    public AxisAngle4d set(double angle, Vector3d axis) {
         return new AxisAngle4d(angle, axis);
     }
 

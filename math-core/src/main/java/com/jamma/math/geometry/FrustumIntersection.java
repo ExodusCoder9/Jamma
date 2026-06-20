@@ -1,6 +1,6 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.Vector3f;
 import com.jamma.math.matrix.Matrix4d;
 import com.jamma.math.matrix.Matrix4f;
@@ -202,7 +202,7 @@ public class FrustumIntersection implements Serializable {
         return result;
     }
 
-    public int testSphere(Vector3D center, double radius) {
+    public int testSphere(Vector3d center, double radius) {
         return testSphere(center.x(), center.y(), center.z(), radius);
     }
 
@@ -224,7 +224,7 @@ public class FrustumIntersection implements Serializable {
         return result;
     }
 
-    public int testPoint(Vector3D point) {
+    public int testPoint(Vector3d point) {
         return testPoint(point.x(), point.y(), point.z());
     }
 

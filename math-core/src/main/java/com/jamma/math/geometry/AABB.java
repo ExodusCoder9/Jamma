@@ -1,6 +1,6 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
 
@@ -32,7 +32,7 @@ public class AABB implements Serializable {
         this.maxZ = maxZ;
     }
 
-    public AABB(Vector3D min, Vector3D max) {
+    public AABB(Vector3d min, Vector3d max) {
         minX = min.x();
         minY = min.y();
         minZ = min.z();
@@ -61,20 +61,20 @@ public class AABB implements Serializable {
         return this;
     }
 
-    public Vector3D getMin(Vector3D dest) {
-        return new Vector3D(minX, minY, minZ);
+    public Vector3d getMin(Vector3d dest) {
+        return new Vector3d(minX, minY, minZ);
     }
 
-    public Vector3D getMax(Vector3D dest) {
-        return new Vector3D(maxX, maxY, maxZ);
+    public Vector3d getMax(Vector3d dest) {
+        return new Vector3d(maxX, maxY, maxZ);
     }
 
-    public Vector3D getCenter(Vector3D dest) {
-        return new Vector3D((minX + maxX) * 0.5, (minY + maxY) * 0.5, (minZ + maxZ) * 0.5);
+    public Vector3d getCenter(Vector3d dest) {
+        return new Vector3d((minX + maxX) * 0.5, (minY + maxY) * 0.5, (minZ + maxZ) * 0.5);
     }
 
-    public Vector3D getExtent(Vector3D dest) {
-        return new Vector3D((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
+    public Vector3d getExtent(Vector3d dest) {
+        return new Vector3d((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
     }
 
     public AABB union(AABB other) {
@@ -87,7 +87,7 @@ public class AABB implements Serializable {
         return this;
     }
 
-    public AABB union(Vector3D point) {
+    public AABB union(Vector3d point) {
         minX = Math.min(minX, point.x());
         minY = Math.min(minY, point.y());
         minZ = Math.min(minZ, point.z());
@@ -107,7 +107,7 @@ public class AABB implements Serializable {
         return this;
     }
 
-    public boolean contains(Vector3D point) {
+    public boolean contains(Vector3d point) {
         return point.x() >= minX && point.x() <= maxX &&
                point.y() >= minY && point.y() <= maxY &&
                point.z() >= minZ && point.z() <= maxZ;
@@ -125,7 +125,7 @@ public class AABB implements Serializable {
                maxZ >= other.minZ && minZ <= other.maxZ;
     }
 
-    public boolean intersectsSphere(Vector3D center, double radius) {
+    public boolean intersectsSphere(Vector3d center, double radius) {
         double closestX = Math.max(minX, Math.min(center.x(), maxX));
         double closestY = Math.max(minY, Math.min(center.y(), maxY));
         double closestZ = Math.max(minZ, Math.min(center.z(), maxZ));
@@ -135,7 +135,7 @@ public class AABB implements Serializable {
         return dx * dx + dy * dy + dz * dz <= radius * radius;
     }
 
-    public double intersectsRay(Vector3D origin, Vector3D direction) {
+    public double intersectsRay(Vector3d origin, Vector3d direction) {
         double tmin = Double.NEGATIVE_INFINITY;
         double tmax = Double.POSITIVE_INFINITY;
         double[] origins = {origin.x(), origin.y(), origin.z()};
@@ -200,8 +200,8 @@ public class AABB implements Serializable {
         return this;
     }
 
-    public Vector3D getSize(Vector3D dest) {
-        return new Vector3D(maxX - minX, maxY - minY, maxZ - minZ);
+    public Vector3d getSize(Vector3d dest) {
+        return new Vector3d(maxX - minX, maxY - minY, maxZ - minZ);
     }
 
     @Override

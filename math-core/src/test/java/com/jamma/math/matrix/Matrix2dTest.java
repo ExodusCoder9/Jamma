@@ -3,7 +3,7 @@ package com.jamma.math.matrix;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import com.jamma.math.Vector2D;
+import com.jamma.math.Vector2d;
 
 class Matrix2dTest {
 
@@ -29,7 +29,7 @@ class Matrix2dTest {
     void rotate() {
         Matrix2d m = new Matrix2d();
         m.rotate(Math.PI / 2.0);
-        Vector2D result = m.transform(new Vector2D(1, 0));
+        Vector2d result = m.transform(new Vector2d(1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(1.0, result.y(), 1e-15);
     }
@@ -38,7 +38,7 @@ class Matrix2dTest {
     void scaleXY() {
         Matrix2d m = new Matrix2d();
         m.scale(2.0, 3.0);
-        Vector2D result = m.transform(new Vector2D(1, 1));
+        Vector2d result = m.transform(new Vector2d(1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
     }
@@ -47,7 +47,7 @@ class Matrix2dTest {
     void scaleUniform() {
         Matrix2d m = new Matrix2d();
         m.scale(5.0);
-        Vector2D result = m.transform(new Vector2D(1, 1));
+        Vector2d result = m.transform(new Vector2d(1, 1));
         assertEquals(5.0, result.x(), 1e-15);
         assertEquals(5.0, result.y(), 1e-15);
     }
@@ -59,7 +59,7 @@ class Matrix2dTest {
         Matrix2d scale = new Matrix2d();
         scale.scale(2.0, 3.0);
         rot.multiply(scale);
-        Vector2D result = rot.transform(new Vector2D(1, 0));
+        Vector2d result = rot.transform(new Vector2d(1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(2.0, result.y(), 1e-15);
     }
@@ -130,7 +130,7 @@ class Matrix2dTest {
     void transformVector() {
         Matrix2d m = new Matrix2d();
         m.scale(2.0, 3.0);
-        Vector2D result = m.transform(new Vector2D(1, 1));
+        Vector2d result = m.transform(new Vector2d(1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
     }
@@ -139,7 +139,7 @@ class Matrix2dTest {
     void transformDest() {
         Matrix2d m = new Matrix2d();
         m.scale(2.0, 3.0);
-        Vector2D result = m.transform(new Vector2D(1, 1));
+        Vector2d result = m.transform(new Vector2d(1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
     }
@@ -209,10 +209,10 @@ class Matrix2dTest {
     }
 
     @Test
-    void scaleByVector2D() {
+    void scaleByVector2d() {
         Matrix2d m = new Matrix2d();
-        m.scale(new Vector2D(2, 3));
-        Vector2D result = m.transform(new Vector2D(1, 1));
+        m.scale(new Vector2d(2, 3));
+        Vector2d result = m.transform(new Vector2d(1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
     }
@@ -228,7 +228,7 @@ class Matrix2dTest {
     void rotateNegativeAngle() {
         Matrix2d m = new Matrix2d();
         m.rotate(-Math.PI / 2.0);
-        Vector2D result = m.transform(new Vector2D(1, 0));
+        Vector2d result = m.transform(new Vector2d(1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(-1.0, result.y(), 1e-15);
     }

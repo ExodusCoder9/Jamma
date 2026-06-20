@@ -1,6 +1,6 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 
 public final class Intersection {
 
@@ -18,7 +18,7 @@ public final class Intersection {
      * @param intersectionPoint  a 1-element array to store the intersection point (optional)
      * @return true if the ray intersects the triangle, false otherwise
      */
-    public static boolean testRayTriangle(Ray r, Vector3D v0, Vector3D v1, Vector3D v2, Vector3D[] intersectionPoint) {
+    public static boolean testRayTriangle(Ray r, Vector3d v0, Vector3d v1, Vector3d v2, Vector3d[] intersectionPoint) {
         double edge1x = v1.x() - v0.x();
         double edge1y = v1.y() - v0.y();
         double edge1z = v1.z() - v0.z();
@@ -57,7 +57,7 @@ public final class Intersection {
         double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         if (t > 1e-15) {
             if (intersectionPoint != null && intersectionPoint.length > 0) {
-                intersectionPoint[0] = new Vector3D(
+                intersectionPoint[0] = new Vector3d(
                     r.origin.x() + t * r.direction.x(),
                     r.origin.y() + t * r.direction.y(),
                     r.origin.z() + t * r.direction.z()
@@ -151,7 +151,7 @@ public final class Intersection {
      * @param r1 the radius of the second sphere
      * @return true if they intersect, false otherwise
      */
-    public static boolean testSphereSphere(Vector3D c0, double r0, Vector3D c1, double r1) {
+    public static boolean testSphereSphere(Vector3d c0, double r0, Vector3d c1, double r1) {
         double dx = c0.x() - c1.x();
         double dy = c0.y() - c1.y();
         double dz = c0.z() - c1.z();

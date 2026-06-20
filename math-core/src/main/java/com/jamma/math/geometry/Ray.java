@@ -1,34 +1,34 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
 
 public class Ray implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public Vector3D origin;
-    public Vector3D direction;
+    public Vector3d origin;
+    public Vector3d direction;
 
-    public Ray(Vector3D origin, Vector3D direction) {
+    public Ray(Vector3d origin, Vector3d direction) {
         this.origin = origin;
         this.direction = direction;
     }
 
     public Ray(double ox, double oy, double oz, double dx, double dy, double dz) {
-        this.origin = new Vector3D(ox, oy, oz);
-        this.direction = new Vector3D(dx, dy, dz);
+        this.origin = new Vector3d(ox, oy, oz);
+        this.direction = new Vector3d(dx, dy, dz);
     }
 
-    public Vector3D getPoint(double t, Vector3D dest) {
-        return new Vector3D(
+    public Vector3d getPoint(double t, Vector3d dest) {
+        return new Vector3d(
             origin.x() + t * direction.x(),
             origin.y() + t * direction.y(),
             origin.z() + t * direction.z()
         );
     }
 
-    public double distanceSquared(Vector3D point) {
+    public double distanceSquared(Vector3d point) {
         double dx = point.x() - origin.x();
         double dy = point.y() - origin.y();
         double dz = point.z() - origin.z();
@@ -44,14 +44,14 @@ public class Ray implements Serializable {
         return dx * dx + dy * dy + dz * dz;
     }
 
-    public Vector3D closestPoint(Vector3D point, Vector3D dest) {
+    public Vector3d closestPoint(Vector3d point, Vector3d dest) {
         double dx = point.x() - origin.x();
         double dy = point.y() - origin.y();
         double dz = point.z() - origin.z();
         double dot = dx * direction.x() + dy * direction.y() + dz * direction.z();
         double lenSq = direction.x() * direction.x() + direction.y() * direction.y() + direction.z() * direction.z();
         double t = Math.max(0.0, dot / lenSq);
-        return new Vector3D(
+        return new Vector3d(
             origin.x() + t * direction.x(),
             origin.y() + t * direction.y(),
             origin.z() + t * direction.z()
@@ -62,14 +62,14 @@ public class Ray implements Serializable {
         return box.intersectsRay(origin, direction);
     }
 
-    public double intersectsPlane(double nx, double ny, double nz, double d, Vector3D dest) {
+    public double intersectsPlane(double nx, double ny, double nz, double d, Vector3d dest) {
         double dot = nx * direction.x() + ny * direction.y() + nz * direction.z();
         if (Math.abs(dot) < 1e-30) return Double.NaN;
         double t = -(nx * origin.x() + ny * origin.y() + nz * origin.z() + d) / dot;
         return t >= 0.0 ? t : Double.NaN;
     }
 
-    public double intersectsSphere(Vector3D center, double radius) {
+    public double intersectsSphere(Vector3d center, double radius) {
         double dx = origin.x() - center.x();
         double dy = origin.y() - center.y();
         double dz = origin.z() - center.z();
@@ -95,8 +95,8 @@ public class Ray implements Serializable {
         double dx = m.m00() * direction.x() + m.m10() * direction.y() + m.m20() * direction.z();
         double dy = m.m01() * direction.x() + m.m11() * direction.y() + m.m21() * direction.z();
         double dz = m.m02() * direction.x() + m.m12() * direction.y() + m.m22() * direction.z();
-        origin = new Vector3D(ox, oy, oz);
-        direction = new Vector3D(dx, dy, dz);
+        origin = new Vector3d(ox, oy, oz);
+        direction = new Vector3d(dx, dy, dz);
         return this;
     }
 
@@ -106,7 +106,7 @@ public class Ray implements Serializable {
             direction.y() * direction.y() +
             direction.z() * direction.z()
         );
-        direction = new Vector3D(
+        direction = new Vector3d(
             direction.x() * invLen,
             direction.y() * invLen,
             direction.z() * invLen

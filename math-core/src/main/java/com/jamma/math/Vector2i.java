@@ -154,8 +154,8 @@ public record Vector2i(int x, int y) implements Serializable {
         return new Vector2f((float) x, (float) y);
     }
 
-    public Vector2D toVector2D() {
-        return new Vector2D((double) x, (double) y);
+    public Vector2d toVector2d() {
+        return new Vector2d((double) x, (double) y);
     }
 
     public void write(MemorySegment segment, long offset) {

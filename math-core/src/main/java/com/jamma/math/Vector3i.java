@@ -168,8 +168,8 @@ public record Vector3i(int x, int y, int z) implements Serializable {
         return new Vector3f((float) x, (float) y, (float) z);
     }
 
-    public Vector3D toVector3D() {
-        return new Vector3D((double) x, (double) y, (double) z);
+    public Vector3d toVector3d() {
+        return new Vector3d((double) x, (double) y, (double) z);
     }
 
     public void write(MemorySegment segment, long offset) {

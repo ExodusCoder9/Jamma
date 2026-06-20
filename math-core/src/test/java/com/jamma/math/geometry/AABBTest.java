@@ -3,7 +3,7 @@ package com.jamma.math.geometry;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 
 class AABBTest {
@@ -11,15 +11,15 @@ class AABBTest {
     @Test
     void constructorAndContains() {
         AABB box = new AABB(0, 0, 0, 1, 1, 1);
-        Vector3D center = new Vector3D(0.5, 0.5, 0.5);
+        Vector3d center = new Vector3d(0.5, 0.5, 0.5);
         assertTrue(box.contains(center));
     }
 
     @Test
     void unionPoint() {
         AABB box = new AABB();
-        box.union(new Vector3D(1, 2, 3));
-        box.union(new Vector3D(4, 5, 6));
+        box.union(new Vector3d(1, 2, 3));
+        box.union(new Vector3d(4, 5, 6));
         assertEquals(1.0, box.minX);
         assertEquals(2.0, box.minY);
         assertEquals(3.0, box.minZ);
@@ -92,15 +92,15 @@ class AABBTest {
     @Test
     void getCenterAndExtentAndSize() {
         AABB box = new AABB(0, 0, 0, 2, 4, 6);
-        Vector3D center = box.getCenter(new Vector3D(0, 0, 0));
+        Vector3d center = box.getCenter(new Vector3d(0, 0, 0));
         assertEquals(1.0, center.x());
         assertEquals(2.0, center.y());
         assertEquals(3.0, center.z());
-        Vector3D extent = box.getExtent(new Vector3D(0, 0, 0));
+        Vector3d extent = box.getExtent(new Vector3d(0, 0, 0));
         assertEquals(1.0, extent.x());
         assertEquals(2.0, extent.y());
         assertEquals(3.0, extent.z());
-        Vector3D size = box.getSize(new Vector3D(0, 0, 0));
+        Vector3d size = box.getSize(new Vector3d(0, 0, 0));
         assertEquals(2.0, size.x());
         assertEquals(4.0, size.y());
         assertEquals(6.0, size.z());
@@ -109,11 +109,11 @@ class AABBTest {
     @Test
     void getMinMax() {
         AABB box = new AABB(1, 2, 3, 4, 5, 6);
-        Vector3D min = box.getMin(new Vector3D(0, 0, 0));
+        Vector3d min = box.getMin(new Vector3d(0, 0, 0));
         assertEquals(1.0, min.x());
         assertEquals(2.0, min.y());
         assertEquals(3.0, min.z());
-        Vector3D max = box.getMax(new Vector3D(0, 0, 0));
+        Vector3d max = box.getMax(new Vector3d(0, 0, 0));
         assertEquals(4.0, max.x());
         assertEquals(5.0, max.y());
         assertEquals(6.0, max.z());
@@ -122,11 +122,11 @@ class AABBTest {
     @Test
     void containsPoint() {
         AABB box = new AABB(0, 0, 0, 2, 2, 2);
-        assertTrue(box.contains(new Vector3D(1, 1, 1)));
-        assertTrue(box.contains(new Vector3D(0, 0, 0)));
-        assertTrue(box.contains(new Vector3D(2, 2, 2)));
-        assertFalse(box.contains(new Vector3D(3, 1, 1)));
-        assertFalse(box.contains(new Vector3D(1, -1, 1)));
+        assertTrue(box.contains(new Vector3d(1, 1, 1)));
+        assertTrue(box.contains(new Vector3d(0, 0, 0)));
+        assertTrue(box.contains(new Vector3d(2, 2, 2)));
+        assertFalse(box.contains(new Vector3d(3, 1, 1)));
+        assertFalse(box.contains(new Vector3d(1, -1, 1)));
     }
 
     @Test
@@ -140,9 +140,9 @@ class AABBTest {
     @Test
     void intersectsSphere() {
         AABB box = new AABB(0, 0, 0, 2, 2, 2);
-        assertTrue(box.intersectsSphere(new Vector3D(1, 1, 1), 1.0));
-        assertTrue(box.intersectsSphere(new Vector3D(-1, 1, 1), 1.0));
-        assertFalse(box.intersectsSphere(new Vector3D(10, 0, 0), 1.0));
+        assertTrue(box.intersectsSphere(new Vector3d(1, 1, 1), 1.0));
+        assertTrue(box.intersectsSphere(new Vector3d(-1, 1, 1), 1.0));
+        assertFalse(box.intersectsSphere(new Vector3d(10, 0, 0), 1.0));
     }
 
     @Test
@@ -201,7 +201,7 @@ class AABBTest {
 
     @Test
     void vectorConstructor() {
-        AABB box = new AABB(new Vector3D(1, 2, 3), new Vector3D(4, 5, 6));
+        AABB box = new AABB(new Vector3d(1, 2, 3), new Vector3d(4, 5, 6));
         assertEquals(1.0, box.minX);
         assertEquals(2.0, box.minY);
         assertEquals(3.0, box.minZ);
@@ -221,7 +221,7 @@ class AABBTest {
     @Test
     void intersectsRay() {
         AABB box = new AABB(0, 0, 0, 1, 1, 1);
-        double t = box.intersectsRay(new Vector3D(-5, 0.5, 0.5), new Vector3D(1, 0, 0));
+        double t = box.intersectsRay(new Vector3d(-5, 0.5, 0.5), new Vector3d(1, 0, 0));
         assertTrue(t >= 0.0);
         assertEquals(5.0, t, 1e-15);
     }

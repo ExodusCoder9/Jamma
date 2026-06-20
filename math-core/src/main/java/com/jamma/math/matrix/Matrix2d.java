@@ -1,6 +1,6 @@
 package com.jamma.math.matrix;
 
-import com.jamma.math.Vector2D;
+import com.jamma.math.Vector2d;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -76,7 +76,7 @@ public class Matrix2d implements Serializable {
         return scale(factor, factor);
     }
 
-    public Matrix2d scale(Vector2D xy) {
+    public Matrix2d scale(Vector2d xy) {
         return scale(xy.x(), xy.y());
     }
 
@@ -130,8 +130,8 @@ public class Matrix2d implements Serializable {
         return m00 + m11;
     }
 
-    public Vector2D transform(Vector2D v) {
-        return new Vector2D(
+    public Vector2d transform(Vector2d v) {
+        return new Vector2d(
             m00 * v.x() + m10 * v.y(),
             m01 * v.x() + m11 * v.y()
         );

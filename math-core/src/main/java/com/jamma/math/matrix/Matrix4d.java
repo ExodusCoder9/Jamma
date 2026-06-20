@@ -1,7 +1,7 @@
 package com.jamma.math.matrix;
 
-import com.jamma.math.Vector3D;
-import com.jamma.math.Vector4D;
+import com.jamma.math.Vector3d;
+import com.jamma.math.Vector4d;
 import com.jamma.math.matrix.Matrix3d;
 import com.jamma.math.quaternion.Quaterniond;
 import java.io.Serializable;
@@ -95,12 +95,12 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d translate(Vector3D offset) {
+    public Matrix4d translate(Vector3d offset) {
         return translate(offset.x(), offset.y(), offset.z());
     }
 
-    public Vector3D getTranslation() {
-        return new Vector3D(m30, m31, m32);
+    public Vector3d getTranslation() {
+        return new Vector3d(m30, m31, m32);
     }
 
     public Matrix4d setTranslation(double x, double y, double z) {
@@ -110,7 +110,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setTranslation(Vector3D v) {
+    public Matrix4d setTranslation(Vector3d v) {
         return setTranslation(v.x(), v.y(), v.z());
     }
     public Matrix4d rotate(double angle, double x, double y, double z) {
@@ -296,15 +296,15 @@ public class Matrix4d implements Serializable {
         return scale(factor, factor, factor);
     }
 
-    public Matrix4d scale(Vector3D xyz) {
+    public Matrix4d scale(Vector3d xyz) {
         return scale(xyz.x(), xyz.y(), xyz.z());
     }
 
-    public Vector3D getScale() {
+    public Vector3d getScale() {
         double sx = Math.sqrt(m00 * m00 + m01 * m01 + m02 * m02);
         double sy = Math.sqrt(m10 * m10 + m11 * m11 + m12 * m12);
         double sz = Math.sqrt(m20 * m20 + m21 * m21 + m22 * m22);
-        return new Vector3D(sx, sy, sz);
+        return new Vector3d(sx, sy, sz);
     }
 
     public Matrix4d reflect(double nx, double ny, double nz) {
@@ -339,7 +339,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d reflect(Vector3D normal) {
+    public Matrix4d reflect(Vector3d normal) {
         return reflect(normal.x(), normal.y(), normal.z());
     }
 
@@ -498,7 +498,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d lookAt(Vector3D eye, Vector3D center, Vector3D up) {
+    public Matrix4d lookAt(Vector3d eye, Vector3d center, Vector3d up) {
         return lookAt(eye.x(), eye.y(), eye.z(), center.x(), center.y(), center.z(), up.x(), up.y(), up.z());
     }
 
@@ -769,35 +769,35 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Vector4D transform(Vector4D v) {
+    public Vector4d transform(Vector4d v) {
         double x = Math.fma(m00, v.x(), Math.fma(m10, v.y(), Math.fma(m20, v.z(), m30 * v.w())));
         double y = Math.fma(m01, v.x(), Math.fma(m11, v.y(), Math.fma(m21, v.z(), m31 * v.w())));
         double z = Math.fma(m02, v.x(), Math.fma(m12, v.y(), Math.fma(m22, v.z(), m32 * v.w())));
         double w = Math.fma(m03, v.x(), Math.fma(m13, v.y(), Math.fma(m23, v.z(), m33 * v.w())));
-        return new Vector4D(x, y, z, w);
+        return new Vector4d(x, y, z, w);
     }
 
-    public Vector3D transformPosition(Vector3D v) {
+    public Vector3d transformPosition(Vector3d v) {
         double x = Math.fma(m00, v.x(), Math.fma(m10, v.y(), Math.fma(m20, v.z(), m30)));
         double y = Math.fma(m01, v.x(), Math.fma(m11, v.y(), Math.fma(m21, v.z(), m31)));
         double z = Math.fma(m02, v.x(), Math.fma(m12, v.y(), Math.fma(m22, v.z(), m32)));
-        return new Vector3D(x, y, z);
+        return new Vector3d(x, y, z);
     }
 
-    public Vector3D transformDirection(Vector3D v) {
+    public Vector3d transformDirection(Vector3d v) {
         double x = Math.fma(m00, v.x(), Math.fma(m10, v.y(), m20 * v.z()));
         double y = Math.fma(m01, v.x(), Math.fma(m11, v.y(), m21 * v.z()));
         double z = Math.fma(m02, v.x(), Math.fma(m12, v.y(), m22 * v.z()));
-        return new Vector3D(x, y, z);
+        return new Vector3d(x, y, z);
     }
 
-    public Vector3D transformProject(Vector3D v) {
+    public Vector3d transformProject(Vector3d v) {
         double x = Math.fma(m00, v.x(), Math.fma(m10, v.y(), Math.fma(m20, v.z(), m30)));
         double y = Math.fma(m01, v.x(), Math.fma(m11, v.y(), Math.fma(m21, v.z(), m31)));
         double z = Math.fma(m02, v.x(), Math.fma(m12, v.y(), Math.fma(m22, v.z(), m32)));
         double w = Math.fma(m03, v.x(), Math.fma(m13, v.y(), Math.fma(m23, v.z(), m33)));
         double invW = 1.0 / w;
-        return new Vector3D(x * invW, y * invW, z * invW);
+        return new Vector3d(x * invW, y * invW, z * invW);
     }
 
     public static Matrix4d translation(double x, double y, double z) {
@@ -873,7 +873,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setRow(int row, Vector4D v) {
+    public Matrix4d setRow(int row, Vector4d v) {
         if (row == 0) { m00 = v.x(); m10 = v.y(); m20 = v.z(); m30 = v.w(); }
         else if (row == 1) { m01 = v.x(); m11 = v.y(); m21 = v.z(); m31 = v.w(); }
         else if (row == 2) { m02 = v.x(); m12 = v.y(); m22 = v.z(); m32 = v.w(); }
@@ -882,7 +882,7 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Matrix4d setColumn(int col, Vector4D v) {
+    public Matrix4d setColumn(int col, Vector4d v) {
         if (col == 0) { m00 = v.x(); m01 = v.y(); m02 = v.z(); m03 = v.w(); }
         else if (col == 1) { m10 = v.x(); m11 = v.y(); m12 = v.z(); m13 = v.w(); }
         else if (col == 2) { m20 = v.x(); m21 = v.y(); m22 = v.z(); m23 = v.w(); }
@@ -958,30 +958,30 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    public Vector3D positiveX() { return new Vector3D(m00, m01, m02); }
-    public Vector3D positiveY() { return new Vector3D(m10, m11, m12); }
-    public Vector3D positiveZ() { return new Vector3D(m20, m21, m22); }
+    public Vector3d positiveX() { return new Vector3d(m00, m01, m02); }
+    public Vector3d positiveY() { return new Vector3d(m10, m11, m12); }
+    public Vector3d positiveZ() { return new Vector3d(m20, m21, m22); }
 
-    public Vector3D normalizedPositiveX() {
+    public Vector3d normalizedPositiveX() {
         double invLen = 1.0 / Math.sqrt(m00 * m00 + m01 * m01 + m02 * m02);
-        return new Vector3D(m00 * invLen, m01 * invLen, m02 * invLen);
+        return new Vector3d(m00 * invLen, m01 * invLen, m02 * invLen);
     }
-    public Vector3D normalizedPositiveY() {
+    public Vector3d normalizedPositiveY() {
         double invLen = 1.0 / Math.sqrt(m10 * m10 + m11 * m11 + m12 * m12);
-        return new Vector3D(m10 * invLen, m11 * invLen, m12 * invLen);
+        return new Vector3d(m10 * invLen, m11 * invLen, m12 * invLen);
     }
-    public Vector3D normalizedPositiveZ() {
+    public Vector3d normalizedPositiveZ() {
         double invLen = 1.0 / Math.sqrt(m20 * m20 + m21 * m21 + m22 * m22);
-        return new Vector3D(m20 * invLen, m21 * invLen, m22 * invLen);
+        return new Vector3d(m20 * invLen, m21 * invLen, m22 * invLen);
     }
 
-    public Vector3D getEulerAnglesZYX() {
+    public Vector3d getEulerAnglesZYX() {
         double a = Math.asin(-m20);
         double ca = Math.cos(a);
         if (Math.abs(ca) > 1.0e-6) {
-            return new Vector3D(Math.atan2(m21, m22), a, Math.atan2(m10, m00));
+            return new Vector3d(Math.atan2(m21, m22), a, Math.atan2(m10, m00));
         }
-        return new Vector3D(0.0, a, Math.atan2(-m01, m11));
+        return new Vector3d(0.0, a, Math.atan2(-m01, m11));
     }
 
     public boolean isFinite() {
@@ -1062,27 +1062,27 @@ public class Matrix4d implements Serializable {
         return dest;
     }
 
-    public Vector4D row(int row) {
+    public Vector4d row(int row) {
         if (row == 0) {
-            return new Vector4D(m00, m10, m20, m30);
+            return new Vector4d(m00, m10, m20, m30);
         } else if (row == 1) {
-            return new Vector4D(m01, m11, m21, m31);
+            return new Vector4d(m01, m11, m21, m31);
         } else if (row == 2) {
-            return new Vector4D(m02, m12, m22, m32);
+            return new Vector4d(m02, m12, m22, m32);
         } else {
-            return new Vector4D(m03, m13, m23, m33);
+            return new Vector4d(m03, m13, m23, m33);
         }
     }
 
-    public Vector4D column(int col) {
+    public Vector4d column(int col) {
         if (col == 0) {
-            return new Vector4D(m00, m01, m02, m03);
+            return new Vector4d(m00, m01, m02, m03);
         } else if (col == 1) {
-            return new Vector4D(m10, m11, m12, m13);
+            return new Vector4d(m10, m11, m12, m13);
         } else if (col == 2) {
-            return new Vector4D(m20, m21, m22, m23);
+            return new Vector4d(m20, m21, m22, m23);
         } else {
-            return new Vector4D(m30, m31, m32, m33);
+            return new Vector4d(m30, m31, m32, m33);
         }
     }
 
@@ -1104,7 +1104,7 @@ public class Matrix4d implements Serializable {
             && Math.abs(m30) <= epsilon && Math.abs(m31) <= epsilon && Math.abs(m32) <= epsilon && Math.abs(m33 - 1.0) <= epsilon;
     }
 
-    public Matrix4d billboard(Vector3D objPos, Vector3D target, Vector3D up) {
+    public Matrix4d billboard(Vector3d objPos, Vector3d target, Vector3d up) {
         double dirX = objPos.x() - target.x();
         double dirY = objPos.y() - target.y();
         double dirZ = objPos.z() - target.z();

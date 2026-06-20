@@ -1,6 +1,6 @@
 package com.jamma.math;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
 
@@ -8,28 +8,28 @@ public class FrustumRayBuilder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Vector3D origin;
-    public Vector3D dir00;
-    public Vector3D dir01;
-    public Vector3D dir10;
-    public Vector3D dir11;
+    public Vector3d origin;
+    public Vector3d dir00;
+    public Vector3d dir01;
+    public Vector3d dir10;
+    public Vector3d dir11;
 
     public FrustumRayBuilder() {
-        origin = new Vector3D();
-        dir00 = new Vector3D();
-        dir01 = new Vector3D();
-        dir10 = new Vector3D();
-        dir11 = new Vector3D();
+        origin = new Vector3d();
+        dir00 = new Vector3d();
+        dir01 = new Vector3d();
+        dir10 = new Vector3d();
+        dir11 = new Vector3d();
     }
 
     public FrustumRayBuilder set(Matrix4d invProjView) {
         double ox = invProjView.m30;
         double oy = invProjView.m31;
         double oz = invProjView.m32;
-        origin = new Vector3D(ox, oy, oz);
+        origin = new Vector3d(ox, oy, oz);
 
         double[][] ndcCorners = {{-1,-1,1}, {1,-1,1}, {-1,1,1}, {1,1,1}};
-        Vector3D[] rayDirs = new Vector3D[4];
+        Vector3d[] rayDirs = new Vector3d[4];
 
         for (int i = 0; i < 4; i++) {
             double cx = ndcCorners[i][0], cy = ndcCorners[i][1], cz = ndcCorners[i][2];
@@ -39,7 +39,7 @@ public class FrustumRayBuilder implements Serializable {
             double tw = invProjView.m03 * cx + invProjView.m13 * cy + invProjView.m23 * cz + invProjView.m33;
             double invW = 1.0 / tw;
             double wx = tx * invW, wy = ty * invW, wz = tz * invW;
-            rayDirs[i] = new Vector3D(wx - ox, wy - oy, wz - oz);
+            rayDirs[i] = new Vector3d(wx - ox, wy - oy, wz - oz);
         }
 
         dir00 = rayDirs[0];
@@ -50,7 +50,7 @@ public class FrustumRayBuilder implements Serializable {
         return this;
     }
 
-    public Vector3D getRay(float x, float y, Vector3D dest) {
+    public Vector3d getRay(float x, float y, Vector3d dest) {
         float right = x;
         float left = 1 - right;
         float up = y;
@@ -58,11 +58,11 @@ public class FrustumRayBuilder implements Serializable {
         double dx = left * down * dir00.x() + right * down * dir10.x() + left * up * dir01.x() + right * up * dir11.x();
         double dy = left * down * dir00.y() + right * down * dir10.y() + left * up * dir01.y() + right * up * dir11.y();
         double dz = left * down * dir00.z() + right * down * dir10.z() + left * up * dir01.z() + right * up * dir11.z();
-        return new Vector3D(dx, dy, dz);
+        return new Vector3d(dx, dy, dz);
     }
 
-    public Vector3D getRay(float x, float y) {
-        return getRay(x, y, new Vector3D());
+    public Vector3d getRay(float x, float y) {
+        return getRay(x, y, new Vector3d());
     }
 
     public FrustumRayBuilder normalize() {

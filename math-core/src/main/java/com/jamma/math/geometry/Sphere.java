@@ -1,18 +1,18 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
 
-public record Sphere(Vector3D center, double radius) implements Serializable {
+public record Sphere(Vector3d center, double radius) implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     public Sphere(double cx, double cy, double cz, double radius) {
-        this(new Vector3D(cx, cy, cz), radius);
+        this(new Vector3d(cx, cy, cz), radius);
     }
 
-    public boolean contains(Vector3D point) {
+    public boolean contains(Vector3d point) {
         double dx = point.x() - center.x();
         double dy = point.y() - center.y();
         double dz = point.z() - center.z();

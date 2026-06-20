@@ -1,7 +1,7 @@
 package com.jamma.math.quaternion;
 
 import com.jamma.math.AxisAngle4d;
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
@@ -74,20 +74,20 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         );
     }
 
-    public static Quaterniond rotateTo(Vector3D from, Vector3D to) {
+    public static Quaterniond rotateTo(Vector3d from, Vector3d to) {
         double d = from.dot(to);
         double x, y, z, w;
         if (d < -1.0 + 1e-6) {
-            Vector3D axis = from.cross(new Vector3D(1, 0, 0));
+            Vector3d axis = from.cross(new Vector3d(1, 0, 0));
             if (axis.lengthSquared() < 1e-6) {
-                axis = from.cross(new Vector3D(0, 1, 0));
+                axis = from.cross(new Vector3d(0, 1, 0));
             }
             axis = axis.normalize();
             x = axis.x(); y = axis.y(); z = axis.z(); w = 0.0;
         } else {
             double s = Math.sqrt((1.0 + d) * 2.0);
             double invS = 1.0 / s;
-            Vector3D c = from.cross(to);
+            Vector3d c = from.cross(to);
             x = c.x() * invS;
             y = c.y() * invS;
             z = c.z() * invS;
@@ -96,7 +96,7 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         return new Quaterniond(x, y, z, w).normalize();
     }
 
-    public static Quaterniond fromAxisAngle(Vector3D axis, double angle) {
+    public static Quaterniond fromAxisAngle(Vector3d axis, double angle) {
         double halfAngle = angle * 0.5;
         double sinHalf = Math.sin(halfAngle);
         double cosHalf = Math.cos(halfAngle);
@@ -224,32 +224,32 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         });
     }
 
-    public Vector3D transform(Vector3D v) {
+    public Vector3d transform(Vector3d v) {
         double xx = x * x, yy = y * y, zz = z * z;
         double xy = x * y, xz = x * z, xw = x * w;
         double yz = y * z, yw = y * w, zw = z * w;
         double vx = v.x(), vy = v.y(), vz = v.z();
-        return new Vector3D(
+        return new Vector3d(
             Math.fma(2.0, xx - 0.5 * (yy + zz), vx) + Math.fma(2.0, xy - zw, vy) + Math.fma(2.0, xz + yw, vz),
             Math.fma(2.0, xy + zw, vx) + Math.fma(2.0, yy - 0.5 * (xx + zz), vy) + Math.fma(2.0, yz - xw, vz),
             Math.fma(2.0, xz - yw, vx) + Math.fma(2.0, yz + xw, vy) + Math.fma(2.0, zz - 0.5 * (xx + yy), vz)
         );
     }
 
-    public Vector3D positiveX() {
+    public Vector3d positiveX() {
         double xz = x * z, yw = y * w;
-        return new Vector3D(Math.fma(-2.0, y * y + z * z, 1.0), Math.fma(2.0, x * y + z * w, 0.0), Math.fma(2.0, xz - yw, 0.0));
+        return new Vector3d(Math.fma(-2.0, y * y + z * z, 1.0), Math.fma(2.0, x * y + z * w, 0.0), Math.fma(2.0, xz - yw, 0.0));
     }
 
-    public Vector3D positiveY() {
-        return new Vector3D(Math.fma(2.0, x * y - z * w, 0.0), Math.fma(-2.0, x * x + z * z, 1.0), Math.fma(2.0, y * z + x * w, 0.0));
+    public Vector3d positiveY() {
+        return new Vector3d(Math.fma(2.0, x * y - z * w, 0.0), Math.fma(-2.0, x * x + z * z, 1.0), Math.fma(2.0, y * z + x * w, 0.0));
     }
 
-    public Vector3D positiveZ() {
-        return new Vector3D(Math.fma(2.0, x * z + y * w, 0.0), Math.fma(2.0, y * z - x * w, 0.0), Math.fma(-2.0, x * x + y * y, 1.0));
+    public Vector3d positiveZ() {
+        return new Vector3d(Math.fma(2.0, x * z + y * w, 0.0), Math.fma(2.0, y * z - x * w, 0.0), Math.fma(-2.0, x * x + y * y, 1.0));
     }
 
-    public Vector3D getEulerAnglesXYZ() {
+    public Vector3d getEulerAnglesXYZ() {
         double m00 = Math.fma(2.0, -y*y - z*z, 1.0);
         double m10 = Math.fma(2.0, x*y + z*w, 0.0);
         double m20 = Math.fma(2.0, x*z - y*w, 0.0);
@@ -269,7 +269,7 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
             yAngle = Math.atan2(-m20, sy);
             zAngle = 0.0;
         }
-        return new Vector3D(xAngle, yAngle, zAngle);
+        return new Vector3d(xAngle, yAngle, zAngle);
     }
 
     public Quaterniond() {
@@ -284,7 +284,7 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         this(values[0], values[1], values[2], values[3]);
     }
 
-    public Quaterniond(Vector3D axis, double angle) {
+    public Quaterniond(Vector3d axis, double angle) {
         this(fromAxisAngle(axis, angle));
     }
 
@@ -375,32 +375,32 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         );
     }
 
-    public Vector3D transform(double x, double y, double z) {
-        return transform(new Vector3D(x, y, z));
+    public Vector3d transform(double x, double y, double z) {
+        return transform(new Vector3d(x, y, z));
     }
 
-    public Vector3D positiveX(Vector3D dest) {
+    public Vector3d positiveX(Vector3d dest) {
         return positiveX();
     }
 
-    public Vector3D positiveY(Vector3D dest) {
+    public Vector3d positiveY(Vector3d dest) {
         return positiveY();
     }
 
-    public Vector3D positiveZ(Vector3D dest) {
+    public Vector3d positiveZ(Vector3d dest) {
         return positiveZ();
     }
 
     public static Quaterniond fromAxisAngle(double axisX, double axisY, double axisZ, double angle) {
-        return fromAxisAngle(new Vector3D(axisX, axisY, axisZ), angle);
+        return fromAxisAngle(new Vector3d(axisX, axisY, axisZ), angle);
     }
 
-    public static Quaterniond fromAxisAngleDeg(Vector3D axis, double angleDeg) {
+    public static Quaterniond fromAxisAngleDeg(Vector3d axis, double angleDeg) {
         return fromAxisAngle(axis, angleDeg * Math.PI / 180.0);
     }
 
     public static Quaterniond fromAxisAngleDeg(double axisX, double axisY, double axisZ, double angleDeg) {
-        return fromAxisAngleDeg(new Vector3D(axisX, axisY, axisZ), angleDeg);
+        return fromAxisAngleDeg(new Vector3d(axisX, axisY, axisZ), angleDeg);
     }
 
     public static Quaterniond fromEulerAnglesZYX(double angleZ, double angleY, double angleX) {
@@ -433,18 +433,18 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         );
     }
 
-    public static Quaterniond fromAngleAxis(double angle, Vector3D axis) {
+    public static Quaterniond fromAngleAxis(double angle, Vector3d axis) {
         return fromAxisAngle(axis, angle);
     }
 
-    public static Quaterniond rotationTo(Vector3D from, Vector3D to) {
+    public static Quaterniond rotationTo(Vector3d from, Vector3d to) {
         return rotateTo(from, to);
     }
 
-    public static Quaterniond lookAt(Vector3D dir, Vector3D up) {
-        Vector3D forward = dir.normalize();
-        Vector3D right = up.normalize().cross(forward).normalize();
-        Vector3D newUp = forward.cross(right);
+    public static Quaterniond lookAt(Vector3d dir, Vector3d up) {
+        Vector3d forward = dir.normalize();
+        Vector3d right = up.normalize().cross(forward).normalize();
+        Vector3d newUp = forward.cross(right);
         Matrix3d m = new Matrix3d();
         m.m00 = right.x(); m.m01 = newUp.x(); m.m02 = forward.x();
         m.m10 = right.y(); m.m11 = newUp.y(); m.m12 = forward.y();
@@ -453,7 +453,7 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
     }
 
     public static Quaterniond lookAt(double dirX, double dirY, double dirZ, double upX, double upY, double upZ) {
-        return lookAt(new Vector3D(dirX, dirY, dirZ), new Vector3D(upX, upY, upZ));
+        return lookAt(new Vector3d(dirX, dirY, dirZ), new Vector3d(upX, upY, upZ));
     }
 
     public AxisAngle4d toAxisAngle() {

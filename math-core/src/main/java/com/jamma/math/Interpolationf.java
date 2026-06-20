@@ -181,4 +181,67 @@ public final class Interpolationf {
         float bottom = grid[1][0] * (1 - u) + grid[1][1] * u;
         return top * (1 - v) + bottom * v;
     }
+
+    public static float bezierBiquadratic(float[][] grid, float u, float v) {
+        float u1 = 1.0f - u, v1 = 1.0f - v;
+        float bu0 = u1 * u1, bu1 = 2.0f * u1 * u, bu2 = u * u;
+        float bv0 = v1 * v1, bv1 = 2.0f * v1 * v, bv2 = v * v;
+        float row0 = bu0 * grid[0][0] + bu1 * grid[0][1] + bu2 * grid[0][2];
+        float row1 = bu0 * grid[1][0] + bu1 * grid[1][1] + bu2 * grid[1][2];
+        float row2 = bu0 * grid[2][0] + bu1 * grid[2][1] + bu2 * grid[2][2];
+        return bv0 * row0 + bv1 * row1 + bv2 * row2;
+    }
+
+    public static float bezierBicubic(float[][] grid, float u, float v) {
+        float u1 = 1.0f - u, v1 = 1.0f - v;
+        float bu0 = u1 * u1 * u1, bu1 = 3.0f * u1 * u1 * u, bu2 = 3.0f * u1 * u * u, bu3 = u * u * u;
+        float bv0 = v1 * v1 * v1, bv1 = 3.0f * v1 * v1 * v, bv2 = 3.0f * v1 * v * v, bv3 = v * v * v;
+        float row0 = bu0 * grid[0][0] + bu1 * grid[0][1] + bu2 * grid[0][2] + bu3 * grid[0][3];
+        float row1 = bu0 * grid[1][0] + bu1 * grid[1][1] + bu2 * grid[1][2] + bu3 * grid[1][3];
+        float row2 = bu0 * grid[2][0] + bu1 * grid[2][1] + bu2 * grid[2][2] + bu3 * grid[2][3];
+        float row3 = bu0 * grid[3][0] + bu1 * grid[3][1] + bu2 * grid[3][2] + bu3 * grid[3][3];
+        return bv0 * row0 + bv1 * row1 + bv2 * row2 + bv3 * row3;
+    }
+
+    public static float catmullRomSurface(float[][] grid, float u, float v) {
+        float[] col = new float[4];
+        for (int i = 0; i < 4; i++) {
+            col[i] = catmullRom(grid[i][0], grid[i][1], grid[i][2], grid[i][3], u);
+        }
+        return catmullRom(col[0], col[1], col[2], col[3], v);
+    }
+
+    public static float bsplineSurface(float[][] grid, float u, float v) {
+        float u2 = u * u, u3 = u2 * u;
+        float bu0 = (1.0f - 3.0f * u + 3.0f * u2 - u3) / 6.0f;
+        float bu1 = (4.0f - 6.0f * u2 + 3.0f * u3) / 6.0f;
+        float bu2 = (1.0f + 3.0f * u + 3.0f * u2 - 3.0f * u3) / 6.0f;
+        float bu3 = u3 / 6.0f;
+        float v2 = v * v, v3 = v2 * v;
+        float bv0 = (1.0f - 3.0f * v + 3.0f * v2 - v3) / 6.0f;
+        float bv1 = (4.0f - 6.0f * v2 + 3.0f * v3) / 6.0f;
+        float bv2 = (1.0f + 3.0f * v + 3.0f * v2 - 3.0f * v3) / 6.0f;
+        float bv3 = v3 / 6.0f;
+        float row0 = bu0 * grid[0][0] + bu1 * grid[0][1] + bu2 * grid[0][2] + bu3 * grid[0][3];
+        float row1 = bu0 * grid[1][0] + bu1 * grid[1][1] + bu2 * grid[1][2] + bu3 * grid[1][3];
+        float row2 = bu0 * grid[2][0] + bu1 * grid[2][1] + bu2 * grid[2][2] + bu3 * grid[2][3];
+        float row3 = bu0 * grid[3][0] + bu1 * grid[3][1] + bu2 * grid[3][2] + bu3 * grid[3][3];
+        return bv0 * row0 + bv1 * row1 + bv2 * row2 + bv3 * row3;
+    }
+
+    public static float bezierTriangle(float[] cp, float u, float v) {
+        float w = 1.0f - u - v;
+        float u2 = u * u, v2 = v * v, w2 = w * w;
+        float u3 = u2 * u, v3 = v2 * v, w3 = w2 * w;
+        return cp[0] * w3
+             + cp[1] * 3.0f * u * w2
+             + cp[2] * 3.0f * u2 * w
+             + cp[3] * u3
+             + cp[4] * 3.0f * v * w2
+             + cp[5] * 6.0f * u * v * w
+             + cp[6] * 3.0f * v2 * w
+             + cp[7] * 3.0f * u * v2
+             + cp[8] * 3.0f * v * u2
+             + cp[9] * v3;
+    }
 }

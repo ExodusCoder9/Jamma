@@ -146,7 +146,7 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public Vector2f toVector2f() { return new Vector2f(x, y); }
     public Vector4f toVector4f() { return new Vector4f(x, y, z, 0.0f); }
     public Vector4f toVector4f(float w) { return new Vector4f(x, y, z, w); }
-    public Vector3D toVector3D() { return new Vector3D(x, y, z); }
+    public Vector3d toVector3d() { return new Vector3d(x, y, z); }
     public float[] get(float[] dest) { dest[0] = x; dest[1] = y; dest[2] = z; return dest; }
 
     @Override

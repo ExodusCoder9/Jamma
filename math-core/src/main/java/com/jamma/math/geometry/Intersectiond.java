@@ -1,6 +1,6 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ public final class Intersectiond {
 
     private Intersectiond() {}
 
-    public static boolean testRayTriangle(Ray r, Vector3D v0, Vector3D v1, Vector3D v2, double[] t) {
+    public static boolean testRayTriangle(Ray r, Vector3d v0, Vector3d v1, Vector3d v2, double[] t) {
         double edge1x = v1.x() - v0.x();
         double edge1y = v1.y() - v0.y();
         double edge1z = v1.z() - v0.z();
@@ -39,7 +39,7 @@ public final class Intersectiond {
         return false;
     }
 
-    public static boolean testRayTriangle(Ray r, Vector3D v0, Vector3D v1, Vector3D v2, Vector3D[] intersectionPoint) {
+    public static boolean testRayTriangle(Ray r, Vector3d v0, Vector3d v1, Vector3d v2, Vector3d[] intersectionPoint) {
         double edge1x = v1.x() - v0.x();
         double edge1y = v1.y() - v0.y();
         double edge1z = v1.z() - v0.z();
@@ -65,7 +65,7 @@ public final class Intersectiond {
         double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         if (t > 1e-15) {
             if (intersectionPoint != null && intersectionPoint.length > 0) {
-                intersectionPoint[0] = new Vector3D(
+                intersectionPoint[0] = new Vector3d(
                     r.origin.x() + t * r.direction.x(),
                     r.origin.y() + t * r.direction.y(),
                     r.origin.z() + t * r.direction.z()
@@ -120,12 +120,12 @@ public final class Intersectiond {
         return true;
     }
 
-    public static boolean testRayQuad(Ray r, Vector3D v0, Vector3D v1, Vector3D v2, Vector3D v3, Vector3D[] intersectionPoint) {
+    public static boolean testRayQuad(Ray r, Vector3d v0, Vector3d v1, Vector3d v2, Vector3d v3, Vector3d[] intersectionPoint) {
         if (testRayTriangle(r, v0, v1, v2, intersectionPoint)) return true;
         return testRayTriangle(r, v0, v2, v3, intersectionPoint);
     }
 
-    public static boolean testRaySphere(Ray r, Vector3D center, double radius, double[] t) {
+    public static boolean testRaySphere(Ray r, Vector3d center, double radius, double[] t) {
         double dx = r.origin.x() - center.x();
         double dy = r.origin.y() - center.y();
         double dz = r.origin.z() - center.z();
@@ -149,7 +149,7 @@ public final class Intersectiond {
         return testRaySphere(r, sphere.center(), sphere.radius(), t);
     }
 
-    public static boolean testRaySphere(Ray r, Vector3D center, double radius, Vector3D[] intersectionPoint) {
+    public static boolean testRaySphere(Ray r, Vector3d center, double radius, Vector3d[] intersectionPoint) {
         double dx = r.origin.x() - center.x();
         double dy = r.origin.y() - center.y();
         double dz = r.origin.z() - center.z();
@@ -166,7 +166,7 @@ public final class Intersectiond {
         else if (t2 >= 0.0) t = t2;
         else return false;
         if (intersectionPoint != null && intersectionPoint.length > 0) {
-            intersectionPoint[0] = new Vector3D(
+            intersectionPoint[0] = new Vector3d(
                 r.origin.x() + t * r.direction.x(),
                 r.origin.y() + t * r.direction.y(),
                 r.origin.z() + t * r.direction.z()
@@ -184,14 +184,14 @@ public final class Intersectiond {
         return true;
     }
 
-    public static boolean testRayPlane(Ray r, Plane p, Vector3D[] intersectionPoint) {
+    public static boolean testRayPlane(Ray r, Plane p, Vector3d[] intersectionPoint) {
         double nx = p.normal().x(), ny = p.normal().y(), nz = p.normal().z();
         double dot = nx * r.direction.x() + ny * r.direction.y() + nz * r.direction.z();
         if (Math.abs(dot) < 1e-15) return false;
         double t = -(nx * r.origin.x() + ny * r.origin.y() + nz * r.origin.z() + p.d()) / dot;
         if (t < 0.0) return false;
         if (intersectionPoint != null && intersectionPoint.length > 0) {
-            intersectionPoint[0] = new Vector3D(
+            intersectionPoint[0] = new Vector3d(
                 r.origin.x() + t * r.direction.x(),
                 r.origin.y() + t * r.direction.y(),
                 r.origin.z() + t * r.direction.z()
@@ -200,7 +200,7 @@ public final class Intersectiond {
         return true;
     }
 
-    public static boolean testRayCircle(Ray r, Vector3D center, double radius, Vector3D planeNormal, Vector3D[] intersectionPoint) {
+    public static boolean testRayCircle(Ray r, Vector3d center, double radius, Vector3d planeNormal, Vector3d[] intersectionPoint) {
         double nx = planeNormal.x(), ny = planeNormal.y(), nz = planeNormal.z();
         double dot = nx * r.direction.x() + ny * r.direction.y() + nz * r.direction.z();
         if (Math.abs(dot) < 1e-15) return false;
@@ -214,12 +214,12 @@ public final class Intersectiond {
         double ddz = pz - center.z();
         if (ddx * ddx + ddy * ddy + ddz * ddz > radius * radius) return false;
         if (intersectionPoint != null && intersectionPoint.length > 0) {
-            intersectionPoint[0] = new Vector3D(px, py, pz);
+            intersectionPoint[0] = new Vector3d(px, py, pz);
         }
         return true;
     }
 
-    public static boolean testRayDisc(Ray r, Vector3D center, double radius, Vector3D planeNormal, Vector3D[] intersectionPoint) {
+    public static boolean testRayDisc(Ray r, Vector3d center, double radius, Vector3d planeNormal, Vector3d[] intersectionPoint) {
         double nx = planeNormal.x(), ny = planeNormal.y(), nz = planeNormal.z();
         double dot = nx * r.direction.x() + ny * r.direction.y() + nz * r.direction.z();
         if (Math.abs(dot) < 1e-15) return false;
@@ -233,12 +233,12 @@ public final class Intersectiond {
         double ddz = pz - center.z();
         if (ddx * ddx + ddy * ddy + ddz * ddz > radius * radius) return false;
         if (intersectionPoint != null && intersectionPoint.length > 0) {
-            intersectionPoint[0] = new Vector3D(px, py, pz);
+            intersectionPoint[0] = new Vector3d(px, py, pz);
         }
         return true;
     }
 
-    public static boolean testLineSegmentTriangle(Vector3D p0, Vector3D p1, Vector3D v0, Vector3D v1, Vector3D v2, Vector3D[] intersectionPoint) {
+    public static boolean testLineSegmentTriangle(Vector3d p0, Vector3d p1, Vector3d v0, Vector3d v1, Vector3d v2, Vector3d[] intersectionPoint) {
         double dirx = p1.x() - p0.x();
         double diry = p1.y() - p0.y();
         double dirz = p1.z() - p0.z();
@@ -267,7 +267,7 @@ public final class Intersectiond {
         double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         if (t >= 0.0 && t <= 1.0) {
             if (intersectionPoint != null && intersectionPoint.length > 0) {
-                intersectionPoint[0] = new Vector3D(
+                intersectionPoint[0] = new Vector3d(
                     p0.x() + t * dirx, p0.y() + t * diry, p0.z() + t * dirz
                 );
             }
@@ -276,7 +276,7 @@ public final class Intersectiond {
         return false;
     }
 
-    public static boolean testLineSegmentAABB(Vector3D p0, Vector3D p1, AABB box, Vector3D[] intersectionPoint) {
+    public static boolean testLineSegmentAABB(Vector3d p0, Vector3d p1, AABB box, Vector3d[] intersectionPoint) {
         double dx = p1.x() - p0.x();
         double dy = p1.y() - p0.y();
         double dz = p1.z() - p0.z();
@@ -317,24 +317,24 @@ public final class Intersectiond {
         }
         if (intersectionPoint != null && intersectionPoint.length > 0) {
             double t = tmin >= 0.0 ? tmin : tmax;
-            intersectionPoint[0] = new Vector3D(p0.x() + t * dx, p0.y() + t * dy, p0.z() + t * dz);
+            intersectionPoint[0] = new Vector3d(p0.x() + t * dx, p0.y() + t * dy, p0.z() + t * dz);
         }
         return true;
     }
 
-    public static double distancePointTriangle(Vector3D point, Vector3D v0, Vector3D v1, Vector3D v2) {
-        Vector3D closest = closestPointTriangle(point, v0, v1, v2);
+    public static double distancePointTriangle(Vector3d point, Vector3d v0, Vector3d v1, Vector3d v2) {
+        Vector3d closest = closestPointTriangle(point, v0, v1, v2);
         double dx = point.x() - closest.x();
         double dy = point.y() - closest.y();
         double dz = point.z() - closest.z();
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    public static Vector3D closestPointTriangle(Vector3D point, Vector3D v0, Vector3D v1, Vector3D v2, Vector3D dest) {
+    public static Vector3d closestPointTriangle(Vector3d point, Vector3d v0, Vector3d v1, Vector3d v2, Vector3d dest) {
         return closestPointTriangle(point, v0, v1, v2);
     }
 
-    public static Vector3D closestPointTriangle(Vector3D p, Vector3D a, Vector3D b, Vector3D c) {
+    public static Vector3d closestPointTriangle(Vector3d p, Vector3d a, Vector3d b, Vector3d c) {
         double abx = b.x() - a.x(), aby = b.y() - a.y(), abz = b.z() - a.z();
         double acx = c.x() - a.x(), acy = c.y() - a.y(), acz = c.z() - a.z();
         double apx = p.x() - a.x(), apy = p.y() - a.y(), apz = p.z() - a.z();
@@ -348,7 +348,7 @@ public final class Intersectiond {
         double vc = d1 * d4 - d3 * d2;
         if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0) {
             double v = d1 / (d1 - d3);
-            return new Vector3D(a.x() + v * abx, a.y() + v * aby, a.z() + v * abz);
+            return new Vector3d(a.x() + v * abx, a.y() + v * aby, a.z() + v * abz);
         }
         double cpx = p.x() - c.x(), cpy = p.y() - c.y(), cpz = p.z() - c.z();
         double d5 = abx * cpx + aby * cpy + abz * cpz;
@@ -357,19 +357,19 @@ public final class Intersectiond {
         double vb = d5 * d2 - d1 * d6;
         if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0) {
             double w = d2 / (d2 - d6);
-            return new Vector3D(a.x() + w * acx, a.y() + w * acy, a.z() + w * acz);
+            return new Vector3d(a.x() + w * acx, a.y() + w * acy, a.z() + w * acz);
         }
         double va = d3 * d6 - d5 * d4;
         if (va <= 0.0 && d4 - d3 >= 0.0 && d5 - d6 >= 0.0) {
             double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-            return new Vector3D(b.x() + w * (c.x() - b.x()), b.y() + w * (c.y() - b.y()), b.z() + w * (c.z() - b.z()));
+            return new Vector3d(b.x() + w * (c.x() - b.x()), b.y() + w * (c.y() - b.y()), b.z() + w * (c.z() - b.z()));
         }
         double denom = 1.0 / (va + vb + vc);
         double v = vb * denom;
         double w = vc * denom;
-        return new Vector3D(a.x() + v * abx + w * acx, a.y() + v * aby + w * acy, a.z() + v * abz + w * acz);
+        return new Vector3d(a.x() + v * abx + w * acx, a.y() + v * aby + w * acy, a.z() + v * abz + w * acz);
     }
-    public static double distancePointLine(Vector3D point, Vector3D p0, Vector3D p1) {
+    public static double distancePointLine(Vector3d point, Vector3d p0, Vector3d p1) {
         double abx = p1.x() - p0.x();
         double aby = p1.y() - p0.y();
         double abz = p1.z() - p0.z();
@@ -389,7 +389,7 @@ public final class Intersectiond {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    public static Vector3D closestPointLine(Vector3D point, Vector3D p0, Vector3D p1) {
+    public static Vector3d closestPointLine(Vector3d point, Vector3d p0, Vector3d p1) {
         double abx = p1.x() - p0.x();
         double aby = p1.y() - p0.y();
         double abz = p1.z() - p0.z();
@@ -400,41 +400,41 @@ public final class Intersectiond {
         double lenSq = abx * abx + aby * aby + abz * abz;
         if (lenSq == 0.0) return p0;
         double t = Math.max(0.0, Math.min(1.0, dot / lenSq));
-        return new Vector3D(p0.x() + t * abx, p0.y() + t * aby, p0.z() + t * abz);
+        return new Vector3d(p0.x() + t * abx, p0.y() + t * aby, p0.z() + t * abz);
     }
 
-    public static double distancePointPlane(Vector3D point, Plane p) {
+    public static double distancePointPlane(Vector3d point, Plane p) {
         return Math.abs(p.normal().x() * point.x() + p.normal().y() * point.y() + p.normal().z() * point.z() + p.d());
     }
 
-    public static double distancePointPlane(Vector3D point, double nx, double ny, double nz, double d) {
+    public static double distancePointPlane(Vector3d point, double nx, double ny, double nz, double d) {
         return Math.abs(nx * point.x() + ny * point.y() + nz * point.z() + d);
     }
 
-    public static double signedDistancePointPlane(Vector3D point, double nx, double ny, double nz, double d) {
+    public static double signedDistancePointPlane(Vector3d point, double nx, double ny, double nz, double d) {
         return nx * point.x() + ny * point.y() + nz * point.z() + d;
     }
 
-    public static Vector3D closestPointPlane(Vector3D point, Plane p) {
+    public static Vector3d closestPointPlane(Vector3d point, Plane p) {
         double nx = p.normal().x(), ny = p.normal().y(), nz = p.normal().z();
         double dist = nx * point.x() + ny * point.y() + nz * point.z() + p.d();
-        return new Vector3D(point.x() - dist * nx, point.y() - dist * ny, point.z() - dist * nz);
+        return new Vector3d(point.x() - dist * nx, point.y() - dist * ny, point.z() - dist * nz);
     }
 
-    public static Vector3D closestPointPlane(Vector3D point, double nx, double ny, double nz, double d) {
+    public static Vector3d closestPointPlane(Vector3d point, double nx, double ny, double nz, double d) {
         double dist = nx * point.x() + ny * point.y() + nz * point.z() + d;
-        return new Vector3D(point.x() - dist * nx, point.y() - dist * ny, point.z() - dist * nz);
+        return new Vector3d(point.x() - dist * nx, point.y() - dist * ny, point.z() - dist * nz);
     }
 
-    public static boolean testSphereTriangle(Vector3D center, double radius, Vector3D v0, Vector3D v1, Vector3D v2) {
-        Vector3D closest = closestPointTriangle(center, v0, v1, v2);
+    public static boolean testSphereTriangle(Vector3d center, double radius, Vector3d v0, Vector3d v1, Vector3d v2) {
+        Vector3d closest = closestPointTriangle(center, v0, v1, v2);
         double dx = center.x() - closest.x();
         double dy = center.y() - closest.y();
         double dz = center.z() - closest.z();
         return dx * dx + dy * dy + dz * dz <= radius * radius;
     }
 
-    public static boolean testSphereAABB(Vector3D center, double radius, AABB box) {
+    public static boolean testSphereAABB(Vector3d center, double radius, AABB box) {
         double closestX = Math.max(box.minX, Math.min(center.x(), box.maxX));
         double closestY = Math.max(box.minY, Math.min(center.y(), box.maxY));
         double closestZ = Math.max(box.minZ, Math.min(center.z(), box.maxZ));
@@ -444,12 +444,12 @@ public final class Intersectiond {
         return dx * dx + dy * dy + dz * dz <= radius * radius;
     }
 
-    public static boolean testSpherePlane(Vector3D center, double radius, Plane p) {
+    public static boolean testSpherePlane(Vector3d center, double radius, Plane p) {
         double dist = Math.abs(p.normal().x() * center.x() + p.normal().y() * center.y() + p.normal().z() * center.z() + p.d());
         return dist <= radius;
     }
 
-    public static boolean testSphereFrustum(Vector3D center, double radius, Matrix4d projectionMatrix) {
+    public static boolean testSphereFrustum(Vector3d center, double radius, Matrix4d projectionMatrix) {
         FrustumIntersection frustum = new FrustumIntersection(projectionMatrix);
         return frustum.testSphere(center, radius) != FrustumIntersection.OUTSIDE;
     }
@@ -475,7 +475,7 @@ public final class Intersectiond {
         return frustum.testAABB(box) != FrustumIntersection.OUTSIDE;
     }
 
-    public static double intersectRayTriangle(Ray r, Vector3D v0, Vector3D v1, Vector3D v2, double epsilon) {
+    public static double intersectRayTriangle(Ray r, Vector3d v0, Vector3d v1, Vector3d v2, double epsilon) {
         double edge1x = v1.x() - v0.x();
         double edge1y = v1.y() - v0.y();
         double edge1z = v1.z() - v0.z();
@@ -503,7 +503,7 @@ public final class Intersectiond {
         return -1.0;
     }
 
-    public static double intersectRaySphere(Ray r, Vector3D center, double radius) {
+    public static double intersectRaySphere(Ray r, Vector3d center, double radius) {
         double dx = r.origin.x() - center.x();
         double dy = r.origin.y() - center.y();
         double dz = r.origin.z() - center.z();
@@ -531,11 +531,11 @@ public final class Intersectiond {
     public static double intersectRayPlane(Ray r, Plane p) {
         return intersectRayPlane(r, p.normal().x(), p.normal().y(), p.normal().z(), p.d());
     }
-    public static Vector3D intersectPlanePlane(Plane p0, Plane p1, Vector3D dest) {
+    public static Vector3d intersectPlanePlane(Plane p0, Plane p1, Vector3d dest) {
         return intersectPlanePlane(p0, p1);
     }
 
-    public static Vector3D intersectPlanePlane(Plane p0, Plane p1) {
+    public static Vector3d intersectPlanePlane(Plane p0, Plane p1) {
         double n1x = p0.normal().x(), n1y = p0.normal().y(), n1z = p0.normal().z();
         double n2x = p1.normal().x(), n2y = p1.normal().y(), n2z = p1.normal().z();
         double d1 = p0.d(), d2 = p1.d();
@@ -546,10 +546,10 @@ public final class Intersectiond {
         if (Math.abs(denom) < 1e-30) return null;
         double u = (-c * d1 + b * d2) / denom;
         double v = (b * d1 - a * d2) / denom;
-        return new Vector3D(u * n1x + v * n2x, u * n1y + v * n2y, u * n1z + v * n2z);
+        return new Vector3d(u * n1x + v * n2x, u * n1y + v * n2y, u * n1z + v * n2z);
     }
 
-    public static Vector3D intersectPlanePlanePlane(Plane p0, Plane p1, Plane p2) {
+    public static Vector3d intersectPlanePlanePlane(Plane p0, Plane p1, Plane p2) {
         double n1x = p0.normal().x(), n1y = p0.normal().y(), n1z = p0.normal().z();
         double n2x = p1.normal().x(), n2y = p1.normal().y(), n2z = p1.normal().z();
         double n3x = p2.normal().x(), n3y = p2.normal().y(), n3z = p2.normal().z();
@@ -566,19 +566,19 @@ public final class Intersectiond {
         double c12x = n1y * n2z - n1z * n2y;
         double c12y = n1z * n2x - n1x * n2z;
         double c12z = n1x * n2y - n1y * n2x;
-        return new Vector3D(
+        return new Vector3d(
             (-d1 * c23x - d2 * c31x - d3 * c12x) * invDet,
             (-d1 * c23y - d2 * c31y - d3 * c12y) * invDet,
             (-d1 * c23z - d2 * c31z - d3 * c12z) * invDet
         );
     }
 
-    public static Vector3D intersectLineLine(Vector3D p0, Vector3D d0, Vector3D p1, Vector3D d1) {
-        Vector3D[] closest = findClosestPointsLineLine(p0, d0, p1, d1);
+    public static Vector3d intersectLineLine(Vector3d p0, Vector3d d0, Vector3d p1, Vector3d d1) {
+        Vector3d[] closest = findClosestPointsLineLine(p0, d0, p1, d1);
         return closest[0];
     }
 
-    public static Vector3D[] findClosestPointsLineLine(Vector3D p0, Vector3D d0, Vector3D p1, Vector3D d1) {
+    public static Vector3d[] findClosestPointsLineLine(Vector3d p0, Vector3d d0, Vector3d p1, Vector3d d1) {
         double px = p0.x(), py = p0.y(), pz = p0.z();
         double dx = d0.x(), dy = d0.y(), dz = d0.z();
         double qx = p1.x(), qy = p1.y(), qz = p1.z();
@@ -598,26 +598,26 @@ public final class Intersectiond {
             t = (b * eval - c * dval) / denom;
             s = (a * eval - b * dval) / denom;
         }
-        return new Vector3D[] {
-            new Vector3D(px + t * dx, py + t * dy, pz + t * dz),
-            new Vector3D(qx + s * ex, qy + s * ey, qz + s * ez)
+        return new Vector3d[] {
+            new Vector3d(px + t * dx, py + t * dy, pz + t * dz),
+            new Vector3d(qx + s * ex, qy + s * ey, qz + s * ez)
         };
     }
 
-    public static boolean intersectPolygonPlane(Vector3D[] vertices, Plane p, Vector3D[] intersectionLine) {
+    public static boolean intersectPolygonPlane(Vector3d[] vertices, Plane p, Vector3d[] intersectionLine) {
         int n = vertices.length;
         if (n < 3) return false;
         double nx = p.normal().x(), ny = p.normal().y(), nz = p.normal().z();
         double pd = p.d();
-        ArrayList<Vector3D> pts = new ArrayList<>();
+        ArrayList<Vector3d> pts = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            Vector3D a = vertices[i];
-            Vector3D b = vertices[(i + 1) % n];
+            Vector3d a = vertices[i];
+            Vector3d b = vertices[(i + 1) % n];
             double da = nx * a.x() + ny * a.y() + nz * a.z() + pd;
             double db = nx * b.x() + ny * b.y() + nz * b.z() + pd;
             if (da * db < 0.0) {
                 double t = da / (da - db);
-                pts.add(new Vector3D(
+                pts.add(new Vector3d(
                     a.x() + t * (b.x() - a.x()),
                     a.y() + t * (b.y() - a.y()),
                     a.z() + t * (b.z() - a.z())
@@ -632,7 +632,7 @@ public final class Intersectiond {
         return false;
     }
 
-    public static Vector3D[] transformAab(Vector3D min, Vector3D max, Matrix4d m) {
+    public static Vector3d[] transformAab(Vector3d min, Vector3d max, Matrix4d m) {
         double x0 = min.x(), y0 = min.y(), z0 = min.z();
         double x1 = max.x(), y1 = max.y(), z1 = max.z();
         double m00 = m.m00(), m01 = m.m01(), m02 = m.m02(), m03 = m.m03();
@@ -661,15 +661,15 @@ public final class Intersectiond {
             nx0 = Math.min(nx0, xs[i]); ny0 = Math.min(ny0, ys[i]); nz0 = Math.min(nz0, zs[i]);
             nx1 = Math.max(nx1, xs[i]); ny1 = Math.max(ny1, ys[i]); nz1 = Math.max(nz1, zs[i]);
         }
-        return new Vector3D[] { new Vector3D(nx0, ny0, nz0), new Vector3D(nx1, ny1, nz1) };
+        return new Vector3d[] { new Vector3d(nx0, ny0, nz0), new Vector3d(nx1, ny1, nz1) };
     }
 
-    public static boolean testPointFrustum(Vector3D point, Matrix4d projectionMatrix) {
+    public static boolean testPointFrustum(Vector3d point, Matrix4d projectionMatrix) {
         FrustumIntersection frustum = new FrustumIntersection(projectionMatrix);
         return frustum.testPoint(point) != FrustumIntersection.OUTSIDE;
     }
 
-    public static int intersectSphereFrustum(Vector3D center, double radius, Matrix4d projectionMatrix) {
+    public static int intersectSphereFrustum(Vector3d center, double radius, Matrix4d projectionMatrix) {
         FrustumIntersection frustum = new FrustumIntersection(projectionMatrix);
         return frustum.testSphere(center, radius);
     }
@@ -679,11 +679,11 @@ public final class Intersectiond {
         return frustum.testAABB(box);
     }
 
-    public static boolean isPointInsideFrustum(Vector3D point, FrustumIntersection frustum) {
+    public static boolean isPointInsideFrustum(Vector3d point, FrustumIntersection frustum) {
         return frustum.testPoint(point) != FrustumIntersection.OUTSIDE;
     }
 
-    public static boolean isPointInsideFrustum(Vector3D point, Matrix4d projectionMatrix) {
+    public static boolean isPointInsideFrustum(Vector3d point, Matrix4d projectionMatrix) {
         FrustumIntersection frustum = new FrustumIntersection(projectionMatrix);
         return frustum.testPoint(point) != FrustumIntersection.OUTSIDE;
     }

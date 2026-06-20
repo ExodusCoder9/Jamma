@@ -1,6 +1,6 @@
 package com.jamma.math.matrix;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -161,7 +161,7 @@ public class Matrix3d implements Serializable {
         return scale(factor, factor, factor);
     }
 
-    public Matrix3d scale(Vector3D xyz) {
+    public Matrix3d scale(Vector3d xyz) {
         return scale(xyz.x(), xyz.y(), xyz.z());
     }
 
@@ -247,8 +247,8 @@ public class Matrix3d implements Serializable {
         return m00 + m11 + m22;
     }
 
-    public Vector3D transform(Vector3D v) {
-        return new Vector3D(
+    public Vector3d transform(Vector3d v) {
+        return new Vector3d(
             Math.fma(m00, v.x(), Math.fma(m10, v.y(), m20 * v.z())),
             Math.fma(m01, v.x(), Math.fma(m11, v.y(), m21 * v.z())),
             Math.fma(m02, v.x(), Math.fma(m12, v.y(), m22 * v.z()))
@@ -313,20 +313,20 @@ public class Matrix3d implements Serializable {
         return get(dest, 0);
     }
 
-    public Vector3D row(int index) {
+    public Vector3d row(int index) {
         return switch (index) {
-            case 0 -> new Vector3D(m00, m10, m20);
-            case 1 -> new Vector3D(m01, m11, m21);
-            case 2 -> new Vector3D(m02, m12, m22);
+            case 0 -> new Vector3d(m00, m10, m20);
+            case 1 -> new Vector3d(m01, m11, m21);
+            case 2 -> new Vector3d(m02, m12, m22);
             default -> throw new IndexOutOfBoundsException("Row index: " + index);
         };
     }
 
-    public Vector3D col(int index) {
+    public Vector3d col(int index) {
         return switch (index) {
-            case 0 -> new Vector3D(m00, m01, m02);
-            case 1 -> new Vector3D(m10, m11, m12);
-            case 2 -> new Vector3D(m20, m21, m22);
+            case 0 -> new Vector3d(m00, m01, m02);
+            case 1 -> new Vector3d(m10, m11, m12);
+            case 2 -> new Vector3d(m20, m21, m22);
             default -> throw new IndexOutOfBoundsException("Column index: " + index);
         };
     }

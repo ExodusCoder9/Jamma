@@ -3,7 +3,7 @@ package com.jamma.math.matrix;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 
 class Matrix3dTest {
 
@@ -53,7 +53,7 @@ class Matrix3dTest {
     void rotateX() {
         Matrix3d m = new Matrix3d();
         m.rotateX(Math.PI / 2.0);
-        Vector3D result = m.transform(new Vector3D(0, 1, 0));
+        Vector3d result = m.transform(new Vector3d(0, 1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(1.0, result.z(), 1e-15);
@@ -63,7 +63,7 @@ class Matrix3dTest {
     void rotateY() {
         Matrix3d m = new Matrix3d();
         m.rotateY(Math.PI / 2.0);
-        Vector3D result = m.transform(new Vector3D(1, 0, 0));
+        Vector3d result = m.transform(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(-1.0, result.z(), 1e-15);
@@ -73,7 +73,7 @@ class Matrix3dTest {
     void rotateZ() {
         Matrix3d m = new Matrix3d();
         m.rotateZ(Math.PI / 2.0);
-        Vector3D result = m.transform(new Vector3D(1, 0, 0));
+        Vector3d result = m.transform(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(1.0, result.y(), 1e-15);
         assertEquals(0.0, result.z(), 1e-15);
@@ -83,7 +83,7 @@ class Matrix3dTest {
     void rotateAxisAngle() {
         Matrix3d m = new Matrix3d();
         m.rotate(Math.PI / 2.0, 0.0, 1.0, 0.0);
-        Vector3D result = m.transform(new Vector3D(1, 0, 0));
+        Vector3d result = m.transform(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(-1.0, result.z(), 1e-15);
@@ -93,7 +93,7 @@ class Matrix3dTest {
     void rotateXYZ() {
         Matrix3d m = new Matrix3d();
         m.rotateXYZ(Math.PI / 2.0, 0.0, 0.0);
-        Vector3D result = m.transform(new Vector3D(0, 1, 0));
+        Vector3d result = m.transform(new Vector3d(0, 1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(1.0, result.z(), 1e-15);
@@ -103,7 +103,7 @@ class Matrix3dTest {
     void scaleXYZ() {
         Matrix3d m = new Matrix3d();
         m.scale(2.0, 3.0, 4.0);
-        Vector3D result = m.transform(new Vector3D(1, 1, 1));
+        Vector3d result = m.transform(new Vector3d(1, 1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
         assertEquals(4.0, result.z(), 1e-15);
@@ -113,7 +113,7 @@ class Matrix3dTest {
     void scaleUniform() {
         Matrix3d m = new Matrix3d();
         m.scale(5.0);
-        Vector3D result = m.transform(new Vector3D(1, 1, 1));
+        Vector3d result = m.transform(new Vector3d(1, 1, 1));
         assertEquals(5.0, result.x(), 1e-15);
         assertEquals(5.0, result.y(), 1e-15);
         assertEquals(5.0, result.z(), 1e-15);
@@ -126,7 +126,7 @@ class Matrix3dTest {
         Matrix3d b = new Matrix3d();
         b.rotateY(Math.PI / 2.0);
         a.multiply(b);
-        Vector3D result = a.transform(new Vector3D(1, 0, 0));
+        Vector3d result = a.transform(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(1.0, result.y(), 1e-15);
         assertEquals(0.0, result.z(), 1e-15);
@@ -222,7 +222,7 @@ class Matrix3dTest {
     void transformVector() {
         Matrix3d m = new Matrix3d();
         m.scale(2.0, 3.0, 4.0);
-        Vector3D result = m.transform(new Vector3D(1, 1, 1));
+        Vector3d result = m.transform(new Vector3d(1, 1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
         assertEquals(4.0, result.z(), 1e-15);
@@ -232,7 +232,7 @@ class Matrix3dTest {
     void transformDest() {
         Matrix3d m = new Matrix3d();
         m.scale(2.0, 3.0, 4.0);
-        Vector3D result = m.transform(new Vector3D(1, 1, 1));
+        Vector3d result = m.transform(new Vector3d(1, 1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
         assertEquals(4.0, result.z(), 1e-15);
@@ -274,7 +274,7 @@ class Matrix3dTest {
     @Test
     void row() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D row0 = m.row(0);
+        Vector3d row0 = m.row(0);
         assertEquals(1.0, row0.x(), 1e-15);
         assertEquals(4.0, row0.y(), 1e-15);
         assertEquals(7.0, row0.z(), 1e-15);
@@ -283,7 +283,7 @@ class Matrix3dTest {
     @Test
     void row1() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D row1 = m.row(1);
+        Vector3d row1 = m.row(1);
         assertEquals(2.0, row1.x(), 1e-15);
         assertEquals(5.0, row1.y(), 1e-15);
         assertEquals(8.0, row1.z(), 1e-15);
@@ -292,7 +292,7 @@ class Matrix3dTest {
     @Test
     void row2() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D row2 = m.row(2);
+        Vector3d row2 = m.row(2);
         assertEquals(3.0, row2.x(), 1e-15);
         assertEquals(6.0, row2.y(), 1e-15);
         assertEquals(9.0, row2.z(), 1e-15);
@@ -301,7 +301,7 @@ class Matrix3dTest {
     @Test
     void col() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D col0 = m.col(0);
+        Vector3d col0 = m.col(0);
         assertEquals(1.0, col0.x(), 1e-15);
         assertEquals(2.0, col0.y(), 1e-15);
         assertEquals(3.0, col0.z(), 1e-15);
@@ -310,7 +310,7 @@ class Matrix3dTest {
     @Test
     void col1() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D col1 = m.col(1);
+        Vector3d col1 = m.col(1);
         assertEquals(4.0, col1.x(), 1e-15);
         assertEquals(5.0, col1.y(), 1e-15);
         assertEquals(6.0, col1.z(), 1e-15);
@@ -319,7 +319,7 @@ class Matrix3dTest {
     @Test
     void col2() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
-        Vector3D col2 = m.col(2);
+        Vector3d col2 = m.col(2);
         assertEquals(7.0, col2.x(), 1e-15);
         assertEquals(8.0, col2.y(), 1e-15);
         assertEquals(9.0, col2.z(), 1e-15);
@@ -407,10 +407,10 @@ class Matrix3dTest {
     }
 
     @Test
-    void scaleByVector3D() {
+    void scaleByVector3d() {
         Matrix3d m = new Matrix3d();
-        m.scale(new Vector3D(2, 3, 4));
-        Vector3D result = m.transform(new Vector3D(1, 1, 1));
+        m.scale(new Vector3d(2, 3, 4));
+        Vector3d result = m.transform(new Vector3d(1, 1, 1));
         assertEquals(2.0, result.x(), 1e-15);
         assertEquals(3.0, result.y(), 1e-15);
         assertEquals(4.0, result.z(), 1e-15);

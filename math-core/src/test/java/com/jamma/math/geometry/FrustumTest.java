@@ -1,6 +1,6 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.Vector3f;
 import com.jamma.math.matrix.Matrix4d;
 import com.jamma.math.matrix.Matrix4f;
@@ -16,26 +16,26 @@ public class FrustumTest {
         FrustumIntersection frustum = new FrustumIntersection(m, false);
 
         // Point inside (-1 to 1)
-        assertEquals(FrustumIntersection.INSIDE, frustum.testPoint(new Vector3D(0.0, 0.0, 0.0)));
+        assertEquals(FrustumIntersection.INSIDE, frustum.testPoint(new Vector3d(0.0, 0.0, 0.0)));
         assertEquals(FrustumIntersection.INSIDE, frustum.testPoint(0.0, 0.0, 0.0));
 
         // Point outside
-        assertEquals(FrustumIntersection.OUTSIDE, frustum.testPoint(new Vector3D(2.0, 0.0, 0.0)));
+        assertEquals(FrustumIntersection.OUTSIDE, frustum.testPoint(new Vector3d(2.0, 0.0, 0.0)));
         assertEquals(FrustumIntersection.OUTSIDE, frustum.testPoint(0.0, -2.0, 0.0));
 
         // Sphere culling
-        assertEquals(FrustumIntersection.INSIDE, frustum.testSphere(new Vector3D(0.0, 0.0, 0.0), 0.5));
-        assertEquals(FrustumIntersection.INTERSECT, frustum.testSphere(new Vector3D(0.9, 0.0, 0.0), 0.2));
-        assertEquals(FrustumIntersection.OUTSIDE, frustum.testSphere(new Vector3D(1.5, 0.0, 0.0), 0.2));
+        assertEquals(FrustumIntersection.INSIDE, frustum.testSphere(new Vector3d(0.0, 0.0, 0.0), 0.5));
+        assertEquals(FrustumIntersection.INTERSECT, frustum.testSphere(new Vector3d(0.9, 0.0, 0.0), 0.2));
+        assertEquals(FrustumIntersection.OUTSIDE, frustum.testSphere(new Vector3d(1.5, 0.0, 0.0), 0.2));
 
         // AABB culling
-        AABB boxInside = new AABB(new Vector3D(-0.5, -0.5, -0.5), new Vector3D(0.5, 0.5, 0.5));
+        AABB boxInside = new AABB(new Vector3d(-0.5, -0.5, -0.5), new Vector3d(0.5, 0.5, 0.5));
         assertEquals(FrustumIntersection.INSIDE, frustum.testAABB(boxInside));
 
-        AABB boxIntersect = new AABB(new Vector3D(0.5, 0.5, 0.5), new Vector3D(1.5, 1.5, 1.5));
+        AABB boxIntersect = new AABB(new Vector3d(0.5, 0.5, 0.5), new Vector3d(1.5, 1.5, 1.5));
         assertEquals(FrustumIntersection.INTERSECT, frustum.testAABB(boxIntersect));
 
-        AABB boxOutside = new AABB(new Vector3D(2.0, 2.0, 2.0), new Vector3D(3.0, 3.0, 3.0));
+        AABB boxOutside = new AABB(new Vector3d(2.0, 2.0, 2.0), new Vector3d(3.0, 3.0, 3.0));
         assertEquals(FrustumIntersection.OUTSIDE, frustum.testAABB(boxOutside));
     }
 

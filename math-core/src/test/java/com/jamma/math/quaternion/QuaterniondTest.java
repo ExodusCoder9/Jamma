@@ -3,7 +3,7 @@ package com.jamma.math.quaternion;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix3d;
 import com.jamma.math.matrix.Matrix4d;
 
@@ -25,7 +25,7 @@ class QuaterniondTest {
         double s = Math.sin(half);
         Quaterniond q = new Quaterniond(0, s, 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(-1.0, result.z(), 1e-15);
@@ -37,7 +37,7 @@ class QuaterniondTest {
         double sx = Math.sin(halfX), cx = Math.cos(halfX);
         Quaterniond qx = new Quaterniond(sx, 0, 0, cx);
         Matrix4d m = new Matrix4d().rotate(qx);
-        Vector3D result = m.transformDirection(new Vector3D(0, 1, 0));
+        Vector3d result = m.transformDirection(new Vector3d(0, 1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(1.0, result.z(), 1e-15);
@@ -87,7 +87,7 @@ class QuaterniondTest {
             aw * bw - ax * bx - ay * by - az * bz
         );
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 0.1);
         assertEquals(1.0, result.y(), 0.1);
         assertEquals(0.0, result.z(), 0.1);
@@ -108,7 +108,7 @@ class QuaterniondTest {
             aw * bw - ax * bx - ay * by - az * bz
         );
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(0, 1, 0));
+        Vector3d result = m.transformDirection(new Vector3d(0, 1, 0));
         assertEquals(1.0, result.x(), 0.1);
         assertEquals(0.0, result.y(), 0.1);
     }
@@ -174,7 +174,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(Math.sin(half), 0, 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(0, 1, 0));
+        Vector3d result = m.transformDirection(new Vector3d(0, 1, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(1.0, result.z(), 1e-15);
@@ -185,7 +185,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(0, Math.sin(half), 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(-1.0, result.z(), 1e-15);
@@ -196,7 +196,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(0, 0, Math.sin(half), Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(1.0, result.y(), 1e-15);
         assertEquals(0.0, result.z(), 1e-15);
@@ -243,7 +243,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(0, Math.sin(half), 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertEquals(0.0, result.x(), 1e-15);
         assertEquals(0.0, result.y(), 1e-15);
         assertEquals(-1.0, result.z(), 1e-15);
@@ -254,7 +254,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(0, Math.sin(half), 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertNotNull(result);
         assertEquals(-1.0, result.z(), 1e-15);
     }
@@ -265,12 +265,12 @@ class QuaterniondTest {
         double s = Math.sin(half), c = Math.cos(half);
         Quaterniond q = new Quaterniond(0, s, 0, c);
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D v = new Vector3D(1, 0, 0);
-        Vector3D transformed = m.transformDirection(v);
+        Vector3d v = new Vector3d(1, 0, 0);
+        Vector3d transformed = m.transformDirection(v);
         double lenSq = q.x() * q.x() + q.y() * q.y() + q.z() * q.z() + q.w() * q.w();
         Quaterniond inv = new Quaterniond(-q.x() / lenSq, -q.y() / lenSq, -q.z() / lenSq, q.w() / lenSq);
         Matrix4d mInv = new Matrix4d().rotate(inv);
-        Vector3D restored = mInv.transformDirection(transformed);
+        Vector3d restored = mInv.transformDirection(transformed);
         assertEquals(v.x(), restored.x(), 1e-15);
         assertEquals(v.y(), restored.y(), 1e-15);
         assertEquals(v.z(), restored.z(), 1e-15);
@@ -291,7 +291,7 @@ class QuaterniondTest {
         double len = Math.sqrt(nx * nx + ny * ny + nz * nz + nw * nw);
         Quaterniond nlerp = new Quaterniond(nx / len, ny / len, nz / len, nw / len);
         Matrix4d m = new Matrix4d().rotate(nlerp);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertTrue(Math.abs(result.x()) < 0.8);
     }
 
@@ -312,7 +312,7 @@ class QuaterniondTest {
         double nw = a.w() * wa + b.w() * wb;
         Quaterniond slerp = new Quaterniond(nx, ny, nz, nw);
         Matrix4d m = new Matrix4d().rotate(slerp);
-        Vector3D result = m.transformDirection(new Vector3D(1, 0, 0));
+        Vector3d result = m.transformDirection(new Vector3d(1, 0, 0));
         assertTrue(Math.abs(result.x()) < 0.8);
     }
 
@@ -391,7 +391,7 @@ class QuaterniondTest {
         double half = Math.PI / 4.0;
         Quaterniond q = new Quaterniond(0, Math.sin(half), 0, Math.cos(half));
         Matrix4d m = new Matrix4d().rotate(q);
-        Vector3D forward = m.transformDirection(new Vector3D(0, 0, -1));
+        Vector3d forward = m.transformDirection(new Vector3d(0, 0, -1));
         assertEquals(-1.0, forward.x(), 1e-15);
         assertEquals(0.0, forward.y(), 1e-15);
         assertEquals(0.0, forward.z(), 1e-15);

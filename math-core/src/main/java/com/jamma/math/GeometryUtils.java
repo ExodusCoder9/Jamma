@@ -55,49 +55,49 @@ public final class GeometryUtils {
         return new Vector3f[] { tangent, bitangent };
     }
 
-    public static Vector3D computeNormal(Vector3D p1, Vector3D p2, Vector3D p3) {
-        Vector3D edge1 = p2.sub(p1);
-        Vector3D edge2 = p3.sub(p1);
+    public static Vector3d computeNormal(Vector3d p1, Vector3d p2, Vector3d p3) {
+        Vector3d edge1 = p2.sub(p1);
+        Vector3d edge2 = p3.sub(p1);
         return edge1.cross(edge2).normalize();
     }
 
-    public static Vector3D computeTangent(
-        Vector3D p1, Vector3D p2, Vector3D p3,
-        Vector2D uv1, Vector2D uv2, Vector2D uv3
+    public static Vector3d computeTangent(
+        Vector3d p1, Vector3d p2, Vector3d p3,
+        Vector2d uv1, Vector2d uv2, Vector2d uv3
     ) {
-        Vector3D edge1 = p2.sub(p1);
-        Vector3D edge2 = p3.sub(p1);
-        Vector2D duv1 = uv2.sub(uv1);
-        Vector2D duv2 = uv3.sub(uv1);
+        Vector3d edge1 = p2.sub(p1);
+        Vector3d edge2 = p3.sub(p1);
+        Vector2d duv1 = uv2.sub(uv1);
+        Vector2d duv2 = uv3.sub(uv1);
         double f = 1.0 / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
         double tx = f * (duv2.y() * edge1.x() - duv1.y() * edge2.x());
         double ty = f * (duv2.y() * edge1.y() - duv1.y() * edge2.y());
         double tz = f * (duv2.y() * edge1.z() - duv1.y() * edge2.z());
-        return new Vector3D(tx, ty, tz);
+        return new Vector3d(tx, ty, tz);
     }
 
-    public static Vector3D computeBitangent(
-        Vector3D p1, Vector3D p2, Vector3D p3,
-        Vector2D uv1, Vector2D uv2, Vector2D uv3
+    public static Vector3d computeBitangent(
+        Vector3d p1, Vector3d p2, Vector3d p3,
+        Vector2d uv1, Vector2d uv2, Vector2d uv3
     ) {
-        Vector3D edge1 = p2.sub(p1);
-        Vector3D edge2 = p3.sub(p1);
-        Vector2D duv1 = uv2.sub(uv1);
-        Vector2D duv2 = uv3.sub(uv1);
+        Vector3d edge1 = p2.sub(p1);
+        Vector3d edge2 = p3.sub(p1);
+        Vector2d duv1 = uv2.sub(uv1);
+        Vector2d duv2 = uv3.sub(uv1);
         double f = 1.0 / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
         double bx = f * (-duv2.x() * edge1.x() + duv1.x() * edge2.x());
         double by = f * (-duv2.x() * edge1.y() + duv1.x() * edge2.y());
         double bz = f * (-duv2.x() * edge1.z() + duv1.x() * edge2.z());
-        return new Vector3D(bx, by, bz);
+        return new Vector3d(bx, by, bz);
     }
 
-    public static Vector3D[] computeTangentBitangent(
-        Vector3D p1, Vector3D p2, Vector3D p3,
-        Vector2D uv1, Vector2D uv2, Vector2D uv3
+    public static Vector3d[] computeTangentBitangent(
+        Vector3d p1, Vector3d p2, Vector3d p3,
+        Vector2d uv1, Vector2d uv2, Vector2d uv3
     ) {
-        Vector3D tangent = computeTangent(p1, p2, p3, uv1, uv2, uv3);
-        Vector3D bitangent = computeBitangent(p1, p2, p3, uv1, uv2, uv3);
-        return new Vector3D[] { tangent, bitangent };
+        Vector3d tangent = computeTangent(p1, p2, p3, uv1, uv2, uv3);
+        Vector3d bitangent = computeBitangent(p1, p2, p3, uv1, uv2, uv3);
+        return new Vector3d[] { tangent, bitangent };
     }
 
     public static Matrix3f rotationMatrix(Vector3f from, Vector3f to) {
@@ -105,7 +105,7 @@ public final class GeometryUtils {
         return q.toMatrix3();
     }
 
-    public static Matrix3d rotationMatrix(Vector3D from, Vector3D to) {
+    public static Matrix3d rotationMatrix(Vector3d from, Vector3d to) {
         com.jamma.math.quaternion.Quaterniond q =
             com.jamma.math.quaternion.Quaterniond.rotateTo(from, to);
         return q.toMatrix3();
@@ -129,12 +129,12 @@ public final class GeometryUtils {
         return new Vector3f(u, v, w);
     }
 
-    public static Vector3D barycentric(
-        Vector3D point, Vector3D a, Vector3D b, Vector3D c
+    public static Vector3d barycentric(
+        Vector3d point, Vector3d a, Vector3d b, Vector3d c
     ) {
-        Vector3D v0 = c.sub(a);
-        Vector3D v1 = b.sub(a);
-        Vector3D v2 = point.sub(a);
+        Vector3d v0 = c.sub(a);
+        Vector3d v1 = b.sub(a);
+        Vector3d v2 = point.sub(a);
         double dot00 = v0.dot(v0);
         double dot01 = v0.dot(v1);
         double dot02 = v0.dot(v2);
@@ -144,7 +144,7 @@ public final class GeometryUtils {
         double v = (dot11 * dot02 - dot01 * dot12) * invDenom;
         double w = (dot00 * dot12 - dot01 * dot02) * invDenom;
         double u = 1.0 - v - w;
-        return new Vector3D(u, v, w);
+        return new Vector3d(u, v, w);
     }
 
     public static float interpolateBarycentric(
@@ -159,9 +159,9 @@ public final class GeometryUtils {
         return edge1.cross(edge2).length() * 0.5f;
     }
 
-    public static double areaTriangle(Vector3D a, Vector3D b, Vector3D c) {
-        Vector3D edge1 = b.sub(a);
-        Vector3D edge2 = c.sub(a);
+    public static double areaTriangle(Vector3d a, Vector3d b, Vector3d c) {
+        Vector3d edge1 = b.sub(a);
+        Vector3d edge2 = c.sub(a);
         return edge1.cross(edge2).length() * 0.5;
     }
 
@@ -173,8 +173,8 @@ public final class GeometryUtils {
         );
     }
 
-    public static Vector3D centroid(Vector3D a, Vector3D b, Vector3D c) {
-        return new Vector3D(
+    public static Vector3d centroid(Vector3d a, Vector3d b, Vector3d c) {
+        return new Vector3d(
             (a.x() + b.x() + c.x()) / 3.0,
             (a.y() + b.y() + c.y()) / 3.0,
             (a.z() + b.z() + c.z()) / 3.0
@@ -194,17 +194,17 @@ public final class GeometryUtils {
         return new Vector3f[] { tangent, bitangent, n };
     }
 
-    public static Vector3D[] orthonormalBasis(Vector3D n0) {
-        Vector3D n = n0.normalize();
-        Vector3D t;
+    public static Vector3d[] orthonormalBasis(Vector3d n0) {
+        Vector3d n = n0.normalize();
+        Vector3d t;
         if (Math.abs(n.x()) < Math.abs(n.y())) {
-            t = new Vector3D(n.z(), 0, -n.x());
+            t = new Vector3d(n.z(), 0, -n.x());
         } else {
-            t = new Vector3D(0, -n.z(), n.y());
+            t = new Vector3d(0, -n.z(), n.y());
         }
-        Vector3D tangent = t.normalize();
-        Vector3D bitangent = n.cross(tangent);
-        return new Vector3D[] { tangent, bitangent, n };
+        Vector3d tangent = t.normalize();
+        Vector3d bitangent = n.cross(tangent);
+        return new Vector3d[] { tangent, bitangent, n };
     }
 
     public static Vector3f transformNormal(Matrix4f mat, Vector3f normal) {
@@ -230,7 +230,7 @@ public final class GeometryUtils {
         return transformNormal(mat, new Vector3f(nx, ny, nz));
     }
 
-    public static Vector3D transformNormal(Matrix4d mat, Vector3D normal) {
+    public static Vector3d transformNormal(Matrix4d mat, Vector3d normal) {
         double m00 = mat.m00(), m01 = mat.m01(), m02 = mat.m02();
         double m10 = mat.m10(), m11 = mat.m11(), m12 = mat.m12();
         double m20 = mat.m20(), m21 = mat.m21(), m22 = mat.m22();
@@ -246,11 +246,11 @@ public final class GeometryUtils {
         double tx = c00 * normal.x() + c01 * normal.y() + c02 * normal.z();
         double ty = c10 * normal.x() + c11 * normal.y() + c12 * normal.z();
         double tz = c20 * normal.x() + c21 * normal.y() + c22 * normal.z();
-        return new Vector3D(tx, ty, tz).normalize();
+        return new Vector3d(tx, ty, tz).normalize();
     }
 
-    public static Vector3D transformNormal(Matrix4d mat, double nx, double ny, double nz) {
-        return transformNormal(mat, new Vector3D(nx, ny, nz));
+    public static Vector3d transformNormal(Matrix4d mat, double nx, double ny, double nz) {
+        return transformNormal(mat, new Vector3d(nx, ny, nz));
     }
 
     public static Vector3f transformNormal(Matrix3f mat, Vector3f normal) {
@@ -272,7 +272,7 @@ public final class GeometryUtils {
         return new Vector3f(nx, ny, nz).normalize();
     }
 
-    public static Vector3D transformNormal(Matrix3d mat, Vector3D normal) {
+    public static Vector3d transformNormal(Matrix3d mat, Vector3d normal) {
         double m00 = mat.m00(), m01 = mat.m01(), m02 = mat.m02();
         double m10 = mat.m10(), m11 = mat.m11(), m12 = mat.m12();
         double m20 = mat.m20(), m21 = mat.m21(), m22 = mat.m22();
@@ -288,6 +288,6 @@ public final class GeometryUtils {
         double tx = c00 * normal.x() + c01 * normal.y() + c02 * normal.z();
         double ty = c10 * normal.x() + c11 * normal.y() + c12 * normal.z();
         double tz = c20 * normal.x() + c21 * normal.y() + c22 * normal.z();
-        return new Vector3D(tx, ty, tz).normalize();
+        return new Vector3d(tx, ty, tz).normalize();
     }
 }

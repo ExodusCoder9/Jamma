@@ -1,18 +1,18 @@
 package com.jamma.math.geometry;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
 import java.io.Serializable;
 
-public record Plane(Vector3D normal, double d) implements Serializable {
+public record Plane(Vector3d normal, double d) implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     public Plane(double nx, double ny, double nz, double d) {
-        this(new Vector3D(nx, ny, nz), d);
+        this(new Vector3d(nx, ny, nz), d);
     }
 
-    public static Plane fromPointNormal(Vector3D point, Vector3D normal) {
+    public static Plane fromPointNormal(Vector3d point, Vector3d normal) {
         double invLen = 1.0 / Math.sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
         double nx = normal.x() * invLen;
         double ny = normal.y() * invLen;
@@ -20,7 +20,7 @@ public record Plane(Vector3D normal, double d) implements Serializable {
         return new Plane(nx, ny, nz, -(nx * point.x() + ny * point.y() + nz * point.z()));
     }
 
-    public static Plane fromPoints(Vector3D a, Vector3D b, Vector3D c) {
+    public static Plane fromPoints(Vector3d a, Vector3d b, Vector3d c) {
         double abx = b.x() - a.x(), aby = b.y() - a.y(), abz = b.z() - a.z();
         double acx = c.x() - a.x(), acy = c.y() - a.y(), acz = c.z() - a.z();
         double nx = aby * acz - abz * acy;
@@ -33,7 +33,7 @@ public record Plane(Vector3D normal, double d) implements Serializable {
         return new Plane(nx, ny, nz, -(nx * a.x() + ny * a.y() + nz * a.z()));
     }
 
-    public double distance(Vector3D point) {
+    public double distance(Vector3d point) {
         return normal.x() * point.x() + normal.y() * point.y() + normal.z() * point.z() + d;
     }
 

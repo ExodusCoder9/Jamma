@@ -67,19 +67,19 @@ class FfmIntegrationTest {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segment = arena.allocate(32); // 4 doubles = 32 bytes
 
-            Vector2D v2 = new Vector2D(1.5, 2.5);
+            Vector2d v2 = new Vector2d(1.5, 2.5);
             v2.writeToMemorySegment(segment, 0);
-            Vector2D copy2 = Vector2D.fromMemorySegment(segment, 0);
+            Vector2d copy2 = Vector2d.fromMemorySegment(segment, 0);
             assertEquals(v2, copy2);
 
-            Vector3D v3 = new Vector3D(1.1, 2.2, 3.3);
+            Vector3d v3 = new Vector3d(1.1, 2.2, 3.3);
             v3.writeToMemorySegment(segment, 0);
-            Vector3D copy3 = Vector3D.fromMemorySegment(segment, 0);
+            Vector3d copy3 = Vector3d.fromMemorySegment(segment, 0);
             assertEquals(v3, copy3);
 
-            Vector4D v4 = new Vector4D(1.0, 2.0, 3.0, 4.0);
+            Vector4d v4 = new Vector4d(1.0, 2.0, 3.0, 4.0);
             v4.writeToMemorySegment(segment, 0);
-            Vector4D copy4 = Vector4D.fromMemorySegment(segment, 0);
+            Vector4d copy4 = Vector4d.fromMemorySegment(segment, 0);
             assertEquals(v4, copy4);
         }
     }

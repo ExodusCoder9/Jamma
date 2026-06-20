@@ -1,6 +1,6 @@
 package com.jamma.math.matrix;
 
-import com.jamma.math.Vector4D;
+import com.jamma.math.Vector4d;
 import com.jamma.math.Vector4f;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,15 +12,15 @@ public class ProjectionTest {
         Matrix4d m = new Matrix4d().perspective(Math.toRadians(90.0), 1.0, 1.0, 100.0);
 
         // Near plane point: (0, 0, -1, 1)
-        Vector4D pNear = new Vector4D(0.0, 0.0, -1.0, 1.0);
-        Vector4D projNear = m.transform(pNear);
+        Vector4d pNear = new Vector4d(0.0, 0.0, -1.0, 1.0);
+        Vector4d projNear = m.transform(pNear);
         // NDC = projNear / w
         double zNdcNear = projNear.z() / projNear.w();
         assertEquals(-1.0, zNdcNear, 1e-6);
 
         // Far plane point: (0, 0, -100, 1)
-        Vector4D pFar = new Vector4D(0.0, 0.0, -100.0, 1.0);
-        Vector4D projFar = m.transform(pFar);
+        Vector4d pFar = new Vector4d(0.0, 0.0, -100.0, 1.0);
+        Vector4d projFar = m.transform(pFar);
         double zNdcFar = projFar.z() / projFar.w();
         assertEquals(1.0, zNdcFar, 1e-6);
     }
@@ -33,14 +33,14 @@ public class ProjectionTest {
         assertTrue(m.m11() < 0.0);
 
         // Near plane point: (0, 0, -1, 1)
-        Vector4D pNear = new Vector4D(0.0, 0.0, -1.0, 1.0);
-        Vector4D projNear = m.transform(pNear);
+        Vector4d pNear = new Vector4d(0.0, 0.0, -1.0, 1.0);
+        Vector4d projNear = m.transform(pNear);
         double zNdcNear = projNear.z() / projNear.w();
         assertEquals(0.0, zNdcNear, 1e-6);
 
         // Far plane point: (0, 0, -100, 1)
-        Vector4D pFar = new Vector4D(0.0, 0.0, -100.0, 1.0);
-        Vector4D projFar = m.transform(pFar);
+        Vector4d pFar = new Vector4d(0.0, 0.0, -100.0, 1.0);
+        Vector4d projFar = m.transform(pFar);
         double zNdcFar = projFar.z() / projFar.w();
         assertEquals(1.0, zNdcFar, 1e-6);
     }
@@ -84,13 +84,13 @@ public class ProjectionTest {
         Matrix4d m = new Matrix4d().ortho(-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
 
         // Point at near plane: (0, 0, -1, 1)
-        Vector4D pNear = new Vector4D(0.0, 0.0, -1.0, 1.0);
-        Vector4D projNear = m.transform(pNear);
+        Vector4d pNear = new Vector4d(0.0, 0.0, -1.0, 1.0);
+        Vector4d projNear = m.transform(pNear);
         assertEquals(-1.0, projNear.z(), 1e-6);
 
         // Point at far plane: (0, 0, -10, 1)
-        Vector4D pFar = new Vector4D(0.0, 0.0, -10.0, 1.0);
-        Vector4D projFar = m.transform(pFar);
+        Vector4d pFar = new Vector4d(0.0, 0.0, -10.0, 1.0);
+        Vector4d projFar = m.transform(pFar);
         assertEquals(1.0, projFar.z(), 1e-6);
     }
 
@@ -99,13 +99,13 @@ public class ProjectionTest {
         Matrix4d m = new Matrix4d().orthoVulkan(-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
 
         // Point at near plane: (0, 0, -1, 1)
-        Vector4D pNear = new Vector4D(0.0, 0.0, -1.0, 1.0);
-        Vector4D projNear = m.transform(pNear);
+        Vector4d pNear = new Vector4d(0.0, 0.0, -1.0, 1.0);
+        Vector4d projNear = m.transform(pNear);
         assertEquals(0.0, projNear.z(), 1e-6);
 
         // Point at far plane: (0, 0, -10, 1)
-        Vector4D pFar = new Vector4D(0.0, 0.0, -10.0, 1.0);
-        Vector4D projFar = m.transform(pFar);
+        Vector4d pFar = new Vector4d(0.0, 0.0, -10.0, 1.0);
+        Vector4d projFar = m.transform(pFar);
         assertEquals(1.0, projFar.z(), 1e-6);
     }
 }

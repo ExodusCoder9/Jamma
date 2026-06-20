@@ -1,6 +1,6 @@
 package com.jamma.math.incubator;
 
-import com.jamma.math.Vector3D;
+import com.jamma.math.Vector3d;
 import java.util.concurrent.StructuredTaskScope;
 
 @SuppressWarnings("preview")
@@ -11,9 +11,9 @@ public final class ParallelOps {
     private ParallelOps() {
     }
 
-    public static Vector3D[] batchAddParallel(Vector3D[] a, Vector3D[] b) {
+    public static Vector3d[] batchAddParallel(Vector3d[] a, Vector3d[] b) {
         int n = a.length;
-        Vector3D[] result = new Vector3D[n];
+        Vector3d[] result = new Vector3d[n];
         if (n <= PARALLEL_THRESHOLD) {
             for (int i = 0; i < n; i++) {
                 result[i] = VectorMath.add(a[i], b[i]);
