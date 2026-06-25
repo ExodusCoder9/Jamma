@@ -896,4 +896,4 @@ Static utility classes mirroring all instance methods on the record types. These
 
 MIT License — see [LICENSE](LICENSE).
 
-Copyright (c) 2026 ExodusCoder9
+Copyright © 2026 ExodusCoder9
