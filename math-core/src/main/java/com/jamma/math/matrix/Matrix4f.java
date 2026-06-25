@@ -13,7 +13,7 @@ import java.lang.foreign.ValueLayout;
  * A 4x4 column-major single-precision transformation matrix.
  * <p>
  * This is a mutable class for performance. Use the static methods in
- * {@link com.jamma.math.matrix.Mathf} for immutable-style operations.
+ * {@link com.jamma.math.matrix.Matrix4f} for immutable-style operations.
  * <p>
  * Memory layout: 16 contiguous floats in column-major order
  * (m00, m10, m20, m30, m01, m11, …).
@@ -363,15 +363,15 @@ public class Matrix4f implements Serializable {
         float nnz = nz * invLen;
         float nd = d * invLen;
         float r00 = 1.0f - 2.0f * nnx * nnx;
-        float r01 = -2.0f * nny * nnx;
-        float r02 = -2.0f * nnz * nnx;
+        float r01 = -2.0f * nnx * nny;
+        float r02 = -2.0f * nnx * nnz;
         float r03 = -2.0f * nnx * nd;
-        float r10 = -2.0f * nnx * nny;
+        float r10 = -2.0f * nny * nnx;
         float r11 = 1.0f - 2.0f * nny * nny;
-        float r12 = -2.0f * nnz * nny;
+        float r12 = -2.0f * nny * nnz;
         float r13 = -2.0f * nny * nd;
-        float r20 = -2.0f * nnx * nnz;
-        float r21 = -2.0f * nny * nnz;
+        float r20 = -2.0f * nnz * nnx;
+        float r21 = -2.0f * nnz * nny;
         float r22 = 1.0f - 2.0f * nnz * nnz;
         float r23 = -2.0f * nnz * nd;
         float t00 = m00; float t01 = m01; float t02 = m02; float t03 = m03;
@@ -1859,8 +1859,7 @@ public class Matrix4f implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Matrix4f)) return false;
-        Matrix4f other = (Matrix4f) obj;
+        if (!(obj instanceof Matrix4f other)) return false;
         return Float.floatToIntBits(m00) == Float.floatToIntBits(other.m00)
             && Float.floatToIntBits(m01) == Float.floatToIntBits(other.m01)
             && Float.floatToIntBits(m02) == Float.floatToIntBits(other.m02)
@@ -2027,9 +2026,9 @@ public class Matrix4f implements Serializable {
         fX *= invFLen;
         fY *= invFLen;
         fZ *= invFLen;
-        float sX = fY * 1.0f - fZ * 0.0f;
-        float sY = fZ * 0.0f - fX * 1.0f;
-        float sZ = fX * 0.0f - fY * 0.0f;
+        float sX = fY;
+        float sY = -fX;
+        float sZ = 0.0f;
         float invSLen = 1.0f / (float) Math.sqrt(sX * sX + sY * sY + sZ * sZ);
         sX *= invSLen;
         sY *= invSLen;
@@ -2614,23 +2613,14 @@ public class Matrix4f implements Serializable {
         float y = (winY - viewport[1]) / viewport[3] * 2.0f - 1.0f;
         Matrix4f inv = new Matrix4f(this);
         inv.invert();
-        float nx = Math.fma(inv.m00, x, Math.fma(inv.m10, y, -inv.m20));
-        float ny = Math.fma(inv.m01, x, Math.fma(inv.m11, y, -inv.m21));
-        float nz = Math.fma(inv.m02, x, Math.fma(inv.m12, y, -inv.m22));
-        float nw = Math.fma(inv.m03, x, Math.fma(inv.m13, y, -inv.m23));
         float px = Math.fma(inv.m00, x, Math.fma(inv.m10, y, inv.m30));
         float py = Math.fma(inv.m01, x, Math.fma(inv.m11, y, inv.m31));
         float pz = Math.fma(inv.m02, x, Math.fma(inv.m12, y, inv.m32));
         float pw = Math.fma(inv.m03, x, Math.fma(inv.m13, y, inv.m33));
         float invW = 1.0f / pw;
-        float invNW = 1.0f / nw;
         float ox = px * invW;
         float oy = py * invW;
         float oz = pz * invW;
-        float dx = nx * invNW - ox;
-        float dy = ny * invNW - oy;
-        float dz = nz * invNW - oz;
-        float invDirLen = 1.0f / (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
         return new Vector3f(ox, oy, oz);
     }
 
@@ -2728,9 +2718,6 @@ public class Matrix4f implements Serializable {
     }
 
     public Vector3f frustumCorner(int corner, Vector3f dest) {
-        float a = m30 - m20, b = m31 - m21, c = m32 - m22;
-        float nX = m30 + m20, nY = m31 + m21, nZ = m32 + m22;
-        float fX = m30 - m20, fY = m31 - m21, fZ = m32 - m22;
         float rX = m03 - m00, rY = m13 - m10, rZ = m23 - m20, rW = m33 - m30;
         float lX = m03 + m00, lY = m13 + m10, lZ = m23 + m20, lW = m33 + m30;
         float tX = m03 - m01, tY = m13 - m11, tZ = m23 - m21, tW = m33 - m31;
@@ -2792,15 +2779,15 @@ public class Matrix4f implements Serializable {
         float nnz = nz * invLen;
         float nd = d * invLen;
         float r00 = 1.0f - 2.0f * nnx * nnx;
-        float r01 = -2.0f * nny * nnx;
-        float r02 = -2.0f * nnz * nnx;
+        float r01 = -2.0f * nnx * nny;
+        float r02 = -2.0f * nnx * nnz;
         float r03 = -2.0f * nnx * nd;
-        float r10 = -2.0f * nnx * nny;
+        float r10 = -2.0f * nny * nnx;
         float r11 = 1.0f - 2.0f * nny * nny;
-        float r12 = -2.0f * nnz * nny;
+        float r12 = -2.0f * nny * nnz;
         float r13 = -2.0f * nny * nd;
-        float r20 = -2.0f * nnx * nnz;
-        float r21 = -2.0f * nny * nnz;
+        float r20 = -2.0f * nnz * nnx;
+        float r21 = -2.0f * nnz * nny;
         float r22 = 1.0f - 2.0f * nnz * nnz;
         float r23 = -2.0f * nnz * nd;
         float t00 = m00; float t01 = m01; float t02 = m02; float t03 = m03;
