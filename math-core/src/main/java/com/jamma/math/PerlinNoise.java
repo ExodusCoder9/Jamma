@@ -64,9 +64,7 @@ public final class PerlinNoise {
 
     private static int[] seedPerm(int seed) {
         int[] perm = new int[512];
-        for (int i = 0; i < 256; i++) {
-            perm[i] = p[i];
-        }
+        System.arraycopy(p, 0, perm, 0, 256);
         long r = seed;
         for (int i = 255; i > 0; i--) {
             r = r * 1103515245L + 12345L;
