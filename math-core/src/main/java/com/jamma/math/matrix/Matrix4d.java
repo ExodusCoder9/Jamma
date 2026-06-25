@@ -2,9 +2,6 @@ package com.jamma.math.matrix;
 
 import com.jamma.math.Vector3d;
 import com.jamma.math.Vector4d;
-import com.jamma.math.matrix.Matrix3d;
-import com.jamma.math.matrix.Matrix4x3d;
-import com.jamma.math.geometry.Plane;
 import com.jamma.math.quaternion.Quaterniond;
 
 import java.io.Serial;
