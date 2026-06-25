@@ -69,18 +69,19 @@ public record Vector2f(float x, float y) implements Serializable {
     public float dot(Vector2f v) { return Math.fma(x, v.x, y * v.y); }
     public float length() { return (float) Math.sqrt(dot(this)); }
     public float lengthSquared() { return dot(this); }
-    public float distance(Vector2f v) { return sub(v).length(); }
-    public float distance(float x, float y) { return (float) Math.sqrt(Math.fma(this.x - x, this.x - x, (this.y - y) * (this.y - y))); }
-    public float distanceSquared(Vector2f v) { return sub(v).lengthSquared(); }
+    public float distance(Vector2f v) { return (float) Math.sqrt(distanceSquared(v)); }
+    public float distance(float x, float y) { return (float) Math.sqrt(distanceSquared(x, y)); }
+    public float distanceSquared(Vector2f v) { return Math.fma(this.x - v.x, this.x - v.x, (this.y - v.y) * (this.y - v.y)); }
     public float distanceSquared(float x, float y) { return Math.fma(this.x - x, this.x - x, (this.y - y) * (this.y - y)); }
     public Vector2f normalize() { float len = length(); return new Vector2f(x / len, y / len); }
     public Vector2f normalize(float length) { float len = length(); float s = length / len; return new Vector2f(x * s, y * s); }
-    public float angle(Vector2f v) { return (float) Math.acos(clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
+    public float angle(Vector2f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
     public float angleSigned(Vector2f v) { return (float) Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2f reflect(Vector2f normal) { float d = 2.0f * dot(normal); return new Vector2f(x - d * normal.x, y - d * normal.y); }
     public Vector2f project(Vector2f onto) { float s = dot(onto) / onto.dot(onto); return onto.scale(s); }
     public Vector2f reject(Vector2f onto) { return sub(project(onto)); }
     public Vector2f lerp(Vector2f other, float t) { return new Vector2f(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y)); }
+    @SuppressWarnings("SuspiciousNameCombination")
     public Vector2f perpendicular() { return new Vector2f(-y, x); }
     public Vector2f rotate(float angle) { float c = (float) Math.cos(angle); float s = (float) Math.sin(angle); return new Vector2f(x * c - y * s, x * s + y * c); }
     public Vector2f halfway(Vector2f other) { return new Vector2f(x + other.x, y + other.y).normalize(); }
@@ -97,7 +98,6 @@ public record Vector2f(float x, float y) implements Serializable {
     public float maxComponent() { return Math.max(x, y); }
     public int maxComponentIndex() { return x >= y ? 0 : 1; }
     public int minComponentIndex() { return x <= y ? 0 : 1; }
-    public Vector2f absolute() { return new Vector2f(Math.abs(x), Math.abs(y)); }
     public Vector3f toVector3f() { return new Vector3f(x, y, 0.0f); }
     public Vector3f toVector3f(float z) { return new Vector3f(x, y, z); }
     public Vector4f toVector4f() { return new Vector4f(x, y, 0.0f, 0.0f); }
@@ -120,9 +120,5 @@ public record Vector2f(float x, float y) implements Serializable {
             segment.get(ValueLayout.JAVA_FLOAT, offset),
             segment.get(ValueLayout.JAVA_FLOAT, offset + 4)
         );
-    }
-
-    private static float clamp(float value, float min, float max) {
-        return Math.min(Math.max(value, min), max);
     }
 }

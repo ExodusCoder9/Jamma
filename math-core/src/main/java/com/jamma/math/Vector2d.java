@@ -65,22 +65,22 @@ public record Vector2d(double x, double y) implements Serializable {
     public Vector2d scale(double s) { return new Vector2d(x * s, y * s); }
     public Vector2d negate() { return new Vector2d(-x, -y); }
     public Vector2d abs() { return new Vector2d(Math.abs(x), Math.abs(y)); }
-    public Vector2d absolute() { return abs(); }
     public double dot(Vector2d v) { return Math.fma(x, v.x, y * v.y); }
     public double length() { return Math.sqrt(dot(this)); }
     public double lengthSquared() { return dot(this); }
-    public double distance(Vector2d v) { return sub(v).length(); }
-    public double distance(double x, double y) { return sub(x, y).length(); }
-    public double distanceSquared(Vector2d v) { return sub(v).lengthSquared(); }
-    public double distanceSquared(double x, double y) { return sub(x, y).lengthSquared(); }
+    public double distance(Vector2d v) { return Math.sqrt(distanceSquared(v)); }
+    public double distance(double x, double y) { return Math.sqrt(distanceSquared(x, y)); }
+    public double distanceSquared(Vector2d v) { return distanceSquared(v.x, v.y); }
+    public double distanceSquared(double x, double y) { return Math.fma(this.x - x, this.x - x, (this.y - y) * (this.y - y)); }
     public Vector2d normalize() { double len = length(); return new Vector2d(x / len, y / len); }
     public Vector2d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector2d v) { return Math.acos(clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
+    public double angle(Vector2d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
     public double angleSigned(Vector2d v) { return Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2d reflect(Vector2d normal) { double d = 2.0 * dot(normal); return new Vector2d(x - d * normal.x, y - d * normal.y); }
     public Vector2d project(Vector2d onto) { double s = dot(onto) / onto.dot(onto); return onto.scale(s); }
     public Vector2d reject(Vector2d onto) { return sub(project(onto)); }
     public Vector2d lerp(Vector2d other, double t) { return new Vector2d(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y)); }
+    @SuppressWarnings("SuspiciousNameCombination")
     public Vector2d perpendicular() { return new Vector2d(-y, x); }
     public Vector2d rotate(double angle) { double c = Math.cos(angle); double s = Math.sin(angle); return new Vector2d(x * c - y * s, x * s + y * c); }
     public Vector2d halfway(Vector2d other) { return new Vector2d(x + other.x, y + other.y).normalize(); }
@@ -107,8 +107,4 @@ public record Vector2d(double x, double y) implements Serializable {
     public double[] get(double[] dest) { dest[0] = x; dest[1] = y; return dest; }
 
     public String toString() { return "(" + x + ", " + y + ")"; }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.min(Math.max(value, min), max);
-    }
 }

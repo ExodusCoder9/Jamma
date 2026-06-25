@@ -71,18 +71,17 @@ public record Vector3d(double x, double y, double z) implements Serializable {
     public Vector3d scale(double s) { return new Vector3d(x * s, y * s, z * s); }
     public Vector3d negate() { return new Vector3d(-x, -y, -z); }
     public Vector3d abs() { return new Vector3d(Math.abs(x), Math.abs(y), Math.abs(z)); }
-    public Vector3d absolute() { return abs(); }
     public double dot(Vector3d v) { return Math.fma(x, v.x, Math.fma(y, v.y, z * v.z)); }
     public Vector3d cross(Vector3d v) { return new Vector3d(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x); }
     public double length() { return Math.sqrt(dot(this)); }
     public double lengthSquared() { return dot(this); }
-    public double distance(Vector3d v) { return sub(v).length(); }
-    public double distance(double x, double y, double z) { return sub(x, y, z).length(); }
-    public double distanceSquared(Vector3d v) { return sub(v).lengthSquared(); }
-    public double distanceSquared(double x, double y, double z) { return sub(x, y, z).lengthSquared(); }
+    public double distance(Vector3d v) { return Math.sqrt(distanceSquared(v)); }
+    public double distance(double x, double y, double z) { return Math.sqrt(distanceSquared(x, y, z)); }
+    public double distanceSquared(Vector3d v) { return distanceSquared(v.x, v.y, v.z); }
+    public double distanceSquared(double x, double y, double z) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z))); }
     public Vector3d normalize() { double len = length(); return new Vector3d(x / len, y / len, z / len); }
     public Vector3d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector3d v) { return Math.acos(clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
+    public double angle(Vector3d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
     public double angleSigned(Vector3d v, Vector3d normal) { return Math.atan2(cross(v).dot(normal), dot(v)); }
     public Vector3d reflect(Vector3d normal) { double d = 2.0 * dot(normal); return new Vector3d(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
     public Vector3d project(Vector3d onto) { double s = dot(onto) / onto.dot(onto); return onto.scale(s); }
@@ -131,8 +130,4 @@ public record Vector3d(double x, double y, double z) implements Serializable {
     public double[] get(double[] dest) { dest[0] = x; dest[1] = y; dest[2] = z; return dest; }
 
     public String toString() { return "(" + x + ", " + y + ", " + z + ")"; }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.min(Math.max(value, min), max);
-    }
 }

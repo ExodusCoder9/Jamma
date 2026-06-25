@@ -9,6 +9,16 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.FloatBuffer;
 
+/**
+ * A unit quaternion stored as an immutable record.
+ * <p>
+ * Represents a rotation in 3D space. For a rotation of angle {@code theta} around
+ * axis {@code (ax, ay, az)}, the quaternion is
+ * {@code (ax*sin(theta/2), ay*sin(theta/2), az*sin(theta/2), cos(theta/2))}.
+ * <p>
+ * Formulas assume the quaternion is normalized. Constructors do <b>not</b>
+ * normalize automatically — call {@link #normalize()} when needed.
+ */
 public record Quaternionf(float x, float y, float z, float w) implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -136,7 +146,14 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public Quaternionf difference(Quaternionf q) {
-        return invert().mul(q);
+        float invLenSq = 1.0f / lengthSquared();
+        float ix = -x * invLenSq, iy = -y * invLenSq, iz = -z * invLenSq, iw = w * invLenSq;
+        return new Quaternionf(
+            Math.fma(iw, q.x, Math.fma(ix, q.w, Math.fma(iy, q.z, -iz * q.y))),
+            Math.fma(iw, q.y, Math.fma(-ix, q.z, Math.fma(iy, q.w, iz * q.x))),
+            Math.fma(iw, q.z, Math.fma(ix, q.y, Math.fma(-iy, q.x, iz * q.w))),
+            Math.fma(iw, q.w, Math.fma(-ix, q.x, Math.fma(-iy, q.y, -iz * q.z)))
+        );
     }
 
     public float dot(Quaternionf q) {
@@ -206,9 +223,9 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         float xy = x * y, xz = x * z, xw = x * w;
         float yz = y * z, yw = y * w, zw = z * w;
         return new Matrix4f(
-            Math.fma(-2.0f, yy + zz, 1.0f), Math.fma(2.0f, xy + zw, 0.0f), Math.fma(2.0f, xz - yw, 0.0f), 0.0f,
-            Math.fma(2.0f, xy - zw, 0.0f), Math.fma(-2.0f, xx + zz, 1.0f), Math.fma(2.0f, yz + xw, 0.0f), 0.0f,
-            Math.fma(2.0f, xz + yw, 0.0f), Math.fma(2.0f, yz - xw, 0.0f), Math.fma(-2.0f, xx + yy, 1.0f), 0.0f,
+            1.0f - 2.0f * (yy + zz), 2.0f * (xy + zw), 2.0f * (xz - yw), 0.0f,
+            2.0f * (xy - zw), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + xw), 0.0f,
+            2.0f * (xz + yw), 2.0f * (yz - xw), 1.0f - 2.0f * (xx + yy), 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         );
     }
@@ -218,9 +235,9 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         float xy = x * y, xz = x * z, xw = x * w;
         float yz = y * z, yw = y * w, zw = z * w;
         return new Matrix3f(new float[] {
-            Math.fma(-2.0f, yy + zz, 1.0f), Math.fma(2.0f, xy + zw, 0.0f), Math.fma(2.0f, xz - yw, 0.0f),
-            Math.fma(2.0f, xy - zw, 0.0f), Math.fma(-2.0f, xx + zz, 1.0f), Math.fma(2.0f, yz + xw, 0.0f),
-            Math.fma(2.0f, xz + yw, 0.0f), Math.fma(2.0f, yz - xw, 0.0f), Math.fma(-2.0f, xx + yy, 1.0f)
+            1.0f - 2.0f * (yy + zz), 2.0f * (xy + zw), 2.0f * (xz - yw),
+            2.0f * (xy - zw), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + xw),
+            2.0f * (xz + yw), 2.0f * (yz - xw), 1.0f - 2.0f * (xx + yy)
         });
     }
 
@@ -237,16 +254,15 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public Vector3f positiveX() {
-        float xz = x * z, yw = y * w;
-        return new Vector3f(Math.fma(-2.0f, y * y + z * z, 1.0f), Math.fma(2.0f, x * y + z * w, 0.0f), Math.fma(2.0f, xz - yw, 0.0f));
+        return new Vector3f(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y + z * w), 2.0f * (x * z - y * w));
     }
 
     public Vector3f positiveY() {
-        return new Vector3f(Math.fma(2.0f, x * y - z * w, 0.0f), Math.fma(-2.0f, x * x + z * z, 1.0f), Math.fma(2.0f, y * z + x * w, 0.0f));
+        return new Vector3f(2.0f * (x * y - z * w), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z + x * w));
     }
 
     public Vector3f positiveZ() {
-        return new Vector3f(Math.fma(2.0f, x * z + y * w, 0.0f), Math.fma(2.0f, y * z - x * w, 0.0f), Math.fma(-2.0f, x * x + y * y, 1.0f));
+        return new Vector3f(2.0f * (x * z + y * w), 2.0f * (y * z - x * w), 1.0f - 2.0f * (x * x + y * y));
     }
 
     public Vector3f getEulerAnglesXYZ() {
@@ -289,7 +305,10 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public Quaternionf(AxisAngle4f axisAngle) {
-        this(axisAngle.x(), axisAngle.y(), axisAngle.z(), axisAngle.angle());
+        this(fromAxisAngle(
+            new Vector3f(axisAngle.x(), axisAngle.y(), axisAngle.z()),
+            axisAngle.angle()
+        ));
     }
 
     public Quaternionf(Matrix3f m) {
@@ -380,15 +399,16 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public Vector3f positiveX(Vector3f dest) {
-        return positiveX();
+        float xz = x * z, yw = y * w;
+        return new Vector3f(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y + z * w), 2.0f * (xz - yw));
     }
 
     public Vector3f positiveY(Vector3f dest) {
-        return positiveY();
+        return new Vector3f(2.0f * (x * y - z * w), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z + x * w));
     }
 
     public Vector3f positiveZ(Vector3f dest) {
-        return positiveZ();
+        return new Vector3f(2.0f * (x * z + y * w), 2.0f * (y * z - x * w), 1.0f - 2.0f * (x * x + y * y));
     }
 
     public static Quaternionf fromAxisAngle(float axisX, float axisY, float axisZ, float angle) {

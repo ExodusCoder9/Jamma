@@ -1,5 +1,15 @@
 package com.jamma.math;
 
+/**
+ * Allocation-free static vector math operations for single-precision types.
+ * <p>
+ * Each operation has two overloads:
+ * <ul>
+ *   <li>A allocating overload that returns a new {@code record} instance.
+ *   <li>A {@code float[] dest, int offset} overload that writes into a caller-provided
+ *       array — zero allocations.
+ * </ul>
+ */
 public final class VectorMathf {
 
     private static final float EPSILON = 1.0e-6f;
@@ -10,14 +20,23 @@ public final class VectorMathf {
     public static Vector2f add(Vector2f a, Vector2f b) { return new Vector2f(a.x() + b.x(), a.y() + b.y()); }
     public static Vector3f add(Vector3f a, Vector3f b) { return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z()); }
     public static Vector4f add(Vector4f a, Vector4f b) { return new Vector4f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z(), a.w() + b.w()); }
+    public static void add(Vector3f a, Vector3f b, float[] dest, int offset) {
+        dest[offset] = a.x() + b.x(); dest[offset + 1] = a.y() + b.y(); dest[offset + 2] = a.z() + b.z();
+    }
 
     public static Vector2f sub(Vector2f a, Vector2f b) { return new Vector2f(a.x() - b.x(), a.y() - b.y()); }
     public static Vector3f sub(Vector3f a, Vector3f b) { return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z()); }
     public static Vector4f sub(Vector4f a, Vector4f b) { return new Vector4f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z(), a.w() - b.w()); }
+    public static void sub(Vector3f a, Vector3f b, float[] dest, int offset) {
+        dest[offset] = a.x() - b.x(); dest[offset + 1] = a.y() - b.y(); dest[offset + 2] = a.z() - b.z();
+    }
 
     public static Vector2f mul(Vector2f a, Vector2f b) { return new Vector2f(a.x() * b.x(), a.y() * b.y()); }
     public static Vector3f mul(Vector3f a, Vector3f b) { return new Vector3f(a.x() * b.x(), a.y() * b.y(), a.z() * b.z()); }
     public static Vector4f mul(Vector4f a, Vector4f b) { return new Vector4f(a.x() * b.x(), a.y() * b.y(), a.z() * b.z(), a.w() * b.w()); }
+    public static void mul(Vector3f a, Vector3f b, float[] dest, int offset) {
+        dest[offset] = a.x() * b.x(); dest[offset + 1] = a.y() * b.y(); dest[offset + 2] = a.z() * b.z();
+    }
 
     public static Vector2f div(Vector2f a, Vector2f b) { return new Vector2f(a.x() / b.x(), a.y() / b.y()); }
     public static Vector3f div(Vector3f a, Vector3f b) { return new Vector3f(a.x() / b.x(), a.y() / b.y(), a.z() / b.z()); }
@@ -26,6 +45,9 @@ public final class VectorMathf {
     public static Vector2f scale(Vector2f v, float s) { return new Vector2f(v.x() * s, v.y() * s); }
     public static Vector3f scale(Vector3f v, float s) { return new Vector3f(v.x() * s, v.y() * s, v.z() * s); }
     public static Vector4f scale(Vector4f v, float s) { return new Vector4f(v.x() * s, v.y() * s, v.z() * s, v.w() * s); }
+    public static void scale(Vector3f v, float s, float[] dest, int offset) {
+        dest[offset] = v.x() * s; dest[offset + 1] = v.y() * s; dest[offset + 2] = v.z() * s;
+    }
 
     public static Vector2f negate(Vector2f v) { return new Vector2f(-v.x(), -v.y()); }
     public static Vector3f negate(Vector3f v) { return new Vector3f(-v.x(), -v.y(), -v.z()); }
@@ -54,6 +76,11 @@ public final class VectorMathf {
             a.x() * b.y() - a.y() * b.x()
         );
     }
+    public static void cross(Vector3f a, Vector3f b, float[] dest, int offset) {
+        dest[offset] = a.y() * b.z() - a.z() * b.y();
+        dest[offset + 1] = a.z() * b.x() - a.x() * b.z();
+        dest[offset + 2] = a.x() * b.y() - a.y() * b.x();
+    }
     public static float cross2D(Vector2f a, Vector2f b) {
         return a.x() * b.y() - a.y() * b.x();
     }
@@ -75,12 +102,21 @@ public final class VectorMathf {
     public static float lengthSquared(Vector3f v) { return dot(v, v); }
     public static float lengthSquared(Vector4f v) { return dot(v, v); }
 
-    public static float distance(Vector2f a, Vector2f b) { return length(sub(a, b)); }
-    public static float distance(Vector3f a, Vector3f b) { return length(sub(a, b)); }
-    public static float distance(Vector4f a, Vector4f b) { return length(sub(a, b)); }
-    public static float distanceSquared(Vector2f a, Vector2f b) { return lengthSquared(sub(a, b)); }
-    public static float distanceSquared(Vector3f a, Vector3f b) { return lengthSquared(sub(a, b)); }
-    public static float distanceSquared(Vector4f a, Vector4f b) { return lengthSquared(sub(a, b)); }
+    public static float distance(Vector2f a, Vector2f b) { return (float) Math.sqrt(distanceSquared(a, b)); }
+    public static float distance(Vector3f a, Vector3f b) { return (float) Math.sqrt(distanceSquared(a, b)); }
+    public static float distance(Vector4f a, Vector4f b) { return (float) Math.sqrt(distanceSquared(a, b)); }
+    public static float distanceSquared(Vector2f a, Vector2f b) {
+        float dx = a.x() - b.x(), dy = a.y() - b.y();
+        return Math.fma(dx, dx, dy * dy);
+    }
+    public static float distanceSquared(Vector3f a, Vector3f b) {
+        float dx = a.x() - b.x(), dy = a.y() - b.y(), dz = a.z() - b.z();
+        return Math.fma(dx, dx, Math.fma(dy, dy, dz * dz));
+    }
+    public static float distanceSquared(Vector4f a, Vector4f b) {
+        float dx = a.x() - b.x(), dy = a.y() - b.y(), dz = a.z() - b.z(), dw = a.w() - b.w();
+        return Math.fma(dx, dx, Math.fma(dy, dy, Math.fma(dz, dz, dw * dw)));
+    }
 
     public static Vector2f normalize(Vector2f v) {
         float len = length(v);
@@ -89,6 +125,10 @@ public final class VectorMathf {
     public static Vector3f normalize(Vector3f v) {
         float len = length(v);
         return new Vector3f(v.x() / len, v.y() / len, v.z() / len);
+    }
+    public static void normalize(Vector3f v, float[] dest, int offset) {
+        float invLen = 1.0f / length(v);
+        dest[offset] = v.x() * invLen; dest[offset + 1] = v.y() * invLen; dest[offset + 2] = v.z() * invLen;
     }
     public static Vector4f normalize(Vector4f v) {
         float len = length(v);
@@ -160,6 +200,11 @@ public final class VectorMathf {
             Math.fma(t, b.z() - a.z(), a.z())
         );
     }
+    public static void lerp(Vector3f a, Vector3f b, float t, float[] dest, int offset) {
+        dest[offset] = Math.fma(t, b.x() - a.x(), a.x());
+        dest[offset + 1] = Math.fma(t, b.y() - a.y(), a.y());
+        dest[offset + 2] = Math.fma(t, b.z() - a.z(), a.z());
+    }
     public static Vector4f lerp(Vector4f a, Vector4f b, float t) {
         return new Vector4f(
             Math.fma(t, b.x() - a.x(), a.x()),
@@ -173,7 +218,7 @@ public final class VectorMathf {
         return normalize(lerp(a, b, t));
     }
     public static Vector3f slerp(Vector3f a, Vector3f b, float t) {
-        float d = clamp(dot(a, b), -1.0f, 1.0f);
+        float d = Math.clamp(dot(a, b), -1.0f, 1.0f);
         float theta = (float) Math.acos(d) * t;
         Vector3f relative = normalize(sub(b, scale(a, d)));
         return add(scale(a, (float) Math.cos(theta)), scale(relative, (float) Math.sin(theta)));
@@ -227,10 +272,10 @@ public final class VectorMathf {
     }
 
     public static float angle(Vector2f a, Vector2f b) {
-        return (float) Math.acos(clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
+        return (float) Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
     }
     public static float angle(Vector3f a, Vector3f b) {
-        return (float) Math.acos(clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
+        return (float) Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
     }
     public static float angleSigned(Vector2f a, Vector2f b) {
         return (float) Math.atan2(cross2D(a, b), dot(a, b));
@@ -239,7 +284,7 @@ public final class VectorMathf {
         float d = dot(a, b) / (length(a) * length(b));
         Vector3f c = cross(a, b);
         float sign = dot(c, normal) >= 0.0f ? 1.0f : -1.0f;
-        return sign * (float) Math.acos(clamp(d, -1.0f, 1.0f));
+        return sign * (float) Math.acos(Math.clamp(d, -1.0f, 1.0f));
     }
 
     public static Vector2f rotate(Vector2f v, float angle) {
@@ -274,13 +319,13 @@ public final class VectorMathf {
     }
 
     public static Vector2f clamp(Vector2f v, Vector2f min, Vector2f max) {
-        return new Vector2f(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()));
+        return new Vector2f(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()));
     }
     public static Vector3f clamp(Vector3f v, Vector3f min, Vector3f max) {
-        return new Vector3f(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()), clamp(v.z(), min.z(), max.z()));
+        return new Vector3f(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()), Math.clamp(v.z(), min.z(), max.z()));
     }
     public static Vector4f clamp(Vector4f v, Vector4f min, Vector4f max) {
-        return new Vector4f(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()), clamp(v.z(), min.z(), max.z()), clamp(v.w(), min.w(), max.w()));
+        return new Vector4f(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()), Math.clamp(v.z(), min.z(), max.z()), Math.clamp(v.w(), min.w(), max.w()));
     }
 
     public static Vector2f perpendicular(Vector2f v) { return new Vector2f(-v.y(), v.x()); }
@@ -301,12 +346,12 @@ public final class VectorMathf {
 
     public static Vector2f closestPointOnSegment(Vector2f p, Vector2f a, Vector2f b) {
         Vector2f ab = sub(b, a);
-        float t = clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
+        float t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
         return lerp(a, b, t);
     }
     public static Vector3f closestPointOnSegment(Vector3f p, Vector3f a, Vector3f b) {
         Vector3f ab = sub(b, a);
-        float t = clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
+        float t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
         return lerp(a, b, t);
     }
     public static float distanceToSegment(Vector2f p, Vector2f a, Vector2f b) {
@@ -366,8 +411,4 @@ public final class VectorMathf {
     public static float componentSum(Vector2f v) { return v.x() + v.y(); }
     public static float componentSum(Vector3f v) { return v.x() + v.y() + v.z(); }
     public static float componentSum(Vector4f v) { return v.x() + v.y() + v.z() + v.w(); }
-
-    private static float clamp(float value, float min, float max) {
-        return Math.min(Math.max(value, min), max);
-    }
 }

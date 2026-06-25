@@ -1,5 +1,14 @@
 package com.jamma.math.scalar;
 
+/**
+ * Static math utilities for scalar (non-vector) double-precision operations.
+ * <p>
+ * Provides constants, special functions (gamma, beta, erf, stirling), and
+ * common helpers (clamp, lerp, smoothstep, rounding, statistics).
+ * <p>
+ * All methods operate on primitive {@code double} values and return
+ * primitive results — no allocations.
+ */
 public final class ScalarMath {
 
     private ScalarMath() {
@@ -241,8 +250,13 @@ public final class ScalarMath {
     public static double erfc(double x) { return 1.0 - erf(x); }
 
     public static double gamma(double x) {
+        if (x <= 0.0 && x == Math.floor(x)) {
+            throw new ArithmeticException("Gamma pole at negative integer: " + (int) x);
+        }
         if (x < 0.5) {
-            return PI / (Math.sin(PI * x) * gamma(1.0 - x));
+            double sinTerm = Math.sin(PI * x);
+            if (sinTerm == 0.0) throw new ArithmeticException("Gamma pole at " + (int) x);
+            return PI / (sinTerm * gamma(1.0 - x));
         }
         x -= 1.0;
         double y = GAMMA_P[0];
@@ -287,13 +301,32 @@ public final class ScalarMath {
         if (k < 0 || k > n) return 0.0;
         if (k == 0) return n == 0 ? 1.0 : 0.0;
         if (n == k) return 1.0;
-        return stirlingFirstKind(n - 1, k - 1) - (n - 1) * stirlingFirstKind(n - 1, k);
+        double[][] dp = new double[n + 1][k + 1];
+        dp[0][0] = 1.0;
+        for (int i = 1; i <= n; i++) {
+            int maxJ = Math.min(i, k);
+            for (int j = 1; j <= maxJ; j++) {
+                dp[i][j] = dp[i - 1][j - 1] - (i - 1) * dp[i - 1][j];
+            }
+        }
+        return dp[n][k];
     }
     public static double stirlingSecondKind(int n, int k) {
         if (k < 0 || k > n) return 0.0;
         if (k == 0) return n == 0 ? 1.0 : 0.0;
         if (n == k) return 1.0;
-        return stirlingSecondKind(n - 1, k - 1) + k * stirlingSecondKind(n - 1, k);
+        double[] prev = new double[k + 1];
+        double[] curr = new double[k + 1];
+        prev[0] = 1.0;
+        for (int i = 1; i <= n; i++) {
+            int maxJ = Math.min(i, k);
+            curr[0] = 0.0;
+            for (int j = 1; j <= maxJ; j++) {
+                curr[j] = prev[j - 1] + j * prev[j];
+            }
+            double[] tmp = prev; prev = curr; curr = tmp;
+        }
+        return prev[k];
     }
 
     public static long fibonacci(int n) {

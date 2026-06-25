@@ -1,5 +1,15 @@
 package com.jamma.math;
 
+/**
+ * Allocation-free static vector math operations for double-precision types.
+ * <p>
+ * Each operation has two overloads:
+ * <ul>
+ *   <li>A allocating overload that returns a new {@code record} instance.
+ *   <li>A {@code double[] dest, int offset} overload that writes into a caller-provided
+ *       array — zero allocations.
+ * </ul>
+ */
 public final class VectorMath {
 
     private static final double EPSILON = 1.0e-10;
@@ -75,12 +85,21 @@ public final class VectorMath {
     public static double lengthSquared(Vector3d v) { return dot(v, v); }
     public static double lengthSquared(Vector4d v) { return dot(v, v); }
 
-    public static double distance(Vector2d a, Vector2d b) { return length(sub(a, b)); }
-    public static double distance(Vector3d a, Vector3d b) { return length(sub(a, b)); }
-    public static double distance(Vector4d a, Vector4d b) { return length(sub(a, b)); }
-    public static double distanceSquared(Vector2d a, Vector2d b) { return lengthSquared(sub(a, b)); }
-    public static double distanceSquared(Vector3d a, Vector3d b) { return lengthSquared(sub(a, b)); }
-    public static double distanceSquared(Vector4d a, Vector4d b) { return lengthSquared(sub(a, b)); }
+    public static double distance(Vector2d a, Vector2d b) { return Math.sqrt(distanceSquared(a, b)); }
+    public static double distance(Vector3d a, Vector3d b) { return Math.sqrt(distanceSquared(a, b)); }
+    public static double distance(Vector4d a, Vector4d b) { return Math.sqrt(distanceSquared(a, b)); }
+    public static double distanceSquared(Vector2d a, Vector2d b) {
+        double dx = a.x() - b.x(), dy = a.y() - b.y();
+        return Math.fma(dx, dx, dy * dy);
+    }
+    public static double distanceSquared(Vector3d a, Vector3d b) {
+        double dx = a.x() - b.x(), dy = a.y() - b.y(), dz = a.z() - b.z();
+        return Math.fma(dx, dx, Math.fma(dy, dy, dz * dz));
+    }
+    public static double distanceSquared(Vector4d a, Vector4d b) {
+        double dx = a.x() - b.x(), dy = a.y() - b.y(), dz = a.z() - b.z(), dw = a.w() - b.w();
+        return Math.fma(dx, dx, Math.fma(dy, dy, Math.fma(dz, dz, dw * dw)));
+    }
 
     public static Vector2d normalize(Vector2d v) {
         double len = length(v);
@@ -173,7 +192,7 @@ public final class VectorMath {
         return normalize(lerp(a, b, t));
     }
     public static Vector3d slerp(Vector3d a, Vector3d b, double t) {
-        double d = clamp(dot(a, b), -1.0, 1.0);
+        double d = Math.clamp(dot(a, b), -1.0, 1.0);
         double theta = Math.acos(d) * t;
         Vector3d relative = normalize(sub(b, scale(a, d)));
         return add(scale(a, Math.cos(theta)), scale(relative, Math.sin(theta)));
@@ -227,10 +246,10 @@ public final class VectorMath {
     }
 
     public static double angle(Vector2d a, Vector2d b) {
-        return Math.acos(clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
+        return Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
     }
     public static double angle(Vector3d a, Vector3d b) {
-        return Math.acos(clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
+        return Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
     }
     public static double angleSigned(Vector2d a, Vector2d b) {
         return Math.atan2(cross2D(a, b), dot(a, b));
@@ -239,7 +258,7 @@ public final class VectorMath {
         double d = dot(a, b) / (length(a) * length(b));
         Vector3d c = cross(a, b);
         double sign = dot(c, normal) >= 0.0 ? 1.0 : -1.0;
-        return sign * Math.acos(clamp(d, -1.0, 1.0));
+        return sign * Math.acos(Math.clamp(d, -1.0, 1.0));
     }
 
     public static Vector2d rotate(Vector2d v, double angle) {
@@ -274,13 +293,13 @@ public final class VectorMath {
     }
 
     public static Vector2d clamp(Vector2d v, Vector2d min, Vector2d max) {
-        return new Vector2d(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()));
+        return new Vector2d(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()));
     }
     public static Vector3d clamp(Vector3d v, Vector3d min, Vector3d max) {
-        return new Vector3d(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()), clamp(v.z(), min.z(), max.z()));
+        return new Vector3d(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()), Math.clamp(v.z(), min.z(), max.z()));
     }
     public static Vector4d clamp(Vector4d v, Vector4d min, Vector4d max) {
-        return new Vector4d(clamp(v.x(), min.x(), max.x()), clamp(v.y(), min.y(), max.y()), clamp(v.z(), min.z(), max.z()), clamp(v.w(), min.w(), max.w()));
+        return new Vector4d(Math.clamp(v.x(), min.x(), max.x()), Math.clamp(v.y(), min.y(), max.y()), Math.clamp(v.z(), min.z(), max.z()), Math.clamp(v.w(), min.w(), max.w()));
     }
 
     public static Vector2d perpendicular(Vector2d v) { return new Vector2d(-v.y(), v.x()); }
@@ -301,12 +320,12 @@ public final class VectorMath {
 
     public static Vector2d closestPointOnSegment(Vector2d p, Vector2d a, Vector2d b) {
         Vector2d ab = sub(b, a);
-        double t = clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
+        double t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
         return lerp(a, b, t);
     }
     public static Vector3d closestPointOnSegment(Vector3d p, Vector3d a, Vector3d b) {
         Vector3d ab = sub(b, a);
-        double t = clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
+        double t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
         return lerp(a, b, t);
     }
     public static double distanceToSegment(Vector2d p, Vector2d a, Vector2d b) {
@@ -410,7 +429,32 @@ public final class VectorMath {
     public static double componentSum(Vector3d v) { return v.x() + v.y() + v.z(); }
     public static double componentSum(Vector4d v) { return v.x() + v.y() + v.z() + v.w(); }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.min(Math.max(value, min), max);
+    public static void add(Vector3d a, Vector3d b, double[] dest, int offset) {
+        dest[offset] = a.x() + b.x(); dest[offset + 1] = a.y() + b.y(); dest[offset + 2] = a.z() + b.z();
+    }
+    public static void sub(Vector3d a, Vector3d b, double[] dest, int offset) {
+        dest[offset] = a.x() - b.x(); dest[offset + 1] = a.y() - b.y(); dest[offset + 2] = a.z() - b.z();
+    }
+    public static void mul(Vector3d a, Vector3d b, double[] dest, int offset) {
+        dest[offset] = a.x() * b.x(); dest[offset + 1] = a.y() * b.y(); dest[offset + 2] = a.z() * b.z();
+    }
+    public static void scale(Vector3d v, double s, double[] dest, int offset) {
+        dest[offset] = v.x() * s; dest[offset + 1] = v.y() * s; dest[offset + 2] = v.z() * s;
+    }
+    public static void cross(Vector3d a, Vector3d b, double[] dest, int offset) {
+        double ax = a.x(), ay = a.y(), az = a.z();
+        double bx = b.x(), by = b.y(), bz = b.z();
+        dest[offset] = ay * bz - az * by;
+        dest[offset + 1] = az * bx - ax * bz;
+        dest[offset + 2] = ax * by - ay * bx;
+    }
+    public static void normalize(Vector3d v, double[] dest, int offset) {
+        double len = Math.sqrt(dot(v, v));
+        dest[offset] = v.x() / len; dest[offset + 1] = v.y() / len; dest[offset + 2] = v.z() / len;
+    }
+    public static void lerp(Vector3d a, Vector3d b, double t, double[] dest, int offset) {
+        dest[offset] = Math.fma(b.x() - a.x(), t, a.x());
+        dest[offset + 1] = Math.fma(b.y() - a.y(), t, a.y());
+        dest[offset + 2] = Math.fma(b.z() - a.z(), t, a.z());
     }
 }

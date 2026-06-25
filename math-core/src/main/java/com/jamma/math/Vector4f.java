@@ -85,9 +85,9 @@ public record Vector4f(float x, float y, float z, float w) implements Serializab
     public float dot(Vector4f v) { return Math.fma(x, v.x, Math.fma(y, v.y, Math.fma(z, v.z, w * v.w))); }
     public float length() { return (float) Math.sqrt(dot(this)); }
     public float lengthSquared() { return dot(this); }
-    public float distance(Vector4f v) { return sub(v).length(); }
-    public float distance(float x, float y, float z, float w) { return (float) Math.sqrt(Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, Math.fma(this.z - z, this.z - z, (this.w - w) * (this.w - w))))); }
-    public float distanceSquared(Vector4f v) { return sub(v).lengthSquared(); }
+    public float distance(Vector4f v) { return (float) Math.sqrt(distanceSquared(v)); }
+    public float distance(float x, float y, float z, float w) { return (float) Math.sqrt(distanceSquared(x, y, z, w)); }
+    public float distanceSquared(Vector4f v) { return distanceSquared(v.x, v.y, v.z, v.w); }
     public float distanceSquared(float x, float y, float z, float w) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, Math.fma(this.z - z, this.z - z, (this.w - w) * (this.w - w)))); }
     public Vector4f normalize() { float len = length(); return new Vector4f(x / len, y / len, z / len, w / len); }
     public Vector4f normalize(float length) { float len = length(); float s = length / len; return new Vector4f(x * s, y * s, z * s, w * s); }
@@ -99,7 +99,7 @@ public record Vector4f(float x, float y, float z, float w) implements Serializab
     public Vector4f max(Vector4f v) { return new Vector4f(Math.max(x, v.x), Math.max(y, v.y), Math.max(z, v.z), Math.max(w, v.w)); }
     public Vector4f fma(Vector4f a, Vector4f b) { return new Vector4f(Math.fma(x, a.x, b.x), Math.fma(y, a.y, b.y), Math.fma(z, a.z, b.z), Math.fma(w, a.w, b.w)); }
     public Vector4f fma(float a, Vector4f b) { return new Vector4f(Math.fma(a, x, b.x), Math.fma(a, y, b.y), Math.fma(a, z, b.z), Math.fma(a, w, b.w)); }
-    public float angle(Vector4f v) { return (float) Math.acos(clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
+    public float angle(Vector4f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
     public boolean equals(Vector4f other, float delta) { return Math.abs(x - other.x) < delta && Math.abs(y - other.y) < delta && Math.abs(z - other.z) < delta && Math.abs(w - other.w) < delta; }
     public float minComponent() { return Math.min(Math.min(x, y), Math.min(z, w)); }
     public float maxComponent() { return Math.max(Math.max(x, y), Math.max(z, w)); }
@@ -115,7 +115,6 @@ public record Vector4f(float x, float y, float z, float w) implements Serializab
         if (z <= w) return 2;
         return 3;
     }
-    public Vector4f absolute() { return new Vector4f(Math.abs(x), Math.abs(y), Math.abs(z), Math.abs(w)); }
     public Vector2f xy() { return new Vector2f(x, y); }
     public Vector3f xyz() { return new Vector3f(x, y, z); }
     public Vector2f toVector2f() { return new Vector2f(x, y); }
@@ -142,9 +141,5 @@ public record Vector4f(float x, float y, float z, float w) implements Serializab
             segment.get(ValueLayout.JAVA_FLOAT, offset + 8),
             segment.get(ValueLayout.JAVA_FLOAT, offset + 12)
         );
-    }
-
-    private static float clamp(float value, float min, float max) {
-        return Math.min(Math.max(value, min), max);
     }
 }

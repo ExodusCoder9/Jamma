@@ -8,7 +8,18 @@ import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
+/**
+ * A 4x4 column-major single-precision transformation matrix.
+ * <p>
+ * This is a mutable class for performance. Use the static methods in
+ * {@link com.jamma.math.matrix.Mathf} for immutable-style operations.
+ * <p>
+ * Memory layout: 16 contiguous floats in column-major order
+ * (m00, m10, m20, m30, m01, m11, …).
+ */
 public class Matrix4f implements Serializable {
+
+    public static final Matrix4f IDENTITY = new Matrix4f();
 
     private static final long serialVersionUID = 1L;
 
@@ -1869,10 +1880,10 @@ public class Matrix4f implements Serializable {
     @Override
     public String toString() {
         return String.format("Matrix4f[[%f, %f, %f, %f], [%f, %f, %f, %f], [%f, %f, %f, %f], [%f, %f, %f, %f]]",
-            m00, m10, m20, m30,
-            m01, m11, m21, m31,
-            m02, m12, m22, m32,
-            m03, m13, m23, m33);
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33);
     }
 
     public Matrix4f get(MemorySegment dest, long byteOffset) {
@@ -2333,7 +2344,7 @@ public class Matrix4f implements Serializable {
 
     public static Matrix4f translationRotateScale(float tx, float ty, float tz, float qx, float qy, float qz, float qw, float sx, float sy, float sz) {
         Matrix4f m = new Matrix4f();
-        m.translation(tx, ty, tz);
+        m.setTranslation(tx, ty, tz);
         m.rotate(new Quaternionf(qx, qy, qz, qw));
         m.scale(sx, sy, sz);
         return m;
@@ -2361,7 +2372,7 @@ public class Matrix4f implements Serializable {
 
     public static Matrix4f translationRotate(float tx, float ty, float tz, float qx, float qy, float qz, float qw) {
         Matrix4f m = new Matrix4f();
-        m.translation(tx, ty, tz);
+        m.setTranslation(tx, ty, tz);
         m.rotate(new Quaternionf(qx, qy, qz, qw));
         return m;
     }

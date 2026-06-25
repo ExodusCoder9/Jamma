@@ -61,6 +61,7 @@ All dot products, lerps, and matrix multiply accumulations use `Math.fma` (fused
 - `jdk.incubator.vector.DoubleVector` for SIMD
 - `StructuredTaskScope` for parallel decomposition
 - JPMS `module-info.java` for proper encapsulation
+- `Math.clamp` (JDK 26) for all vector and matrix clamping operations
 
 ---
 
@@ -148,6 +149,8 @@ Each vector type exists in three precision variants:
 | `Matrix2f` | 2×2 | `float` | Yes |
 | `Matrix3d` | 3×3 | `double` | Yes |
 | `Matrix3f` | 3×3 | `float` | Yes |
+| `Matrix3x2d` | 3×2 | `double` | Yes (2D affine) |
+| `Matrix3x2f` | 3×2 | `float` | Yes (2D affine) |
 | `Matrix4d` | 4×4 | `double` | Yes |
 | `Matrix4f` | 4×4 | `float` | Yes |
 | `Matrix4x3d` | 4×3 | `double` | Yes (affine) |
@@ -168,25 +171,26 @@ Each vector type exists in three precision variants:
 
 **Transformations**
 - `identity()`, `zero()`
-- `scale(x, y, z)`, `scale(v)`, `scale(s)`
-- `translate(x, y, z)`, `translate(v)` (4×4, 4×3)
+- `scale(x, y [,z])`, `scale(v)`, `scale(s)`
+- `translate(x, y [,z])`, `translate(v)` (4×4, 4×3, 3×2)
 
-**Rotation** (3×3, 4×4, 4×3)
+**Rotation** (3×3, 4×4, 4×3, 3×2)
 - `rotate(angle, axisX, axisY, axisZ)`, `rotate(q)`
 - `rotateX(angle)`, `rotateY(angle)`, `rotateZ(angle)`
 - `rotateXYZ(angleX, angleY, angleZ)`, `rotateZYX(angleZ, angleY, angleX)`
 - `rotateLocalX/Y/Z(angle)` (4×4 only)
 - Static: `rotationX/Y/Z(angle)`, `scaling(x, y, z)`, `translation(x, y, z)`
+- 3×2: 2D `rotate(angle)` (Z-axis rotation in XY)
 
 **Inverse / Transpose**
 - `invert()`, `invertAffine()` (4×4 only)
-- `transpose()`, `transpose3x3()` (4×4 only)
+- `transpose()`, `transpose3x3()` (4×4, 3×2)
 - `adjugate()`, `normal()` (4×4 only)
 
 **Transform Vectors**
-- `transform(v)` (full 4-component)
+- `transform(v)` (full 4-component; 3×2: 2D point)
 - `transformPosition(v)` (position, w=1)
-- `transformDirection(v)` (direction, w=0)
+- `transformDirection(v)` (direction, w=0; 3×2: no translation)
 - `transformProject(v)` (projected position, divide by w)
 
 **Projection / View** (4×4, 4×3)
@@ -204,6 +208,9 @@ Each vector type exists in three precision variants:
 - `shadow(light, nx, ny, nz, d)` — shadow matrix
 - `reflection(nx, ny, nz, d)` — reflection matrix
 - `reflect(nx, ny, nz)` — reflect (multiply current)
+- `billboardCylindrical(objPos, target, up)` — cylindrical billboard
+- `billboardSpherical(objPos, target, up)` — spherical billboard
+- `arcball(radius, centerX, centerY, centerZ, angleX, angleY)` — arcball rotation
 
 **Component Access**
 - `get(col, row)`, `set(col, row, value)`
@@ -212,14 +219,24 @@ Each vector type exists in three precision variants:
 - `m00()` through `m33()` getters (4×4)
 - `m00(v)` through `m33(v)` fluent setters (4×4)
 - `getScale()`, `getTranslation()`, `setTranslation()`
-- `getEulerAnglesZYX()`
+- `getEulerAnglesZYX()`, `getEulerAnglesXYZ()`, `getEulerAnglesYXZ()`
 - `positiveX/Y/Z()`, `normalizedPositiveX/Y/Z()`
+- `getNormalizedRotation()`, `getUnnormalizedRotation()`
 - `get(double[], offset)` — bulk copy to array
+- `get3x3(double[] dest)` — extract upper-left 3×3
 
 **Buffer / Memory I/O**
 - `fromBuffer(Buffer)`, `fromBuffer(index, Buffer)`, `writeToBuffer(Buffer)`, `writeToBuffer(index, Buffer)`
 - `get(MemorySegment, offset)` / `set(MemorySegment, offset)` (4×4, 4×3)
 - `read(MemorySegment, offset)` / `write(MemorySegment, offset)` (4×3)
+
+### MatrixStack — Scene graph stack
+
+A simple push/pop matrix stack backed by `ArrayDeque<Matrix4f>`:
+- `push()` — duplicate top
+- `pop()` — restore previous
+- `translate/rotate/scale` — modify top
+- `clear()` — reset to single identity
 
 ---
 
@@ -466,31 +483,70 @@ A convenience class re-exposing every `ScalarMath` method as a static call. Use 
 - `contains(point)` — point containment
 - `intersects(Sphere)`, `intersects(Ray)`, `intersects(AABB)` — intersection tests
 
+### `Line` — 2D Line (record, immutable)
+
+- Fields: `point`, `direction` (Vector3f, xy used)
+- `distance(Vector3f p)` — distance from point to infinite line
+- `closestPoint(Vector3f p)` — closest point on line
+
+### `Circle` — 2D Circle (record, immutable)
+
+- Fields: `center` (Vector3f), `radius` (float)
+- `contains(Vector3f p)`, `contains(float px, float py)`
+- `intersects(Circle other)`
+- `area()`
+
+### `Rectangle` — 2D Rectangle (record, immutable)
+
+- Fields: `minX`, `minY`, `maxX`, `maxY` (float)
+- `Rectangle.ofSize(cx, cy, w, h)` — centered construction
+- `contains(float px, float py)`, `contains(Vector3f p)`
+- `intersects(Rectangle)`, `intersects(Circle)`
+- `width()`, `height()`, `area()`, `center()`
+
 ---
 
 ## Intersection Tests
 
-### `Intersectiond` — Static utility (double precision)
+### `Intersection` / `Intersectiond` — Static utilities (double precision)
 
+~50 intersection and distance methods, both classes providing the same API:
+
+**Ray Intersections**
 - `intersectRayTriangle(Ray, v0, v1, v2, result)` — Möller-Trumbore
 - `intersectRayAABB(origin, dir, aabb)` — slab method
 - `intersectRaySphere(origin, dir, sphere)`
 - `intersectRayPlane(origin, dir, plane)`
+- `testRayTriangle(Ray, v0, v1, v2, result)` — hit test
+- `testRayQuad`, `testRaySphere`, `testRayPlane`, `testRayCircle`, `testRayDisc`
+
+**Segment Intersections**
 - `intersectSegmentTriangle(p0, p1, v0, v1, v2, result)`
-- `intersectSegmentAABB(p0, p1, aabb)` — boolean
-- `intersectSegmentSphere(p0, p1, sphere)`
-- `intersectSegmentPlane(p0, p1, plane)`
-- `intersectTriangleTriangle(v0, v1, v2, v3, v4, v5)` — boolean
-- `intersectAABBAABB(aabb1, aabb2)` — boolean
-- `intersectSphereSphere(s1, s2)` — boolean
-- `distancePointSegment(point, p0, p1)` — double
-- `distancePointTriangle(point, v0, v1, v2)` — double
-- `closestPointSegmentSegment(p0, p1, q0, q1, dest1, dest2)`
-- `closestPointPointTriangle(point, v0, v1, v2)` — Vector3d
+- `intersectSegmentAABB`, `intersectSegmentSphere`, `intersectSegmentPlane`
+- `testLineSegmentTriangle`, `testLineSegmentAABB`
 
-### `Intersection` — Simplified static utility
+**Shape Intersections**
+- `intersectAABBAABB`, `intersectSphereSphere`
+- `intersectTriangleTriangle` — boolean
+- `testSphereTriangle`, `testSphereAABB`, `testSpherePlane`, `testSphereFrustum`
+- `testAABBPlane`, `testAABBFrustum`
 
-- Subset of `Intersectiond` using Vector3d-based parameters
+**Point Distance & Closest Point**
+- `distancePointSegment`, `distancePointTriangle`, `distancePointLine`, `distancePointPlane`
+- `signedDistancePointPlane`
+- `closestPointTriangle`, `closestPointLine`, `closestPointPlane`
+- `closestPointSegmentSegment`
+
+**Plane Intersections**
+- `intersectPlanePlane`, `intersectPlanePlanePlane`
+- `intersectPolygonPlane`
+
+**Frustum Tests**
+- `testPointFrustum`, `intersectSphereFrustum`, `intersectAABBFrustum`
+- `isPointInsideFrustum`, `isAabbInsideFrustum`
+
+**Other**
+- `transformAab`, `findClosestPointsLineLine`, `intersectLineLine`
 
 ---
 
@@ -522,6 +578,52 @@ A convenience class re-exposing every `ScalarMath` method as a static call. Use 
 - `centroid(v0, v1, v2)` — triangle centroid (float/double)
 - `orthonormalBasis(normal)` — returns Vector3[3] {tangent, bitangent, normal} (float/double)
 - `transformNormal(matrix, v)` — normal transform via inverse-transpose (Matrix3/Matrix4, float/double)
+
+---
+
+## Noise Generation
+
+### `SimplexNoise` — Static utility
+
+Simplex noise (Ken Perlin's simplex algorithm, Gustavson implementation):
+- `noise(x, y)` — 2D, `noise(x, y, z)` — 3D, `noise(x, y, z, w)` — 4D
+- Seeded overloads: `noise(x, y, seed)`, `noise(x, y, z, seed)`, `noise(x, y, z, w, seed)`
+- Float variants: `noise(float x, float y)`, `noise(float x, float y, float z)`
+
+### `PerlinNoise` — Static utility
+
+Classic Improved Perlin Noise (Perlin 2002):
+- `noise(x)` — 1D, `noise(x, y)` — 2D, `noise(x, y, z)` — 3D
+- Seeded variants: `noise(x, seed)`, `noise(x, y, seed)`, `noise(x, y, z, seed)`
+- Float variants for all dimensions
+- `fBm(x, y [, z], octaves, lacunarity, gain)` — fractal Brownian motion
+
+### `ColorMath` — Static utility
+
+Color space conversions and packing:
+- `srgbToLinear(float)`, `linearToSrgb(float)` — single component
+- `srgbToLinear(r, g, b)` / `linearToSrgb(r, g, b)` — returns `Vector3f`
+- `packRgb(r, g, b)` / `packRgba(r, g, b, a)` — float [0,1] to packed int
+- `unpackRgb(int, Vector3f)` / `unpackRgba(int, Vector3f)` — unpack to floats
+- `hsvToRgb(h, s, v)` — HSV → RGB as Vector3f
+- `rgbToHsv(r, g, b, dest)` — RGB → HSV
+- `colorTemperature(kelvin)` — approximate blackbody color
+
+### `MemUtil` — Static utility
+
+Bulk memory operations:
+- `copy(float[]/double[], srcOff, dest[], destOff, length)` — array copy
+- `fill(float[]/double[], off, len, val)` — array fill
+- `memcpy(T[], srcOff, T[], destOff, len)` — generic array copy
+
+### `RandomUtil` — Static utility
+
+Thin wrappers over `java.util.random.RandomGenerator`:
+- `nextFloat(rng, min, max)` / `nextDouble(rng, min, max)` — range
+- `randomPointInSphere(rng, radius)` — uniform in sphere volume
+- `randomPointOnSphere(rng, radius)` — uniform on sphere surface
+- `randomPointInCircle(rng, radius)` — uniform in 2D circle
+- `randomVector2f(rng, min, max)` / `randomVector3f(rng, min, max)` — random vectors
 
 ---
 
@@ -601,7 +703,9 @@ Supported buffer types:
 | **Vector mutability** | Immutable (records) | Mutable |
 | **Vector types** | 2d/f/i, 3d/f/i, 4d/f/i | 2d/f, 3d/f, 4d/f |
 | **Integer vectors** | `Vector2i`, `Vector3i`, `Vector4i` | ❌ |
-| **Matrix types** | 2x2, 3x3, 4x4, 4x3 (d/f) | 2x2, 3x3, 4x4, 4x3 (d/f) |
+| **Matrix types** | 2×2, 3×3, 3×2, 4×4, 4×3 (d/f) | 2×2, 3×3, 4×4, 4×3 (d/f) |
+| **Matrix4d parity** | 100% (all Matrix4f methods) | N/A (reference) |
+| **MatrixStack** | ✅ Push/pop scene graph | ❌ |
 | **Quaternion** | Record (immutable) | Mutable class |
 | **SLERP / SQUAD** | ✅ | ✅ |
 | **Quaternion log/exp/pow** | ✅ | ✅ |
@@ -609,6 +713,10 @@ Supported buffer types:
 | **Dual numbers** | `DualNumberd/f` | ❌ |
 | **ScalarMath** | 80+ methods, stats, special functions, combinatorics, activation functions | ❌ (only basic `Math`) |
 | **Easing functions** | 34 functions, double + float | ❌ |
+| **Noise generation** | `SimplexNoise` + `PerlinNoise` (2D/3D/4D, seeded, fBm) | ❌ |
+| **Color math** | `ColorMath` (sRGB↔linear, HSV, pack/unpack, color temp) | ❌ |
+| **2D geometry** | `Line`, `Circle`, `Rectangle` | ❌ |
+| **MemUtil / RandomUtil** | ✅ Array ops + random vector helpers | ❌ |
 | **Integer vector types** | ✅ 2i/3i/4i | ❌ |
 | **Java records** | ✅ All vectors and quaternions | ❌ |
 | **JPMS module-info** | ✅ Both modules | ❌ |
@@ -619,11 +727,11 @@ Supported buffer types:
 | **Off-heap memory** | ✅ `MemoryOps` | ❌ |
 | **`Math.fma` usage** | ✅ All dot products, lerps, matrix mul | Partial |
 | **Frustum culling** | ✅ AABB, sphere, point (OpenGL + Vulkan) | ✅ (more variants) |
-| **Ray casting** | ✅ Ray-AABB, Ray-Sphere, Ray-Plane, Ray-Triangle | ✅ |
+| **Ray casting** | ✅ Ray-AABB, Ray-Sphere, Ray-Plane, Ray-Triangle, Ray-Quad, Ray-Circle, Ray-Disc | ✅ |
 | **AABB** | ✅ Union, intersection, containment, transform | ✅ |
 | **Plane** | ✅ Record (immutable) | ✅ Mutable class |
 | **Sphere** | ✅ Record (immutable) | ✅ Mutable class |
-| **Intersection tests** | 15+ static methods | 15+ static methods |
+| **Intersection tests** | ~50 static methods (ray, segment, plane, sphere, AABB, frustum, closest-point) | ~50 static methods |
 | **Geometry utilities** | ✅ Tangents, normals, barycentrics, orthonormal basis | Partial |
 | **Frustum ray builder** | ✅ | ❌ (manual) |
 | **Thread safety** | ✅ Trivially safe (records) | ❌ Not safe |

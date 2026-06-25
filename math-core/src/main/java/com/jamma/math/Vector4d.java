@@ -75,17 +75,16 @@ public record Vector4d(double x, double y, double z, double w) implements Serial
     public Vector4d scale(double s) { return new Vector4d(x * s, y * s, z * s, w * s); }
     public Vector4d negate() { return new Vector4d(-x, -y, -z, -w); }
     public Vector4d abs() { return new Vector4d(Math.abs(x), Math.abs(y), Math.abs(z), Math.abs(w)); }
-    public Vector4d absolute() { return abs(); }
     public double dot(Vector4d v) { return Math.fma(x, v.x, Math.fma(y, v.y, Math.fma(z, v.z, w * v.w))); }
     public double length() { return Math.sqrt(dot(this)); }
     public double lengthSquared() { return dot(this); }
-    public double distance(Vector4d v) { return sub(v).length(); }
-    public double distance(double x, double y, double z, double w) { return sub(x, y, z, w).length(); }
-    public double distanceSquared(Vector4d v) { return sub(v).lengthSquared(); }
-    public double distanceSquared(double x, double y, double z, double w) { return sub(x, y, z, w).lengthSquared(); }
+    public double distance(Vector4d v) { return Math.sqrt(distanceSquared(v)); }
+    public double distance(double x, double y, double z, double w) { return Math.sqrt(distanceSquared(x, y, z, w)); }
+    public double distanceSquared(Vector4d v) { return distanceSquared(v.x, v.y, v.z, v.w); }
+    public double distanceSquared(double x, double y, double z, double w) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, Math.fma(this.z - z, this.z - z, (this.w - w) * (this.w - w)))); }
     public Vector4d normalize() { double len = length(); return new Vector4d(x / len, y / len, z / len, w / len); }
     public Vector4d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector4d v) { return Math.acos(clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
+    public double angle(Vector4d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
     public Vector4d lerp(Vector4d other, double t) { return new Vector4d(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y), Math.fma(t, other.z - z, z), Math.fma(t, other.w - w, w)); }
     public Vector4d ceil() { return new Vector4d(Math.ceil(x), Math.ceil(y), Math.ceil(z), Math.ceil(w)); }
     public Vector4d floor() { return new Vector4d(Math.floor(x), Math.floor(y), Math.floor(z), Math.floor(w)); }
@@ -109,8 +108,4 @@ public record Vector4d(double x, double y, double z, double w) implements Serial
     public double[] get(double[] dest) { dest[0] = x; dest[1] = y; dest[2] = z; dest[3] = w; return dest; }
 
     public String toString() { return "(" + x + ", " + y + ", " + z + ", " + w + ")"; }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.min(Math.max(value, min), max);
-    }
 }

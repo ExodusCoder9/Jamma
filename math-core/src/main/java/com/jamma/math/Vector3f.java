@@ -6,7 +6,20 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.FloatBuffer;
 
+/**
+ * A 3-component single-precision vector stored as an immutable record.
+ * <p>
+ * All operations return new instances. For allocation-free workloads, use the
+ * corresponding static methods in {@link VectorMathf} which write into caller-provided arrays.
+ * <p>
+ * Memory layout: x, y, z (contiguous, 4 bytes each).
+ */
 public record Vector3f(float x, float y, float z) implements Serializable {
+
+    public static final Vector3f ZERO = new Vector3f(0.0f, 0.0f, 0.0f);
+    public static final Vector3f UNIT_X = new Vector3f(1.0f, 0.0f, 0.0f);
+    public static final Vector3f UNIT_Y = new Vector3f(0.0f, 1.0f, 0.0f);
+    public static final Vector3f UNIT_Z = new Vector3f(0.0f, 0.0f, 1.0f);
 
     private static final long serialVersionUID = 1L;
 
@@ -79,13 +92,13 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public Vector3f cross(Vector3f v) { return new Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x); }
     public float length() { return (float) Math.sqrt(dot(this)); }
     public float lengthSquared() { return dot(this); }
-    public float distance(Vector3f v) { return sub(v).length(); }
+    public float distance(Vector3f v) { return (float) Math.sqrt(distanceSquared(v)); }
     public float distance(float x, float y, float z) { return (float) Math.sqrt(Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z)))); }
-    public float distanceSquared(Vector3f v) { return sub(v).lengthSquared(); }
+    public float distanceSquared(Vector3f v) { return distanceSquared(v.x, v.y, v.z); }
     public float distanceSquared(float x, float y, float z) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z))); }
     public Vector3f normalize() { float len = length(); return new Vector3f(x / len, y / len, z / len); }
     public Vector3f normalize(float length) { float len = length(); float s = length / len; return new Vector3f(x * s, y * s, z * s); }
-    public float angle(Vector3f v) { return (float) Math.acos(clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
+    public float angle(Vector3f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
     public float angleSigned(Vector3f v, Vector3f normal) { return (float) Math.atan2(cross(v).dot(normal), dot(v)); }
     public Vector3f reflect(Vector3f normal) { float d = 2.0f * dot(normal); return new Vector3f(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
     public Vector3f project(Vector3f onto) { float s = dot(onto) / onto.dot(onto); return onto.scale(s); }
@@ -142,7 +155,6 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public float maxComponent() { return Math.max(Math.max(x, y), z); }
     public int maxComponentIndex() { return x >= y && x >= z ? 0 : y >= z ? 1 : 2; }
     public int minComponentIndex() { return x <= y && x <= z ? 0 : y <= z ? 1 : 2; }
-    public Vector3f absolute() { return new Vector3f(Math.abs(x), Math.abs(y), Math.abs(z)); }
     public Vector2f toVector2f() { return new Vector2f(x, y); }
     public Vector4f toVector4f() { return new Vector4f(x, y, z, 0.0f); }
     public Vector4f toVector4f(float w) { return new Vector4f(x, y, z, w); }
@@ -166,9 +178,5 @@ public record Vector3f(float x, float y, float z) implements Serializable {
             segment.get(ValueLayout.JAVA_FLOAT, offset + 4),
             segment.get(ValueLayout.JAVA_FLOAT, offset + 8)
         );
-    }
-
-    private static float clamp(float value, float min, float max) {
-        return Math.min(Math.max(value, min), max);
     }
 }
