@@ -3,7 +3,6 @@ package com.jamma.math.matrix;
 import com.jamma.math.Vector3f;
 import com.jamma.math.Vector4f;
 import com.jamma.math.quaternion.Quaternionf;
-import com.jamma.math.matrix.Matrix3f;
 
 import java.io.Serial;
 import java.io.Serializable;
