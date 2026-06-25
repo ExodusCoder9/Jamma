@@ -30,6 +30,39 @@ public final class ScalarMath {
     private static final double DEG_TO_RAD = PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / PI;
 
+    private static final double S1 = -1.66666666666666666e-1;
+    private static final double S2 =  8.33333333333333333e-3;
+    private static final double S3 = -1.98412698412698413e-4;
+    private static final double S4 =  2.75573192239858907e-6;
+    private static final double S5 = -2.50521083854417188e-8;
+    private static final double S6 =  1.60590438368216146e-10;
+    private static final double S7 = -7.64716373181981648e-13;
+
+    private static final double C1 = -5.00000000000000000e-1;
+    private static final double C2 =  4.16666666666666667e-2;
+    private static final double C3 = -1.38888888888888889e-3;
+    private static final double C4 =  2.48015873015873016e-5;
+    private static final double C5 = -2.75573192239858907e-7;
+    private static final double C6 =  2.08767569878680990e-9;
+    private static final double C7 = -1.14707455977297247e-11;
+
+    private static final double PI_2_H = 1.5707963267948966;
+    private static final double PI_2_L = 6.123233995736766e-17;
+
+    private static final float S1_F = -1.6666667e-1f;
+    private static final float S2_F =  8.3333333e-3f;
+    private static final float S3_F = -1.9841270e-4f;
+    private static final float S4_F =  2.7557319e-6f;
+
+    private static final float C1_F = -5.0000000e-1f;
+    private static final float C2_F =  4.1666667e-2f;
+    private static final float C3_F = -1.3888889e-3f;
+    private static final float C4_F =  2.4801587e-5f;
+
+    private static final float PI_F = (float) Math.PI;
+    private static final float PI_2_H_F = 1.5707963f;
+    private static final float PI_2_L_F = -4.371139e-8f;
+
     private static final double ERF_A1 = 0.254829592;
     private static final double ERF_A2 = -0.284496736;
     private static final double ERF_A3 = 1.421413741;
@@ -651,6 +684,94 @@ public final class ScalarMath {
             term *= -(x * x * x * x) * (4.0 * n + 3.0) / (4.0 * n + 7.0);
         }
         return sum;
+    }
+
+    public static double fastSin(double x) {
+        double y = x * (2.0 / PI);
+        double n = Math.round(y);
+        long nLong = (long) n;
+        double t = (x - n * PI_2_H) - n * PI_2_L;
+        double t2 = t * t;
+        double sin_t = t * (1.0 + t2 * (S1 + t2 * (S2 + t2 * (S3 + t2 * (S4 + t2 * (S5 + t2 * (S6 + t2 * S7)))))));
+        double cos_t = 1.0 + t2 * (C1 + t2 * (C2 + t2 * (C3 + t2 * (C4 + t2 * (C5 + t2 * (C6 + t2 * C7))))));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        double sign_sin = ((quadrant & 2) != 0) ? -1.0 : 1.0;
+        return sign_sin * (swap ? cos_t : sin_t);
+    }
+
+    public static double fastCos(double x) {
+        double y = x * (2.0 / PI);
+        double n = Math.round(y);
+        long nLong = (long) n;
+        double t = (x - n * PI_2_H) - n * PI_2_L;
+        double t2 = t * t;
+        double sin_t = t * (1.0 + t2 * (S1 + t2 * (S2 + t2 * (S3 + t2 * (S4 + t2 * (S5 + t2 * (S6 + t2 * S7)))))));
+        double cos_t = 1.0 + t2 * (C1 + t2 * (C2 + t2 * (C3 + t2 * (C4 + t2 * (C5 + t2 * (C6 + t2 * C7))))));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        double sign_cos = (((quadrant + 1) & 2) != 0) ? -1.0 : 1.0;
+        return sign_cos * (swap ? sin_t : cos_t);
+    }
+
+    public static void sinCos(double x, double[] dest, int offset) {
+        double y = x * (2.0 / PI);
+        double n = Math.round(y);
+        long nLong = (long) n;
+        double t = (x - n * PI_2_H) - n * PI_2_L;
+        double t2 = t * t;
+        double sin_t = t * (1.0 + t2 * (S1 + t2 * (S2 + t2 * (S3 + t2 * (S4 + t2 * (S5 + t2 * (S6 + t2 * S7)))))));
+        double cos_t = 1.0 + t2 * (C1 + t2 * (C2 + t2 * (C3 + t2 * (C4 + t2 * (C5 + t2 * (C6 + t2 * C7))))));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        double sign_sin = ((quadrant & 2) != 0) ? -1.0 : 1.0;
+        double sign_cos = (((quadrant + 1) & 2) != 0) ? -1.0 : 1.0;
+        dest[offset] = sign_sin * (swap ? cos_t : sin_t);
+        dest[offset + 1] = sign_cos * (swap ? sin_t : cos_t);
+    }
+
+    public static float fastSin(float x) {
+        float y = x * (2.0f / PI_F);
+        float n = Math.round(y);
+        long nLong = (long) n;
+        float t = (x - n * PI_2_H_F) - n * PI_2_L_F;
+        float t2 = t * t;
+        float sin_t = t * (1.0f + t2 * (S1_F + t2 * (S2_F + t2 * (S3_F + t2 * S4_F))));
+        float cos_t = 1.0f + t2 * (C1_F + t2 * (C2_F + t2 * (C3_F + t2 * C4_F)));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        float sign_sin = ((quadrant & 2) != 0) ? -1.0f : 1.0f;
+        return sign_sin * (swap ? cos_t : sin_t);
+    }
+
+    public static float fastCos(float x) {
+        float y = x * (2.0f / PI_F);
+        float n = Math.round(y);
+        long nLong = (long) n;
+        float t = (x - n * PI_2_H_F) - n * PI_2_L_F;
+        float t2 = t * t;
+        float sin_t = t * (1.0f + t2 * (S1_F + t2 * (S2_F + t2 * (S3_F + t2 * S4_F))));
+        float cos_t = 1.0f + t2 * (C1_F + t2 * (C2_F + t2 * (C3_F + t2 * C4_F)));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        float sign_cos = (((quadrant + 1) & 2) != 0) ? -1.0f : 1.0f;
+        return sign_cos * (swap ? sin_t : cos_t);
+    }
+
+    public static void sinCos(float x, float[] dest, int offset) {
+        float y = x * (2.0f / PI_F);
+        float n = Math.round(y);
+        long nLong = (long) n;
+        float t = (x - n * PI_2_H_F) - n * PI_2_L_F;
+        float t2 = t * t;
+        float sin_t = t * (1.0f + t2 * (S1_F + t2 * (S2_F + t2 * (S3_F + t2 * S4_F))));
+        float cos_t = 1.0f + t2 * (C1_F + t2 * (C2_F + t2 * (C3_F + t2 * C4_F)));
+        int quadrant = (int) (nLong & 3);
+        boolean swap = (quadrant & 1) != 0;
+        float sign_sin = ((quadrant & 2) != 0) ? -1.0f : 1.0f;
+        float sign_cos = (((quadrant + 1) & 2) != 0) ? -1.0f : 1.0f;
+        dest[offset] = sign_sin * (swap ? cos_t : sin_t);
+        dest[offset + 1] = sign_cos * (swap ? sin_t : cos_t);
     }
 
     public static boolean isFinite(double x) { return Double.isFinite(x); }

@@ -22,6 +22,12 @@ public final class MathLib {
 
     public static double sin(double x) { return ScalarMath.sin(x); }
     public static double cos(double x) { return ScalarMath.cos(x); }
+    public static double fastSin(double x) { return ScalarMath.fastSin(x); }
+    public static double fastCos(double x) { return ScalarMath.fastCos(x); }
+    public static float fastSin(float x) { return ScalarMath.fastSin(x); }
+    public static float fastCos(float x) { return ScalarMath.fastCos(x); }
+    public static void sinCos(double x, double[] dest, int offset) { ScalarMath.sinCos(x, dest, offset); }
+    public static void sinCos(float x, float[] dest, int offset) { ScalarMath.sinCos(x, dest, offset); }
     public static double tan(double x) { return ScalarMath.tan(x); }
     public static double asin(double x) { return ScalarMath.asin(x); }
     public static double acos(double x) { return ScalarMath.acos(x); }

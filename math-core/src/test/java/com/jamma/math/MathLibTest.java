@@ -169,4 +169,30 @@ class MathLibTest {
     @Test void riemannZeta() { assertTrue(MathLib.riemannZeta(2.0) > 1.5); }
     @Test void fresnelC() { assertEquals(0.0, MathLib.fresnelC(0.0), 1e-10); }
     @Test void fresnelS() { assertEquals(0.0, MathLib.fresnelS(0.0), 1e-10); }
+
+    @Test void fastTrig() {
+        double[] testAngles = {0.0, Math.PI / 6, Math.PI / 4, Math.PI / 3, Math.PI / 2, Math.PI, -Math.PI / 4, 3.0 * Math.PI / 2, 2.0 * Math.PI, -Math.PI, 10.0, -5.0};
+        double[] dest = new double[2];
+        for (double a : testAngles) {
+            double expectedSin = Math.sin(a);
+            double expectedCos = Math.cos(a);
+            assertEquals(expectedSin, MathLib.fastSin(a), 1e-12);
+            assertEquals(expectedCos, MathLib.fastCos(a), 1e-12);
+            MathLib.sinCos(a, dest, 0);
+            assertEquals(expectedSin, dest[0], 1e-12);
+            assertEquals(expectedCos, dest[1], 1e-12);
+        }
+
+        float[] testAnglesF = {0.0f, (float)Math.PI / 6.0f, (float)Math.PI / 4.0f, (float)Math.PI / 3.0f, (float)Math.PI / 2.0f, (float)Math.PI, -(float)Math.PI / 4.0f, 3.0f * (float)Math.PI / 2.0f, 2.0f * (float)Math.PI, -(float)Math.PI, 10.0f, -5.0f};
+        float[] destF = new float[2];
+        for (float a : testAnglesF) {
+            float expectedSin = (float) Math.sin(a);
+            float expectedCos = (float) Math.cos(a);
+            assertEquals(expectedSin, MathLib.fastSin(a), 1e-6f);
+            assertEquals(expectedCos, MathLib.fastCos(a), 1e-6f);
+            MathLib.sinCos(a, destF, 0);
+            assertEquals(expectedSin, destF[0], 1e-6f);
+            assertEquals(expectedCos, destF[1], 1e-6f);
+        }
+    }
 }
