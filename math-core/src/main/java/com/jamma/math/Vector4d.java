@@ -1,11 +1,13 @@
 package com.jamma.math;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public record Vector4d(double x, double y, double z, double w) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Vector4d() { this(0.0, 0.0, 0.0, 0.0); }

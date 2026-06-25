@@ -4,12 +4,12 @@
 
 ## Requirements
 
-| Requirement | Minimum |
-|-------------|---------|
-| **Java** | 26+ (for `--enable-preview` and `jdk.incubator.vector`) |
-| **Math Core** | Java 26+ |
+| Requirement        | Minimum                                                             |
+|--------------------|---------------------------------------------------------------------|
+| **Java**           | 26+ (for `--enable-preview` and `jdk.incubator.vector`)             |
+| **Math Core**      | Java 26+                                                            |
 | **Math Incubator** | Java 26+ with `--add-modules jdk.incubator.vector --enable-preview` |
-| **Build** | Gradle 8.x+ (included wrapper) |
+| **Build**          | Gradle 8.x+ (included wrapper)                                      |
 
 ---
 
@@ -84,11 +84,11 @@ LWJGL 3 interop module. Provides zero-allocation `put`/`get` methods that write 
 
 Each vector type exists in three precision variants:
 
-| 2D | 3D | 4D | Precision |
-|----|----|----|-----------|
-| `Vector2d` | `Vector3d` | `Vector4d` | `double` |
-| `Vector2f` | `Vector3f` | `Vector4f` | `float` |
-| `Vector2i` | `Vector3i` | `Vector4i` | `int` |
+| 2D         | 3D         | 4D         | Precision |
+|------------|------------|------------|-----------|
+| `Vector2d` | `Vector3d` | `Vector4d` | `double`  |
+| `Vector2f` | `Vector3f` | `Vector4f` | `float`   |
+| `Vector2i` | `Vector3i` | `Vector4i` | `int`     |
 
 ### Common Operations (all vector types)
 
@@ -143,18 +143,18 @@ Each vector type exists in three precision variants:
 
 ### Variants
 
-| Type | Size | Precision | Mutable |
-|------|------|-----------|---------|
-| `Matrix2d` | 2×2 | `double` | Yes |
-| `Matrix2f` | 2×2 | `float` | Yes |
-| `Matrix3d` | 3×3 | `double` | Yes |
-| `Matrix3f` | 3×3 | `float` | Yes |
-| `Matrix3x2d` | 3×2 | `double` | Yes (2D affine) |
-| `Matrix3x2f` | 3×2 | `float` | Yes (2D affine) |
-| `Matrix4d` | 4×4 | `double` | Yes |
-| `Matrix4f` | 4×4 | `float` | Yes |
-| `Matrix4x3d` | 4×3 | `double` | Yes (affine) |
-| `Matrix4x3f` | 4×3 | `float` | Yes (affine) |
+| Type         | Size | Precision | Mutable         |
+|--------------|------|-----------|-----------------|
+| `Matrix2d`   | 2×2  | `double`  | Yes             |
+| `Matrix2f`   | 2×2  | `float`   | Yes             |
+| `Matrix3d`   | 3×3  | `double`  | Yes             |
+| `Matrix3f`   | 3×3  | `float`   | Yes             |
+| `Matrix3x2d` | 3×2  | `double`  | Yes (2D affine) |
+| `Matrix3x2f` | 3×2  | `float`   | Yes (2D affine) |
+| `Matrix4d`   | 4×4  | `double`  | Yes             |
+| `Matrix4f`   | 4×4  | `float`   | Yes             |
+| `Matrix4x3d` | 4×3  | `double`  | Yes (affine)    |
+| `Matrix4x3f` | 4×3  | `float`   | Yes (affine)    |
 
 ### Common Operations (all matrix types)
 
@@ -426,20 +426,20 @@ A convenience class re-exposing every `ScalarMath` method as a static call. Use 
 
 34 easing functions each in double and float precision:
 
-| Category | Functions |
-|----------|-----------|
-| Linear | `linear` |
-| Quadratic | `quadraticIn`, `quadraticOut`, `quadraticInOut` |
-| Cubic | `cubicIn`, `cubicOut`, `cubicInOut` |
-| Quartic | `quarticIn`, `quarticOut`, `quarticInOut` |
-| Quintic | `quinticIn`, `quinticOut`, `quinticInOut` |
-| Sinusoidal | `sinusoidalIn`, `sinusoidalOut`, `sinusoidalInOut` |
+| Category    | Functions                                             |
+|-------------|-------------------------------------------------------|
+| Linear      | `linear`                                              |
+| Quadratic   | `quadraticIn`, `quadraticOut`, `quadraticInOut`       |
+| Cubic       | `cubicIn`, `cubicOut`, `cubicInOut`                   |
+| Quartic     | `quarticIn`, `quarticOut`, `quarticInOut`             |
+| Quintic     | `quinticIn`, `quinticOut`, `quinticInOut`             |
+| Sinusoidal  | `sinusoidalIn`, `sinusoidalOut`, `sinusoidalInOut`    |
 | Exponential | `exponentialIn`, `exponentialOut`, `exponentialInOut` |
-| Circular | `circularIn`, `circularOut`, `circularInOut` |
-| Elastic | `elasticIn`, `elasticOut`, `elasticInOut` |
-| Back | `backIn`, `backOut`, `backInOut` |
-| Bounce | `bounceIn`, `bounceOut`, `bounceInOut` |
-| Misc | `smoothStep`, `smootherStep` |
+| Circular    | `circularIn`, `circularOut`, `circularInOut`          |
+| Elastic     | `elasticIn`, `elasticOut`, `elasticInOut`             |
+| Back        | `backIn`, `backOut`, `backInOut`                      |
+| Bounce      | `bounceIn`, `bounceOut`, `bounceInOut`                |
+| Misc        | `smoothStep`, `smootherStep`                          |
 
 ---
 
@@ -684,9 +684,9 @@ Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) for SIMD-accelerated oper
 
 Every vector and matrix type supports multiple I/O backends:
 
-| Backend | Read | Write |
-|---------|------|-------|
-| **NIO Buffer** | `fromBuffer(Buffer)`, `fromBuffer(idx, Buffer)` | `writeToBuffer(Buffer)`, `writeToBuffer(idx, Buffer)` |
+| Backend           | Read                                                  | Write                                                     |
+|-------------------|-------------------------------------------------------|-----------------------------------------------------------|
+| **NIO Buffer**    | `fromBuffer(Buffer)`, `fromBuffer(idx, Buffer)`       | `writeToBuffer(Buffer)`, `writeToBuffer(idx, Buffer)`     |
 | **MemorySegment** | `fromMemorySegment(seg, offset)`, `read(seg, offset)` | `writeToMemorySegment(seg, offset)`, `write(seg, offset)` |
 
 Supported buffer types:
@@ -698,50 +698,50 @@ Supported buffer types:
 
 ## JOML Comparison
 
-| Feature | Jamma | JOML 1.10.8 |
-|---------|-------|-------------|
-| **Vector mutability** | Immutable (records) | Mutable |
-| **Vector types** | 2d/f/i, 3d/f/i, 4d/f/i | 2d/f, 3d/f, 4d/f |
-| **Integer vectors** | `Vector2i`, `Vector3i`, `Vector4i` | ❌ |
-| **Matrix types** | 2×2, 3×3, 3×2, 4×4, 4×3 (d/f) | 2×2, 3×3, 4×4, 4×3 (d/f) |
-| **Matrix4d parity** | 100% (all Matrix4f methods) | N/A (reference) |
-| **MatrixStack** | ✅ Push/pop scene graph | ❌ |
-| **Quaternion** | Record (immutable) | Mutable class |
-| **SLERP / SQUAD** | ✅ | ✅ |
-| **Quaternion log/exp/pow** | ✅ | ✅ |
-| **AxisAngle** | Record (immutable) | Mutable class |
-| **Dual numbers** | `DualNumberd/f` | ❌ |
-| **ScalarMath** | 80+ methods, stats, special functions, combinatorics, activation functions | ❌ (only basic `Math`) |
-| **Easing functions** | 34 functions, double + float | ❌ |
-| **Noise generation** | `SimplexNoise` + `PerlinNoise` (2D/3D/4D, seeded, fBm) | ❌ |
-| **Color math** | `ColorMath` (sRGB↔linear, HSV, pack/unpack, color temp) | ❌ |
-| **2D geometry** | `Line`, `Circle`, `Rectangle` | ❌ |
-| **MemUtil / RandomUtil** | ✅ Array ops + random vector helpers | ❌ |
-| **Integer vector types** | ✅ 2i/3i/4i | ❌ |
-| **Java records** | ✅ All vectors and quaternions | ❌ |
-| **JPMS module-info** | ✅ Both modules | ❌ |
-| **MemorySegment I/O** | ✅ All types (vectors, matrices, quaternions) | Partial (NIO only) |
-| **NIO Buffer I/O** | ✅ All types | ✅ |
-| **SIMD (Vector API)** | ✅ Incubator module (`VectorApiMath`) | ✅ (later versions) |
-| **Parallel batch ops** | ✅ `ParallelOps` with `StructuredTaskScope` | ❌ |
-| **Off-heap memory** | ✅ `MemoryOps` | ❌ |
-| **`Math.fma` usage** | ✅ All dot products, lerps, matrix mul | Partial |
-| **Frustum culling** | ✅ AABB, sphere, point (OpenGL + Vulkan) | ✅ (more variants) |
-| **Ray casting** | ✅ Ray-AABB, Ray-Sphere, Ray-Plane, Ray-Triangle, Ray-Quad, Ray-Circle, Ray-Disc | ✅ |
-| **AABB** | ✅ Union, intersection, containment, transform | ✅ |
-| **Plane** | ✅ Record (immutable) | ✅ Mutable class |
-| **Sphere** | ✅ Record (immutable) | ✅ Mutable class |
-| **Intersection tests** | ~50 static methods (ray, segment, plane, sphere, AABB, frustum, closest-point) | ~50 static methods |
-| **Geometry utilities** | ✅ Tangents, normals, barycentrics, orthonormal basis | Partial |
-| **Frustum ray builder** | ✅ | ❌ (manual) |
-| **Thread safety** | ✅ Trivially safe (records) | ❌ Not safe |
-| **`equals`/`hashCode`** | ✅ Correct (records) | ❌ Often omitted/incomplete |
-| **Serialization** | ✅ `Serializable` on all core types | Partial |
-| **License** | MIT | MIT |
-| **Documentation** | This README | Extensive Javadoc |
-| **Maturity** | New | Battle-tested (10+ years) |
-| **LWJGL integration** | ✅ Native (`lwjgl-jamma` module) | ✅ Native |
-| **GC pressure** | Minor (short-lived records) | None (mutable in-place) |
+| Feature                    | Jamma                                                                           | JOML 1.10.8                |
+|----------------------------|---------------------------------------------------------------------------------|----------------------------|
+| **Vector mutability**      | Immutable (records)                                                             | Mutable                    |
+| **Vector types**           | 2d/f/i, 3d/f/i, 4d/f/i                                                          | 2d/f, 3d/f, 4d/f           |
+| **Integer vectors**        | `Vector2i`, `Vector3i`, `Vector4i`                                              | ❌                          |
+| **Matrix types**           | 2×2, 3×3, 3×2, 4×4, 4×3 (d/f)                                                   | 2×2, 3×3, 4×4, 4×3 (d/f)   |
+| **Matrix4d parity**        | 100% (all Matrix4f methods)                                                     | N/A (reference)            |
+| **MatrixStack**            | ✅ Push/pop scene graph                                                          | ❌                          |
+| **Quaternion**             | Record (immutable)                                                              | Mutable class              |
+| **SLERP / SQUAD**          | ✅                                                                               | ✅                          |
+| **Quaternion log/exp/pow** | ✅                                                                               | ✅                          |
+| **AxisAngle**              | Record (immutable)                                                              | Mutable class              |
+| **Dual numbers**           | `DualNumberd/f`                                                                 | ❌                          |
+| **ScalarMath**             | 80+ methods, stats, special functions, combinatorics, activation functions      | ❌ (only basic `Math`)      |
+| **Easing functions**       | 34 functions, double + float                                                    | ❌                          |
+| **Noise generation**       | `SimplexNoise` + `PerlinNoise` (2D/3D/4D, seeded, fBm)                          | ❌                          |
+| **Color math**             | `ColorMath` (sRGB↔linear, HSV, pack/unpack, color temp)                         | ❌                          |
+| **2D geometry**            | `Line`, `Circle`, `Rectangle`                                                   | ❌                          |
+| **MemUtil / RandomUtil**   | ✅ Array ops + random vector helpers                                             | ❌                          |
+| **Integer vector types**   | ✅ 2i/3i/4i                                                                      | ❌                          |
+| **Java records**           | ✅ All vectors and quaternions                                                   | ❌                          |
+| **JPMS module-info**       | ✅ Both modules                                                                  | ❌                          |
+| **MemorySegment I/O**      | ✅ All types (vectors, matrices, quaternions)                                    | Partial (NIO only)         |
+| **NIO Buffer I/O**         | ✅ All types                                                                     | ✅                          |
+| **SIMD (Vector API)**      | ✅ Incubator module (`VectorApiMath`)                                            | ✅ (later versions)         |
+| **Parallel batch ops**     | ✅ `ParallelOps` with `StructuredTaskScope`                                      | ❌                          |
+| **Off-heap memory**        | ✅ `MemoryOps`                                                                   | ❌                          |
+| **`Math.fma` usage**       | ✅ All dot products, lerps, matrix mul                                           | Partial                    |
+| **Frustum culling**        | ✅ AABB, sphere, point (OpenGL + Vulkan)                                         | ✅ (more variants)          |
+| **Ray casting**            | ✅ Ray-AABB, Ray-Sphere, Ray-Plane, Ray-Triangle, Ray-Quad, Ray-Circle, Ray-Disc | ✅                          |
+| **AABB**                   | ✅ Union, intersection, containment, transform                                   | ✅                          |
+| **Plane**                  | ✅ Record (immutable)                                                            | ✅ Mutable class            |
+| **Sphere**                 | ✅ Record (immutable)                                                            | ✅ Mutable class            |
+| **Intersection tests**     | ~50 static methods (ray, segment, plane, sphere, AABB, frustum, closest-point)  | ~50 static methods         |
+| **Geometry utilities**     | ✅ Tangents, normals, barycentrics, orthonormal basis                            | Partial                    |
+| **Frustum ray builder**    | ✅                                                                               | ❌ (manual)                 |
+| **Thread safety**          | ✅ Trivially safe (records)                                                      | ❌ Not safe                 |
+| **`equals`/`hashCode`**    | ✅ Correct (records)                                                             | ❌ Often omitted/incomplete |
+| **Serialization**          | ✅ `Serializable` on all core types                                              | Partial                    |
+| **License**                | MIT                                                                             | MIT                        |
+| **Documentation**          | This README                                                                     | Extensive Javadoc          |
+| **Maturity**               | New                                                                             | Battle-tested (10+ years)  |
+| **LWJGL integration**      | ✅ Native (`lwjgl-jamma` module)                                                 | ✅ Native                   |
+| **GC pressure**            | Minor (short-lived records)                                                     | None (mutable in-place)    |
 
 ---
 
@@ -841,18 +841,18 @@ get(aiBone.mOffsetMatrix().asFloatBuffer(), boneMatrix);
 
 ### Available methods
 
-| Method | Input | Output |
-|--------|-------|--------|
-| `put(Matrix4f, FloatBuffer)` | Jamma type | LWJGL buffer (column-major) |
-| `put(Matrix4f, MemorySegment, long)` | Jamma type | Off-heap memory |
-| `get(FloatBuffer, Matrix4f)` | LWJGL buffer | Jamma type |
-| `put(Matrix4d, DoubleBuffer)` | Jamma type | LWJGL buffer |
-| `put(Vector3f, FloatBuffer)` | Jamma type | xyz in buffer |
-| `put(Vector3f, MemorySegment, long)` | Jamma type | Off-heap memory |
-| `put(Vector4f, FloatBuffer)` | Jamma type | xyzw in buffer |
-| `put(Vector2f, FloatBuffer)` | Jamma type | xy in buffer |
-| `put(Quaternionf, FloatBuffer)` | Jamma type | xyzw in buffer |
-| `segment(ByteBuffer/FloatBuffer/DoubleBuffer)` | NIO buffer | `MemorySegment` |
+| Method                                         | Input        | Output                      |
+|------------------------------------------------|--------------|-----------------------------|
+| `put(Matrix4f, FloatBuffer)`                   | Jamma type   | LWJGL buffer (column-major) |
+| `put(Matrix4f, MemorySegment, long)`           | Jamma type   | Off-heap memory             |
+| `get(FloatBuffer, Matrix4f)`                   | LWJGL buffer | Jamma type                  |
+| `put(Matrix4d, DoubleBuffer)`                  | Jamma type   | LWJGL buffer                |
+| `put(Vector3f, FloatBuffer)`                   | Jamma type   | xyz in buffer               |
+| `put(Vector3f, MemorySegment, long)`           | Jamma type   | Off-heap memory             |
+| `put(Vector4f, FloatBuffer)`                   | Jamma type   | xyzw in buffer              |
+| `put(Vector2f, FloatBuffer)`                   | Jamma type   | xy in buffer                |
+| `put(Quaternionf, FloatBuffer)`                | Jamma type   | xyzw in buffer              |
+| `segment(ByteBuffer/FloatBuffer/DoubleBuffer)` | NIO buffer   | `MemorySegment`             |
 
 All methods are zero-allocation — they write directly into the provided buffer.
 

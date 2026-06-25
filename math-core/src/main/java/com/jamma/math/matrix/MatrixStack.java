@@ -14,13 +14,14 @@ public class MatrixStack {
         stack.push(new Matrix4f());
     }
 
+    @SuppressWarnings("unused")
     public MatrixStack(Matrix4f initial) {
         stack = new ArrayDeque<>();
         stack.push(new Matrix4f(initial));
     }
 
     public void push() {
-        stack.push(new Matrix4f(stack.peek()));
+        stack.push(new Matrix4f(peek()));
     }
 
     public Matrix4f pop() {
@@ -31,51 +32,55 @@ public class MatrixStack {
     }
 
     public Matrix4f peek() {
-        return stack.peek();
+        Matrix4f top = stack.peek();
+        if (top == null) {
+            throw new EmptyStackException();
+        }
+        return top;
     }
 
     public MatrixStack mul(Matrix4f m) {
-        stack.peek().multiply(m);
+        peek().multiply(m);
         return this;
     }
 
     public MatrixStack translate(float x, float y, float z) {
-        stack.peek().translate(x, y, z);
+        peek().translate(x, y, z);
         return this;
     }
 
     public MatrixStack translate(Vector3f offset) {
-        stack.peek().translate(offset);
+        peek().translate(offset);
         return this;
     }
 
     public MatrixStack rotate(float angle, float x, float y, float z) {
-        stack.peek().rotate(angle, x, y, z);
+        peek().rotate(angle, x, y, z);
         return this;
     }
 
     public MatrixStack rotate(Quaternionf q) {
-        stack.peek().rotate(q);
+        peek().rotate(q);
         return this;
     }
 
     public MatrixStack scale(float x, float y, float z) {
-        stack.peek().scale(x, y, z);
+        peek().scale(x, y, z);
         return this;
     }
 
     public MatrixStack scale(float factor) {
-        stack.peek().scale(factor);
+        peek().scale(factor);
         return this;
     }
 
     public MatrixStack scale(Vector3f xyz) {
-        stack.peek().scale(xyz);
+        peek().scale(xyz);
         return this;
     }
 
     public MatrixStack identity() {
-        stack.peek().identity();
+        peek().identity();
         return this;
     }
 

@@ -1,12 +1,15 @@
 package com.jamma.math.matrix;
 
 import com.jamma.math.Vector2d;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class Matrix3x2d implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public double m00, m01, m02;

@@ -1,12 +1,15 @@
 package com.jamma.math;
 
 import com.jamma.math.quaternion.Quaterniond;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public record Vector3d(double x, double y, double z) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Vector3d() { this(0.0, 0.0, 0.0); }

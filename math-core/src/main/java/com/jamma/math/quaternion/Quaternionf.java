@@ -4,6 +4,8 @@ import com.jamma.math.AxisAngle4f;
 import com.jamma.math.Vector3f;
 import com.jamma.math.matrix.Matrix3f;
 import com.jamma.math.matrix.Matrix4f;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -21,6 +23,7 @@ import java.nio.FloatBuffer;
  */
 public record Quaternionf(float x, float y, float z, float w) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static Quaternionf fromMemorySegment(MemorySegment src, long byteOffset) {

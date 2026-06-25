@@ -1,6 +1,8 @@
 package com.jamma.math.matrix;
 
 import com.jamma.math.Vector3d;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -8,6 +10,7 @@ import java.util.Objects;
 
 public class Matrix3d implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public double m00;

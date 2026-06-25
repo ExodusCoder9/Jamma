@@ -4,6 +4,8 @@ import com.jamma.math.Vector3f;
 import com.jamma.math.Vector4f;
 import com.jamma.math.quaternion.Quaternionf;
 import com.jamma.math.matrix.Matrix3f;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -21,6 +23,7 @@ public class Matrix4f implements Serializable {
 
     public static final Matrix4f IDENTITY = new Matrix4f();
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public float m00, m01, m02, m03;

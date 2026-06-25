@@ -2,10 +2,13 @@ package com.jamma.math.geometry;
 
 import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 public record Sphere(Vector3d center, double radius) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Sphere(double cx, double cy, double cz, double radius) {

@@ -5,7 +5,7 @@ package com.jamma.math;
  * <p>
  * Each operation has two overloads:
  * <ul>
- *   <li>A allocating overload that returns a new {@code record} instance.
+ *   <li>AN allocating overload that returns a new {@code record} instance.
  *   <li>A {@code double[] dest, int offset} overload that writes into a caller-provided
  *       array — zero allocations.
  * </ul>

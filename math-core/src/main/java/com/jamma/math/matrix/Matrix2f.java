@@ -1,6 +1,8 @@
 package com.jamma.math.matrix;
 
 import com.jamma.math.Vector2f;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -9,6 +11,7 @@ import java.util.Objects;
 
 public class Matrix2f implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public float m00;

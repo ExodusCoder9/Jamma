@@ -6,12 +6,15 @@ import com.jamma.math.matrix.Matrix3d;
 import com.jamma.math.matrix.Matrix4x3d;
 import com.jamma.math.geometry.Plane;
 import com.jamma.math.quaternion.Quaterniond;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class Matrix4d implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public double m00, m01, m02, m03;

@@ -1,9 +1,11 @@
 package com.jamma.math;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public record DualNumberf(float value, float derivative) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final DualNumberf ZERO = new DualNumberf(0.0f, 0.0f);

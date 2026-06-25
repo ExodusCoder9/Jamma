@@ -2,10 +2,13 @@ package com.jamma.math.geometry;
 
 import com.jamma.math.Vector3d;
 import com.jamma.math.matrix.Matrix4d;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 public record Plane(Vector3d normal, double d) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Plane(double nx, double ny, double nz, double d) {

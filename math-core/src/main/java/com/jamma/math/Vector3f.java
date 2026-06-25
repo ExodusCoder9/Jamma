@@ -1,6 +1,8 @@
 package com.jamma.math;
 
 import com.jamma.math.quaternion.Quaternionf;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -21,6 +23,7 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public static final Vector3f UNIT_Y = new Vector3f(0.0f, 1.0f, 0.0f);
     public static final Vector3f UNIT_Z = new Vector3f(0.0f, 0.0f, 1.0f);
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Vector3f() {

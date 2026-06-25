@@ -1,5 +1,6 @@
 package com.jamma.math;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -7,6 +8,7 @@ import java.nio.IntBuffer;
 
 public record Vector4i(int x, int y, int z, int w) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public Vector4i() {

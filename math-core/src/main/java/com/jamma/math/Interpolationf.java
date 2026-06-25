@@ -165,7 +165,7 @@ public final class Interpolationf {
     }
 
     public static float saturate(float value) {
-        return value < 0.0f ? 0.0f : value > 1.0f ? 1.0f : value;
+        return value < 0.0f ? 0.0f : Math.min(value, 1.0f);
     }
 
     public static float bicubic(float[][] grid, float u, float v) {

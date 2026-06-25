@@ -16,7 +16,7 @@ public class PerformanceBenchmarkTest {
         System.out.println("\n==================================================================");
         System.out.println("                 JAMMA VS JOML MICROBENCHMARK RESULT              ");
         System.out.println("==================================================================");
-        System.out.println(String.format("| %-25s | %-12s | %-12s |", "Operation (1M runs)", "Jamma (ms)", "JOML (ms)"));
+        System.out.printf("| %-25s | %-12s | %-12s |%n", "Operation (1M runs)", "Jamma (ms)", "JOML (ms)");
         System.out.println("|---------------------------|--------------|--------------|");
 
         benchmarkMatrix4fMultiply();
@@ -56,7 +56,7 @@ public class PerformanceBenchmarkTest {
         }
         long jomlTime = (System.nanoTime() - start) / 1_000_000;
 
-        System.out.println(String.format("| %-25s | %-12d | %-12d |", "Matrix4f Multiply", jammaTime, jomlTime));
+        System.out.printf("| %-25s | %-12d | %-12d |%n", "Matrix4f Multiply", jammaTime, jomlTime);
     }
 
     private void benchmarkVector3fAddition() {
@@ -88,7 +88,7 @@ public class PerformanceBenchmarkTest {
         }
         long jomlTime = (System.nanoTime() - start) / 1_000_000;
 
-        System.out.println(String.format("| %-25s | %-12d | %-12d |", "Vector3f Addition", jammaTime, jomlTime));
+        System.out.printf("| %-25s | %-12d | %-12d |%n", "Vector3f Addition", jammaTime, jomlTime);
     }
 
     private void benchmarkQuaternionfSlerp() {
@@ -118,6 +118,6 @@ public class PerformanceBenchmarkTest {
         }
         long jomlTime = (System.nanoTime() - start) / 1_000_000;
 
-        System.out.println(String.format("| %-25s | %-12d | %-12d |", "Quaternionf Slerp", jammaTime, jomlTime));
+        System.out.printf("| %-25s | %-12d | %-12d |%n", "Quaternionf Slerp", jammaTime, jomlTime);
     }
 }

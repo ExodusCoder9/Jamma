@@ -4,10 +4,13 @@ import com.jamma.math.Vector3d;
 import com.jamma.math.Vector3f;
 import com.jamma.math.matrix.Matrix4d;
 import com.jamma.math.matrix.Matrix4f;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 public class FrustumIntersection implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final int INSIDE = 1;

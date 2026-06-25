@@ -3,12 +3,15 @@ package com.jamma.math;
 import com.jamma.math.matrix.Matrix3d;
 import com.jamma.math.matrix.Matrix4d;
 import com.jamma.math.quaternion.Quaterniond;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public record AxisAngle4d(double angle, double x, double y, double z) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public AxisAngle4d() {

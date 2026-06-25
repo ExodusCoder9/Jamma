@@ -3,12 +3,15 @@ package com.jamma.math;
 import com.jamma.math.matrix.Matrix3f;
 import com.jamma.math.matrix.Matrix4f;
 import com.jamma.math.quaternion.Quaternionf;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public record AxisAngle4f(float angle, float x, float y, float z) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public AxisAngle4f() {

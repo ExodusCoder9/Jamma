@@ -165,7 +165,7 @@ public final class Interpolationd {
     }
 
     public static double saturate(double value) {
-        return value < 0.0 ? 0.0 : value > 1.0 ? 1.0 : value;
+        return value < 0.0 ? 0.0 : Math.min(value, 1.0);
     }
 
     public static double bicubic(double[][] grid, double u, double v) {
