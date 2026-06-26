@@ -181,10 +181,11 @@ class JomlAdapterTest {
     }
 
     @Test void quatMul() {
+        // (1,0,0,0) * (0,1,0,0) = (0,0,1,0) — cross product of basis vectors
         var q = new Quaternionf(1, 0, 0, 0).mul(new Quaternionf(0, 1, 0, 0));
         assertEquals(0, q.x, F);
-        assertEquals(1, q.y, F);
-        assertEquals(0, q.z, F);
+        assertEquals(0, q.y, F);
+        assertEquals(1, q.z, F);
         assertEquals(0, q.w, F);
     }
 
@@ -211,16 +212,23 @@ class JomlAdapterTest {
     @Test void mat4Mul() {
         var a = new Matrix4f().translate(1, 2, 3);
         var b = new Matrix4f().scale(2);
+        // a.mul(b) = T * S: first scale, then translate
+        // translation column stays (1,2,3) since scale has identity in col 3
         a.mul(b);
-        // translation should be scaled: (2, 4, 6)
-        assertEquals(2, a.m03, 1e-4f);
-        assertEquals(4, a.m13, 1e-4f);
-        assertEquals(6, a.m23, 1e-4f);
+        assertEquals(1, a.m03, 1e-4f);
+        assertEquals(2, a.m13, 1e-4f);
+        assertEquals(3, a.m23, 1e-4f);
+        assertEquals(2, a.m00, 1e-4f); // scaling applied
     }
 
     @Test void mat4Perspective() {
         var m = new Matrix4f().perspective(1.57f, 16f/9f, 0.1f, 100f);
-        assertEquals(1, m.determinant(), 1e-3f);
+        // perspective projection should not be singular
+        assertNotEquals(0, m.determinant(), 1e-6f);
+        // near plane maps to -1, far plane to +1
+        var v = new Vector4f(0, 0, -0.1f, 1);
+        m.transform(v);
+        assertTrue(v.z < 0); // after perspective divide, near = -1
     }
 
     @Test void mat4ToJamma() {

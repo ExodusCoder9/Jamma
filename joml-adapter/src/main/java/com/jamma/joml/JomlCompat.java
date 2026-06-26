@@ -108,8 +108,8 @@ public final class JomlCompat {
 
     // ── JOML Quaternionf ↔ Jamma Quaternionf ────────────────────────────
 
-    public static com.jamma.math.Quaternionf toJamma(org.joml.Quaternionf q) {
-        return new com.jamma.math.Quaternionf(q.x, q.y, q.z, q.w);
+    public static com.jamma.math.quaternion.Quaternionf toJamma(org.joml.Quaternionf q) {
+        return new com.jamma.math.quaternion.Quaternionf(q.x, q.y, q.z, q.w);
     }
 
     public static Quaternionf toAdapter(org.joml.Quaternionf q) {
@@ -118,8 +118,8 @@ public final class JomlCompat {
 
     // ── JOML Quaterniond ↔ Jamma Quaterniond ────────────────────────────
 
-    public static com.jamma.math.Quaterniond toJamma(org.joml.Quaterniond q) {
-        return new com.jamma.math.Quaterniond(q.x, q.y, q.z, q.w);
+    public static com.jamma.math.quaternion.Quaterniond toJamma(org.joml.Quaterniond q) {
+        return new com.jamma.math.quaternion.Quaterniond(q.x, q.y, q.z, q.w);
     }
 
     public static Quaterniond toAdapter(org.joml.Quaterniond q) {

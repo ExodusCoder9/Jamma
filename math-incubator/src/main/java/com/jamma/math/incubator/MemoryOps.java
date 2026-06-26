@@ -1,6 +1,6 @@
 package com.jamma.math.incubator;
 
-import com.jamma.math.Quaterniond;
+import com.jamma.math.quaternion.Quaterniond;
 import com.jamma.math.Vector2d;
 import com.jamma.math.Vector3d;
 import com.jamma.math.Vector4d;

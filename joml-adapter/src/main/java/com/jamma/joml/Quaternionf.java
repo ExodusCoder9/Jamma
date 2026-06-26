@@ -25,18 +25,18 @@ public class Quaternionf {
         this.w = q.w;
     }
 
-    public Quaternionf(com.jamma.math.Quaternionf jamma) {
+    public Quaternionf(com.jamma.math.quaternion.Quaternionf jamma) {
         this.x = jamma.x();
         this.y = jamma.y();
         this.z = jamma.z();
         this.w = jamma.w();
     }
 
-    public com.jamma.math.Quaternionf toJamma() {
-        return new com.jamma.math.Quaternionf(x, y, z, w);
+    public com.jamma.math.quaternion.Quaternionf toJamma() {
+        return new com.jamma.math.quaternion.Quaternionf(x, y, z, w);
     }
 
-    public static Quaternionf fromJamma(com.jamma.math.Quaternionf jamma) {
+    public static Quaternionf fromJamma(com.jamma.math.quaternion.Quaternionf jamma) {
         return new Quaternionf(jamma.x(), jamma.y(), jamma.z(), jamma.w());
     }
 

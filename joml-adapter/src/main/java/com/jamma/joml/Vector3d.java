@@ -1,6 +1,6 @@
 package com.jamma.joml;
 
-import com.jamma.math.Quaterniond;
+import com.jamma.math.quaternion.Quaterniond;
 import com.jamma.math.matrix.Matrix4d;
 
 import java.lang.foreign.MemorySegment;
