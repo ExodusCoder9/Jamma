@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':math-core')
+
+    // JOML is optional — only needed for the JomlCompat conversion utilities
+    compileOnly 'org.joml:joml:1.10.8'
+}

@@ -11,6 +11,8 @@
 | **Math Incubator** | Java 26+ with `--add-modules jdk.incubator.vector --enable-preview` |
 | **Build**          | Gradle 8.x+ (included wrapper)                                      |
 
+[![build](https://github.com/ExodusCoder9/Jamma/actions/workflows/build.yml/badge.svg)](https://github.com/ExodusCoder9/Jamma/actions/workflows/build.yml)
+
 ---
 
 ## Table of Contents
@@ -75,6 +77,9 @@ Experimental features requiring `--add-modules jdk.incubator.vector` and `--enab
 
 ### `lwjgl-jamma`
 LWJGL 3 interop module. Provides zero-allocation `put`/`get` methods that write Jamma types directly into `FloatBuffer`, `DoubleBuffer`, and `MemorySegment` — ready for GL/Vulkan native calls. Integrates with `MemoryStack` for fast stack-allocated uniforms and vertex buffers.
+
+### `joml-adapter` <sub>*new*</sub>
+JOML compatibility adapter. Provides mutable, `return this` adapter classes with JOML's API surface backed by Jamma types under the hood. Drop-in replacement for `org.joml.Vector3f`, `Matrix4f`, `Quaternionf`, etc. — just change your imports. Includes `JomlCompat` for direct JOML ↔ Jamma conversion.
 
 ---
 
@@ -677,11 +682,22 @@ Re-exports all `ScalarMath` methods and constants under a single namespace: `Mat
 
 ### `VectorApiMath` — Static utility (package `com.jamma.math.incubator`)
 
-Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) for SIMD-accelerated operations on `Vector4d`:
+Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) and `FloatVector` (SPECIES_128) for SIMD-accelerated operations:
 
+**Double-precision (Vector4d)**
 - `add(a, b)`, `sub(a, b)`, `mul(a, b)`, `scale(v, s)`
 - `dot(a, b)` — uses `reduceLanes(ADD)`
 - `batchAdd(results, a, b)` — batch add for arrays of Vector4d
+- `batchDot(a, b)` — batch dot product → `double[]`
+- `transform(Matrix4d, Vector4d)` — SIMD matrix-vector multiply
+
+**Double-precision padded (Vector3d)**
+- `add3(a, b)`, `sub3(a, b)`, `scale3(v, s)`, `dot3(a, b)` — padded to 4-wide for SIMD
+
+**Single-precision (Vector4f)**
+- `add4f(a, b)`, `sub4f(a, b)`, `mul4f(a, b)`, `scale4f(v, s)`
+- `dot4f(a, b)` — SIMD dot product
+- `batchAdd4f(results, a, b)` — batch add for arrays of Vector4f
 
 ---
 
@@ -689,10 +705,18 @@ Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) for SIMD-accelerated oper
 
 ### `ParallelOps` — Static utility (package `com.jamma.math.incubator`)
 
-- `batchAddParallel(a, b)` — parallel batch vector addition using `StructuredTaskScope`
-  - Threshold: 4096 elements
-  - Work divided across `availableProcessors()` cores
-  - Falls back to sequential `VectorMath.add` below threshold
+All parallel ops use `StructuredTaskScope` with a 4096-element threshold. Work is divided across `availableProcessors()` cores; falls back to sequential below threshold.
+
+**Vector3d**
+- `batchAddParallel(a, b)`, `batchSubParallel(a, b)`, `batchMulParallel(a, b)`
+- `batchDotParallel(a, b)` → `double[]`
+- `batchCrossParallel(a, b)`
+- `batchNormalizeParallel(v)`, `batchScaleParallel(v, s)`
+- `batchTransformParallel(Matrix4d, v[])` — transforms positions
+
+**Vector4d**
+- `batchAddParallel(a, b)`
+- `batchTransformParallel(Matrix4d, v[])` — full 4-component transform
 
 ---
 
@@ -700,10 +724,29 @@ Uses `jdk.incubator.vector.DoubleVector` (SPECIES_256) for SIMD-accelerated oper
 
 ### `MemoryOps` — Static utility (package `com.jamma.math.incubator`)
 
-- `allocateVec4(Arena)` — allocates single vec4 in off-heap memory
-- `allocateVec4Array(Arena, count)` — allocates array of vec4
-- `setVec4(segment, x, y, z, w)` — writes components
-- `getVec4X/Y/Z/W(segment)` — reads individual components
+Structured off-heap memory layouts using `MemoryLayout` + `VarHandle` via `java.lang.foreign`.
+
+**Vec4 (double)** — `allocateVec4(Arena)`, `allocateVec4Array(Arena, count)`
+- `setVec4(segment, x, y, z, w)`, `setVec4(segment, index, Vector4d)`
+- `getVec4(segment, index)` → `Vector4d`, `getVec4X/Y/Z/W(segment)`
+
+**Vec3 (double)** — `allocateVec3(Arena)`, `allocateVec3Array(Arena, count)`
+- `setVec3(segment, index, Vector3d)`, `getVec3(segment, index)` → `Vector3d`
+
+**Vec2 (double)** — `allocateVec2(Arena)`, `allocateVec2Array(Arena, count)`
+- `setVec2(segment, index, Vector2d)`, `getVec2(segment, index)` → `Vector2d`
+
+**Quaterniond (double)** — `allocateQuaterniond(Arena)`, `allocateQuaterniondArray(Arena, count)`
+- `setQuaterniond(segment, index, Quaterniond)`, `getQuaterniond(segment, index)` → `Quaterniond`
+
+**Matrix4d (column-major, 16 doubles)** — `allocateMatrix4d(Arena)`, `allocateMatrix4dArray(Arena, count)`
+- `setMatrix4d(segment, index, Matrix4d)`, `getMatrix4d(segment, index)` → `Matrix4d`
+
+**Bulk operations**
+- `copyVec4Array(src, srcIdx, dst, dstIdx, count)`
+- `copyVec3Array(src, srcIdx, dst, dstIdx, count)`
+- `copyMatrix4dArray(src, srcIdx, dst, dstIdx, count)`
+- `writeVec4Array(segment, offset, Vector4d[])`, `readVec4Array(segment, offset, Vector4d[])`
 
 ---
 
@@ -885,6 +928,45 @@ All methods are zero-allocation — they write directly into the provided buffer
 
 ---
 
+## JOML Compatibility Adapter
+
+### Module: `joml-adapter`
+
+A drop-in bridge for projects migrating from JOML to Jamma. Provides mutable adapter classes with JOML's `return this` fluent API, backed by Jamma types under the hood.
+
+**Migration path:**
+
+1. Add `joml-adapter` dependency (replace `org.joml:joml`)
+2. Change imports: `org.joml.Vector3f` → `com.jamma.joml.Vector3f`
+3. Code compiles and runs identically
+4. Gradually opt into Jamma's immutable types via `.toJamma()`
+
+### Adapter Types
+
+| Adapter class         | JOML equivalent      | Key API coverage                                      |
+|-----------------------|----------------------|-------------------------------------------------------|
+| `Vector3f` / `Vector3d` | `org.joml.Vector3f/d` | set, add, sub, mul, div, normalize, cross, dot, reflect, rotate, transform matrix/quat, mulPosition/Direction, fma, MemorySegment load/store |
+| `Vector4f` / `Vector4d` | `org.joml.Vector4f/d` | set, add, sub, mul, div, normalize, dot, mul(Matrix4f/d), mulPosition, mulDirection |
+| `Vector2f` / `Vector2d` | `org.joml.Vector2f/d` | set, add, sub, mul, div, normalize, dot, cross, rotate, angle, perpendicular |
+| `Quaternionf` / `Quaterniond` | `org.joml.Quaternionf/d` | normalize, conjugate, invert, mul, premul, slerp, nlerp, fromAxisAngle, fromEulerAnglesXYZ |
+| `Matrix4f` / `Matrix4d` | `org.joml.Matrix4f/d` | identity, mul, translate, scale, rotateX/Y/Z, transpose, invert, determinant, perspective, lookAt, transformPosition/Direction |
+| `JomlCompat`          | —                    | Static `toJamma()` / `toJoml()` between JOML, adapter, and native Jamma types |
+
+### Example
+
+```java
+// Before (JOML)
+// import org.joml.Vector3f;
+
+// After (Jamma adapter — same API)
+import com.jamma.joml.Vector3f;
+
+Vector3f v = new Vector3f(1, 2, 3).normalize().mul(5);
+com.jamma.math.Vector3f jamma = v.toJamma(); // convert to immutable record
+```
+
+---
+
 ## Static Utility Classes (legacy)
 
 ### `VectorMath` / `VectorMathf`
@@ -903,6 +985,9 @@ Static utility classes mirroring all instance methods on the record types. These
 
 # Build lwjgl-jamma (requires LWJGL dependencies on classpath)
 ./gradlew :lwjgl-jamma:build
+
+# Build joml-adapter (optional: needs JOML on classpath for JomlCompat)
+./gradlew :joml-adapter:build
 
 # Build everything
 ./gradlew build

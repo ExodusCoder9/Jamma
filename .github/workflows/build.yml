@@ -1,0 +1,35 @@
+name: build
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'oracle'
+        java-version: '26'
+
+    - name: Build math-core
+      run: ./gradlew :math-core:build
+
+    - name: Build math-incubator
+      run: ./gradlew :math-incubator:build
+      env:
+        JAVA_ARGS: '--enable-preview --add-modules jdk.incubator.vector'
+
+    - name: Test math-core
+      run: ./gradlew :math-core:test
+
+    - name: Test math-incubator
+      run: ./gradlew :math-incubator:test
+      env:
+        JAVA_ARGS: '--enable-preview --add-modules jdk.incubator.vector'
