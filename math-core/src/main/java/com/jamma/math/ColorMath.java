@@ -1,7 +1,5 @@
 package com.jamma.math;
 
-import java.util.Objects;
-
 public final class ColorMath {
 
     private ColorMath() {}
@@ -43,35 +41,15 @@ public final class ColorMath {
         return (ai << 24) | (ri << 16) | (gi << 8) | bi;
     }
 
-    public static void unpackRgb(int rgb, Vector3f dest) {
-        Objects.requireNonNull(dest);
+    public static Vector3f unpackRgb(int rgb) {
         float r = ((rgb >> 16) & 0xFF) / 255.0f;
         float g = ((rgb >> 8) & 0xFF) / 255.0f;
         float b = (rgb & 0xFF) / 255.0f;
-        dest = new Vector3f(r, g, 0.0f);
+        return new Vector3f(r, g, b);
     }
 
-    public static void unpackRgba(int rgba, Vector3f dest) {
-        Objects.requireNonNull(dest);
-        float r = ((rgba >> 16) & 0xFF) / 255.0f;
-        float g = ((rgba >> 8) & 0xFF) / 255.0f;
-        float b = (rgba & 0xFF) / 255.0f;
-        dest = new Vector3f(r, g, b);
-    }
-
-    public static float[] unpackRgb(int rgb) {
-        float r = ((rgb >> 16) & 0xFF) / 255.0f;
-        float g = ((rgb >> 8) & 0xFF) / 255.0f;
-        float b = (rgb & 0xFF) / 255.0f;
-        return new float[]{r, g, b};
-    }
-
-    public static float[] unpackRgba(int rgba) {
-        float a = ((rgba >> 24) & 0xFF) / 255.0f;
-        float r = ((rgba >> 16) & 0xFF) / 255.0f;
-        float g = ((rgba >> 8) & 0xFF) / 255.0f;
-        float b = (rgba & 0xFF) / 255.0f;
-        return new float[]{r, g, b, a};
+    public static Vector3f unpackRgba(int rgba) {
+        return unpackRgb(rgba);
     }
 
     public static Vector3f hsvToRgb(float h, float s, float v) {
@@ -94,8 +72,7 @@ public final class ColorMath {
         return new Vector3f(r + m, g + m, b + m);
     }
 
-    public static void rgbToHsv(float r, float g, float b, Vector3f dest) {
-        Objects.requireNonNull(dest);
+    public static Vector3f rgbToHsv(float r, float g, float b) {
         float max = Math.max(Math.max(r, g), b);
         float min = Math.min(Math.min(r, g), b);
         float delta = max - min;
@@ -112,7 +89,7 @@ public final class ColorMath {
             h *= 60.0f;
             if (h < 0.0f) h += 360.0f;
         }
-        dest = new Vector3f(h, s, max);
+        return new Vector3f(h, s, max);
     }
 
     public static Vector3f colorTemperature(float kelvin) {

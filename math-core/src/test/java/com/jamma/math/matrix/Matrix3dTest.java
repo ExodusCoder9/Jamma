@@ -446,6 +446,6 @@ class Matrix3dTest {
     void rotateXZeroAngle() {
         Matrix3d m = new Matrix3d();
         m.rotateX(0.0);
-        assertTrue(m.equals(new Matrix3d()));
+        assertEquals(new Matrix3d(), m);
     }
 }

@@ -5,6 +5,7 @@ import com.jamma.math.matrix.Matrix4d;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class AABB implements Serializable {
 
@@ -129,9 +130,9 @@ public class AABB implements Serializable {
     }
 
     public boolean intersectsSphere(Vector3d center, double radius) {
-        double closestX = Math.max(minX, Math.min(center.x(), maxX));
-        double closestY = Math.max(minY, Math.min(center.y(), maxY));
-        double closestZ = Math.max(minZ, Math.min(center.z(), maxZ));
+        double closestX = Math.clamp(center.x(), minX, maxX);
+        double closestY = Math.clamp(center.y(), minY, maxY);
+        double closestZ = Math.clamp(center.z(), minZ, maxZ);
         double dx = closestX - center.x();
         double dy = closestY - center.y();
         double dz = closestZ - center.z();
@@ -209,21 +210,7 @@ public class AABB implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        long temp = Double.doubleToLongBits(minX);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(minY);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(minZ);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(maxX);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(maxY);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(maxZ);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        return result;
+        return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override

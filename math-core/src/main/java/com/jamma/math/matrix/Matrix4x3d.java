@@ -884,8 +884,7 @@ public class Matrix4x3d implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Matrix4x3d)) return false;
-        Matrix4x3d other = (Matrix4x3d) obj;
+        if (!(obj instanceof Matrix4x3d other)) return false;
         return Double.doubleToLongBits(m00) == Double.doubleToLongBits(other.m00)
             && Double.doubleToLongBits(m01) == Double.doubleToLongBits(other.m01)
             && Double.doubleToLongBits(m02) == Double.doubleToLongBits(other.m02)

@@ -5,6 +5,7 @@ import com.jamma.math.matrix.Matrix4f;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class AABBf implements Serializable {
 
@@ -129,9 +130,9 @@ public class AABBf implements Serializable {
     }
 
     public boolean intersectsSphere(Vector3f center, float radius) {
-        float closestX = Math.max(minX, Math.min(center.x(), maxX));
-        float closestY = Math.max(minY, Math.min(center.y(), maxY));
-        float closestZ = Math.max(minZ, Math.min(center.z(), maxZ));
+        float closestX = Math.clamp(center.x(), minX, maxX);
+        float closestY = Math.clamp(center.y(), minY, maxY);
+        float closestZ = Math.clamp(center.z(), minZ, maxZ);
         float dx = closestX - center.x();
         float dy = closestY - center.y();
         float dz = closestZ - center.z();
@@ -209,15 +210,7 @@ public class AABBf implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Float.floatToIntBits(minX);
-        result = prime * result + Float.floatToIntBits(minY);
-        result = prime * result + Float.floatToIntBits(minZ);
-        result = prime * result + Float.floatToIntBits(maxX);
-        result = prime * result + Float.floatToIntBits(maxY);
-        result = prime * result + Float.floatToIntBits(maxZ);
-        return result;
+        return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override

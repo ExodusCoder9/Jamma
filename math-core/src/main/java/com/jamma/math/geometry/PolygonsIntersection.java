@@ -14,7 +14,6 @@ import java.util.BitSet;
 public class PolygonsIntersection {
 
     private final float[] verticesXY;
-    private final int[] polygons;
     private final float centerX, centerY, radiusSquared;
     private final float minX, minY, maxX, maxY;
     private final IntervalTreeNode root;
@@ -26,7 +25,6 @@ public class PolygonsIntersection {
      */
     public PolygonsIntersection(float[] verticesXY, int[] polygons, int count) {
         this.verticesXY = verticesXY;
-        this.polygons = polygons;
         int vertexCount = Math.min(count, verticesXY.length / 2);
 
         // Compute AABB and bounding sphere center

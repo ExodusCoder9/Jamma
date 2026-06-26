@@ -3,6 +3,8 @@ package com.jamma.math;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.jamma.math.Vector3f;
+
 class ColorMathTest {
     static final float F = 1e-5f;
 
@@ -28,7 +30,10 @@ class ColorMathTest {
     }
 
     @Test void unpackRgbRed() {
-        assertArrayEquals(new float[]{1.0f, 0.0f, 0.0f}, ColorMath.unpackRgb(0x00FF0000), F);
+        Vector3f c = ColorMath.unpackRgb(0x00FF0000);
+        assertEquals(1.0f, c.x(), F);
+        assertEquals(0.0f, c.y(), F);
+        assertEquals(0.0f, c.z(), F);
     }
 
     @Test void hsvToRgbWhite() {

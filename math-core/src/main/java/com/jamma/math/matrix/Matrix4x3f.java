@@ -883,8 +883,7 @@ public class Matrix4x3f implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Matrix4x3f)) return false;
-        Matrix4x3f other = (Matrix4x3f) obj;
+        if (!(obj instanceof Matrix4x3f other)) return false;
         return Float.floatToIntBits(m00) == Float.floatToIntBits(other.m00)
             && Float.floatToIntBits(m01) == Float.floatToIntBits(other.m01)
             && Float.floatToIntBits(m02) == Float.floatToIntBits(other.m02)
