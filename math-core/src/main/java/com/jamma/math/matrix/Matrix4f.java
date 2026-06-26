@@ -763,6 +763,29 @@ public class Matrix4f implements Serializable {
         return orthoLH(left, right, bottom, top, -1.0f, 1.0f);
     }
 
+    public Matrix4f orthoVulkan(float left, float right, float bottom, float top, float zNear, float zFar) {
+        float invRL = 1.0f / (right - left);
+        float invTB = 1.0f / (top - bottom);
+        float invFN = 1.0f / (zFar - zNear);
+        m00 = 2.0f * invRL;
+        m01 = 0.0f;
+        m02 = 0.0f;
+        m03 = 0.0f;
+        m10 = 0.0f;
+        m11 = -2.0f * invTB;
+        m12 = 0.0f;
+        m13 = 0.0f;
+        m20 = 0.0f;
+        m21 = 0.0f;
+        m22 = -invFN;
+        m23 = 0.0f;
+        m30 = -(right + left) * invRL;
+        m31 = (top + bottom) * invTB;
+        m32 = -zNear * invFN;
+        m33 = 1.0f;
+        return this;
+    }
+
     public Matrix4f setOrtho(float left, float right, float bottom, float top, float zNear, float zFar, boolean zZeroToOne) {
         return ortho(left, right, bottom, top, zNear, zFar, zZeroToOne);
     }
