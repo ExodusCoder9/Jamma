@@ -197,7 +197,7 @@ Each vector type exists in three precision variants:
 - `perspective(fovY, aspect, zNear, zFar)`
 - `perspectiveVulkan(fovY, aspect, zNear, zFar)`
 - `ortho(left, right, bottom, top, zNear, zFar)`
-- `orthoVulkan(left, right, bottom, top, zNear, zFar)`
+- `orthoVulkan(left, right, bottom, top, zNear, zFar)` (both Matrix4f + Matrix4d)
 - `ortho2D(left, right, bottom, top)`
 - `frustum(left, right, bottom, top, zNear, zFar)`
 - `lookAt(eye, center, up)`, `lookAt(eyeX, ...)`
@@ -334,8 +334,9 @@ A comprehensive scalar math library with **~80+ methods** across 20+ categories.
 **Constants** (12)
 - `PI`, `E`, `TAU`, `PHI` (golden ratio), `LN2`, `LN10`, `LOG2E`, `LOG10E`, `SQRT2`, `SQRT3`, `EPSILON`, `FLT_EPSILON`
 
-**Trigonometric** (15)
+**Trigonometric** (18)
 - Standard: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`
+- Fast approx: `fastSin(float/double)`, `fastCos(float/double)`, `sinCos(float/double)` (returns both)
 - Reciprocal: `sec`, `csc`, `cot`, `asec`, `acsc`, `acot`
 - Historical: `versin`, `coversin`, `haversin`, `exsec`, `excsc`, `vercosin`, `covercosin`, `havercosin`, `hacoversin`, `hacovercosin`
 - Misc: `chord`, `sinc`
@@ -483,6 +484,25 @@ A convenience class re-exposing every `ScalarMath` method as a static call. Use 
 - `contains(point)` — point containment
 - `intersects(Sphere)`, `intersects(Ray)`, `intersects(AABB)` — intersection tests
 
+### `AABBf` — Float AABB (mutable)
+
+- Same API as `AABB` but uses `float` precision (`Vector3f`)
+- `center()`, `extent()`, `size()`, `contains()`, `intersects()`, `union()`, `intersection()`, `transform()`
+
+### `Planef` — Float Plane (record, immutable)
+
+- Same API as `Plane` but uses `float` fields
+- Fields: `a`, `b`, `c`, `d` (float)
+
+### `Rayf` — Float Ray (mutable)
+
+- Same API as `Ray` but uses `Vector3f`
+- `origin`, `direction`, `pointAt(t)`, `closestPoint(point)`, `intersectsTriangle(v0, v1, v2)`
+
+### `Spheref` — Float Sphere (record, immutable)
+
+- Same API as `Sphere` but uses `Vector3f` + `float` radius
+
 ### `Line` — 2D Line (record, immutable)
 
 - Fields: `point`, `direction` (Vector3f, xy used)
@@ -548,6 +568,13 @@ A convenience class re-exposing every `ScalarMath` method as a static call. Use 
 **Other**
 - `transformAab`, `findClosestPointsLineLine`, `intersectLineLine`
 
+### `PolygonsIntersection` — Static utility
+
+Interval-tree accelerated point-in-polygon test:
+- `testPolygon(Vector3f point, float[] verticesX, float[] verticesY)` — boolean test
+- `testPolygon(Vector3d point, double[] verticesX, double[] verticesY)` — double variant
+- `PolygonsIntersection(float[] verticesX, float[] verticesY)` — pre-built with interval tree (thread-safe after construction)
+
 ---
 
 ## Frustum Culling
@@ -604,9 +631,9 @@ Color space conversions and packing:
 - `srgbToLinear(float)`, `linearToSrgb(float)` — single component
 - `srgbToLinear(r, g, b)` / `linearToSrgb(r, g, b)` — returns `Vector3f`
 - `packRgb(r, g, b)` / `packRgba(r, g, b, a)` — float [0,1] to packed int
-- `unpackRgb(int, Vector3f)` / `unpackRgba(int, Vector3f)` — unpack to floats
+- `unpackRgb(int)` / `unpackRgba(int)` — unpack to `Vector3f`
 - `hsvToRgb(h, s, v)` — HSV → RGB as Vector3f
-- `rgbToHsv(r, g, b, dest)` — RGB → HSV
+- `rgbToHsv(r, g, b)` — RGB → HSV as `Vector3f`
 - `colorTemperature(kelvin)` — approximate blackbody color
 
 ### `MemUtil` — Static utility
