@@ -165,11 +165,18 @@ public class FrustumIntersection implements Serializable {
     }
 
     private void normalize(int index) {
-        double invLen = 1.0 / Math.sqrt(
+        double lenSq =
             planes[index][0] * planes[index][0] +
             planes[index][1] * planes[index][1] +
-            planes[index][2] * planes[index][2]
-        );
+            planes[index][2] * planes[index][2];
+        if (lenSq == 0.0) {
+            planes[index][0] = 0.0;
+            planes[index][1] = 0.0;
+            planes[index][2] = 0.0;
+            planes[index][3] = 0.0;
+            return;
+        }
+        double invLen = 1.0 / Math.sqrt(lenSq);
         planes[index][0] *= invLen;
         planes[index][1] *= invLen;
         planes[index][2] *= invLen;

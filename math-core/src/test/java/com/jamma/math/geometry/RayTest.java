@@ -114,6 +114,12 @@ class RayTest {
     }
 
     @Test
+    void intersectsSphereZeroDirection() {
+        Ray ray = new Ray(new Vector3d(0, 0, 0), new Vector3d(0, 0, 0));
+        assertTrue(Double.isNaN(ray.intersectsSphere(new Vector3d(0, 0, 0), 1.0)));
+    }
+
+    @Test
     void transformByTranslation() {
         Ray ray = new Ray(new Vector3d(1, 2, 3), new Vector3d(1, 0, 0));
         Matrix4d m = new Matrix4d().translate(10, 20, 30);

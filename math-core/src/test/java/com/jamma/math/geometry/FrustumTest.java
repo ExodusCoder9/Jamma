@@ -55,4 +55,10 @@ public class FrustumTest {
         // Sphere crossing Z near plane (z = 0.0)
         assertEquals(FrustumIntersection.INTERSECT, frustum.testSphere(0.0, 0.0, 0.0, 0.1));
     }
+
+    @Test
+    public void testDegenerateMatrixDoesNotNaN() {
+        FrustumIntersection frustum = new FrustumIntersection(new Matrix4d().zero(), false);
+        assertEquals(FrustumIntersection.OUTSIDE, frustum.testAABB(new AABB(new Vector3d(-1, -1, -1), new Vector3d(1, 1, 1))));
+    }
 }

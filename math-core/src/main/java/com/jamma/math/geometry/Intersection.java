@@ -215,6 +215,7 @@ public final class Intersection {
         double dy = r.origin.y() - center.y();
         double dz = r.origin.z() - center.z();
         double a = r.direction.x() * r.direction.x() + r.direction.y() * r.direction.y() + r.direction.z() * r.direction.z();
+        if (a == 0.0) return false;
         double b = 2.0 * (dx * r.direction.x() + dy * r.direction.y() + dz * r.direction.z());
         double c = dx * dx + dy * dy + dz * dz - radius * radius;
         double disc = b * b - 4.0 * a * c;
@@ -239,6 +240,7 @@ public final class Intersection {
         double dy = r.origin.y() - center.y();
         double dz = r.origin.z() - center.z();
         double a = r.direction.x() * r.direction.x() + r.direction.y() * r.direction.y() + r.direction.z() * r.direction.z();
+        if (a == 0.0) return false;
         double b = 2.0 * (dx * r.direction.x() + dy * r.direction.y() + dz * r.direction.z());
         double c = dx * dx + dy * dy + dz * dz - radius * radius;
         double disc = b * b - 4.0 * a * c;

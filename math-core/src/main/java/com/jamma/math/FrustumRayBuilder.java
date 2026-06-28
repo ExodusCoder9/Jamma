@@ -40,6 +40,10 @@ public class FrustumRayBuilder implements Serializable {
             double ty = invProjView.m01 * cx + invProjView.m11 * cy + invProjView.m21 * cz + invProjView.m31;
             double tz = invProjView.m02 * cx + invProjView.m12 * cy + invProjView.m22 * cz + invProjView.m32;
             double tw = invProjView.m03 * cx + invProjView.m13 * cy + invProjView.m23 * cz + invProjView.m33;
+            if (tw == 0.0) {
+                rayDirs[i] = new Vector3d();
+                continue;
+            }
             double invW = 1.0 / tw;
             double wx = tx * invW, wy = ty * invW, wz = tz * invW;
             rayDirs[i] = new Vector3d(wx - ox, wy - oy, wz - oz);
