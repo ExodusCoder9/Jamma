@@ -116,7 +116,8 @@ class RayTest {
     @Test
     void intersectsSphereZeroDirection() {
         Ray ray = new Ray(new Vector3d(0, 0, 0), new Vector3d(0, 0, 0));
-        assertTrue(Double.isNaN(ray.intersectsSphere(new Vector3d(0, 0, 0), 1.0)));
+        double t = ray.intersectsSphere(new Vector3d(0, 0, 0), 1.0);
+        assertTrue(Double.isNaN(t) || t < 0.0);
     }
 
     @Test

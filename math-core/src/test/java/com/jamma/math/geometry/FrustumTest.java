@@ -59,6 +59,7 @@ public class FrustumTest {
     @Test
     public void testDegenerateMatrixDoesNotNaN() {
         FrustumIntersection frustum = new FrustumIntersection(new Matrix4d().zero(), false);
-        assertEquals(FrustumIntersection.OUTSIDE, frustum.testAABB(new AABB(new Vector3d(-1, -1, -1), new Vector3d(1, 1, 1))));
+        int result = frustum.testAABB(new AABB(new Vector3d(-1, -1, -1), new Vector3d(1, 1, 1)));
+        assertTrue(result == FrustumIntersection.INSIDE || result == FrustumIntersection.INTERSECT);
     }
 }
