@@ -51,6 +51,19 @@ class VectorMathTest {
         assertEquals(5, VectorMathf.distance(new Vector3f(0, 0, 0), new Vector3f(3, 4, 0)), F);
         assertEquals(25, VectorMathf.distanceSquared(new Vector3f(0, 0, 0), new Vector3f(3, 4, 0)), F);
     }
+    @Test void vmfProjectZeroOntoZero() {
+        assertEquals(new Vector2f(0.0f, 0.0f), VectorMathf.project(new Vector2f(2.0f, 3.0f), new Vector2f(0.0f, 0.0f)));
+        assertEquals(new Vector2f(2.0f, 3.0f), VectorMathf.reject(new Vector2f(2.0f, 3.0f), new Vector2f(0.0f, 0.0f)));
+    }
+    @Test void vmfClosestPointDegenerateSegment() {
+        Vector2f p = new Vector2f(5.0f, -2.0f);
+        Vector2f a = new Vector2f(1.0f, 1.0f);
+        assertEquals(a, VectorMathf.closestPointOnSegment(p, a, a));
+    }
+    @Test void vmfRotateAroundZeroAxis() {
+        Vector3f v = new Vector3f(1.0f, 2.0f, 3.0f);
+        assertEquals(v, VectorMathf.rotateAroundAxis(v, new Vector3f(0.0f, 0.0f, 0.0f), 1.0f));
+    }
 
     // ── VectorMath ────────────────────────────────────────────────────
 
@@ -95,6 +108,19 @@ class VectorMathTest {
     @Test void vmDistance() {
         assertEquals(5, VectorMath.distance(new Vector3d(0, 0, 0), new Vector3d(3, 4, 0)), D);
         assertEquals(25, VectorMath.distanceSquared(new Vector3d(0, 0, 0), new Vector3d(3, 4, 0)), D);
+    }
+    @Test void vmProjectZeroOntoZero() {
+        assertEquals(new Vector2d(0.0, 0.0), VectorMath.project(new Vector2d(2.0, 3.0), new Vector2d(0.0, 0.0)));
+        assertEquals(new Vector2d(2.0, 3.0), VectorMath.reject(new Vector2d(2.0, 3.0), new Vector2d(0.0, 0.0)));
+    }
+    @Test void vmClosestPointDegenerateSegment() {
+        Vector3d p = new Vector3d(5.0, -2.0, 9.0);
+        Vector3d a = new Vector3d(1.0, 1.0, 1.0);
+        assertEquals(a, VectorMath.closestPointOnSegment(p, a, a));
+    }
+    @Test void vmRotateAroundZeroAxis() {
+        Vector3d v = new Vector3d(1.0, 2.0, 3.0);
+        assertEquals(v, VectorMath.rotateAroundAxis(v, new Vector3d(0.0, 0.0, 0.0), 1.0));
     }
     @Test void vmDot() {
         assertEquals(32.0, VectorMath.dot(new Vector3d(1, 2, 3), new Vector3d(4, 5, 6)), D);
