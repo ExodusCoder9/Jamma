@@ -228,11 +228,15 @@ public final class VectorMath {
     }
 
     public static Vector2d project(Vector2d v, Vector2d onto) {
-        double s = dot(v, onto) / dot(onto, onto);
+        double denom = dot(onto, onto);
+        if (denom < EPSILON) return new Vector2d(0.0, 0.0);
+        double s = dot(v, onto) / denom;
         return scale(onto, s);
     }
     public static Vector3d project(Vector3d v, Vector3d onto) {
-        double s = dot(v, onto) / dot(onto, onto);
+        double denom = dot(onto, onto);
+        if (denom < EPSILON) return new Vector3d(0.0, 0.0, 0.0);
+        double s = dot(v, onto) / denom;
         return scale(onto, s);
     }
     public static Vector2d reject(Vector2d v, Vector2d onto) { return sub(v, project(v, onto)); }
@@ -267,6 +271,9 @@ public final class VectorMath {
         return new Vector2d(v.x() * c - v.y() * s, v.x() * s + v.y() * c);
     }
     public static Vector3d rotateAroundAxis(Vector3d v, Vector3d axis, double angle) {
+        if (axis.lengthSquared() < EPSILON) {
+            return v;
+        }
         double c = Math.cos(angle);
         double s = Math.sin(angle);
         Vector3d k = normalize(axis);
@@ -320,12 +327,16 @@ public final class VectorMath {
 
     public static Vector2d closestPointOnSegment(Vector2d p, Vector2d a, Vector2d b) {
         Vector2d ab = sub(b, a);
-        double t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
+        double denom = dot(ab, ab);
+        if (denom < EPSILON) return a;
+        double t = Math.clamp(dot(sub(p, a), ab) / denom, 0.0, 1.0);
         return lerp(a, b, t);
     }
     public static Vector3d closestPointOnSegment(Vector3d p, Vector3d a, Vector3d b) {
         Vector3d ab = sub(b, a);
-        double t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0, 1.0);
+        double denom = dot(ab, ab);
+        if (denom < EPSILON) return a;
+        double t = Math.clamp(dot(sub(p, a), ab) / denom, 0.0, 1.0);
         return lerp(a, b, t);
     }
     public static double distanceToSegment(Vector2d p, Vector2d a, Vector2d b) {

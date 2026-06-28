@@ -79,7 +79,12 @@ public record Vector2d(double x, double y) implements Serializable {
     public double angle(Vector2d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
     public double angleSigned(Vector2d v) { return Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2d reflect(Vector2d normal) { double d = 2.0 * dot(normal); return new Vector2d(x - d * normal.x, y - d * normal.y); }
-    public Vector2d project(Vector2d onto) { double s = dot(onto) / onto.dot(onto); return onto.scale(s); }
+    public Vector2d project(Vector2d onto) {
+        double denom = onto.dot(onto);
+        if (denom == 0.0) return new Vector2d(0.0, 0.0);
+        double s = dot(onto) / denom;
+        return onto.scale(s);
+    }
     public Vector2d reject(Vector2d onto) { return sub(project(onto)); }
     public Vector2d lerp(Vector2d other, double t) { return new Vector2d(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y)); }
     @SuppressWarnings("SuspiciousNameCombination")

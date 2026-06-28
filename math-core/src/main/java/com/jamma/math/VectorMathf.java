@@ -254,11 +254,15 @@ public final class VectorMathf {
     }
 
     public static Vector2f project(Vector2f v, Vector2f onto) {
-        float s = dot(v, onto) / dot(onto, onto);
+        float denom = dot(onto, onto);
+        if (denom < EPSILON) return new Vector2f(0.0f, 0.0f);
+        float s = dot(v, onto) / denom;
         return scale(onto, s);
     }
     public static Vector3f project(Vector3f v, Vector3f onto) {
-        float s = dot(v, onto) / dot(onto, onto);
+        float denom = dot(onto, onto);
+        if (denom < EPSILON) return new Vector3f(0.0f, 0.0f, 0.0f);
+        float s = dot(v, onto) / denom;
         return scale(onto, s);
     }
     public static Vector2f reject(Vector2f v, Vector2f onto) { return sub(v, project(v, onto)); }
@@ -293,6 +297,9 @@ public final class VectorMathf {
         return new Vector2f(v.x() * c - v.y() * s, v.x() * s + v.y() * c);
     }
     public static Vector3f rotateAroundAxis(Vector3f v, Vector3f axis, float angle) {
+        if (axis.lengthSquared() < EPSILON) {
+            return v;
+        }
         float c = (float) Math.cos(angle);
         float s = (float) Math.sin(angle);
         Vector3f k = normalize(axis);
@@ -346,12 +353,16 @@ public final class VectorMathf {
 
     public static Vector2f closestPointOnSegment(Vector2f p, Vector2f a, Vector2f b) {
         Vector2f ab = sub(b, a);
-        float t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
+        float denom = dot(ab, ab);
+        if (denom < EPSILON) return a;
+        float t = Math.clamp(dot(sub(p, a), ab) / denom, 0.0f, 1.0f);
         return lerp(a, b, t);
     }
     public static Vector3f closestPointOnSegment(Vector3f p, Vector3f a, Vector3f b) {
         Vector3f ab = sub(b, a);
-        float t = Math.clamp(dot(sub(p, a), ab) / dot(ab, ab), 0.0f, 1.0f);
+        float denom = dot(ab, ab);
+        if (denom < EPSILON) return a;
+        float t = Math.clamp(dot(sub(p, a), ab) / denom, 0.0f, 1.0f);
         return lerp(a, b, t);
     }
     public static float distanceToSegment(Vector2f p, Vector2f a, Vector2f b) {

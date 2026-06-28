@@ -80,7 +80,12 @@ public record Vector2f(float x, float y) implements Serializable {
     public float angle(Vector2f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
     public float angleSigned(Vector2f v) { return (float) Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2f reflect(Vector2f normal) { float d = 2.0f * dot(normal); return new Vector2f(x - d * normal.x, y - d * normal.y); }
-    public Vector2f project(Vector2f onto) { float s = dot(onto) / onto.dot(onto); return onto.scale(s); }
+    public Vector2f project(Vector2f onto) {
+        float denom = onto.dot(onto);
+        if (denom == 0.0f) return new Vector2f(0.0f, 0.0f);
+        float s = dot(onto) / denom;
+        return onto.scale(s);
+    }
     public Vector2f reject(Vector2f onto) { return sub(project(onto)); }
     public Vector2f lerp(Vector2f other, float t) { return new Vector2f(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y)); }
     @SuppressWarnings("SuspiciousNameCombination")

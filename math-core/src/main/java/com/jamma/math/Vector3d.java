@@ -87,15 +87,24 @@ public record Vector3d(double x, double y, double z) implements Serializable {
     public double angle(Vector3d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
     public double angleSigned(Vector3d v, Vector3d normal) { return Math.atan2(cross(v).dot(normal), dot(v)); }
     public Vector3d reflect(Vector3d normal) { double d = 2.0 * dot(normal); return new Vector3d(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
-    public Vector3d project(Vector3d onto) { double s = dot(onto) / onto.dot(onto); return onto.scale(s); }
+    public Vector3d project(Vector3d onto) {
+        double denom = onto.dot(onto);
+        if (denom == 0.0) return new Vector3d(0.0, 0.0, 0.0);
+        double s = dot(onto) / denom;
+        return onto.scale(s);
+    }
     public Vector3d reject(Vector3d onto) { return sub(project(onto)); }
     public Vector3d lerp(Vector3d other, double t) { return new Vector3d(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y), Math.fma(t, other.z - z, z)); }
     public Vector3d nlerp(Vector3d other, double t) { return lerp(other, t).normalize(); }
     public Vector3d rotate(double ang, double axisX, double axisY, double axisZ) {
+        double axisLenSq = axisX * axisX + axisY * axisY + axisZ * axisZ;
+        if (axisLenSq == 0.0) {
+            return this;
+        }
         double c = Math.cos(ang);
         double s = Math.sin(ang);
         double oc = 1.0 - c;
-        double invLen = 1.0 / Math.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+        double invLen = 1.0 / Math.sqrt(axisLenSq);
         double ux = axisX * invLen;
         double uy = axisY * invLen;
         double uz = axisZ * invLen;

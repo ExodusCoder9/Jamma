@@ -104,15 +104,25 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public float angle(Vector3f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
     public float angleSigned(Vector3f v, Vector3f normal) { return (float) Math.atan2(cross(v).dot(normal), dot(v)); }
     public Vector3f reflect(Vector3f normal) { float d = 2.0f * dot(normal); return new Vector3f(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
-    public Vector3f project(Vector3f onto) { float s = dot(onto) / onto.dot(onto); return onto.scale(s); }
+    public Vector3f project(Vector3f onto) {
+        float denom = onto.dot(onto);
+        if (denom == 0.0f) return new Vector3f(0.0f, 0.0f, 0.0f);
+        float s = dot(onto) / denom;
+        return onto.scale(s);
+    }
     public Vector3f reject(Vector3f onto) { return sub(project(onto)); }
     public Vector3f lerp(Vector3f other, float t) { return new Vector3f(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y), Math.fma(t, other.z - z, z)); }
     public Vector3f nlerp(Vector3f other, float t) { return lerp(other, t).normalize(); }
     public Vector3f rotate(float ang, float axisX, float axisY, float axisZ) {
+        float axisLenSq = axisX * axisX + axisY * axisY + axisZ * axisZ;
+        if (axisLenSq == 0.0f) {
+            return this;
+        }
         float c = (float) Math.cos(ang);
         float s = (float) Math.sin(ang);
         float oc = 1.0f - c;
-        float ux = axisX, uy = axisY, uz = axisZ;
+        float invLen = 1.0f / (float) Math.sqrt(axisLenSq);
+        float ux = axisX * invLen, uy = axisY * invLen, uz = axisZ * invLen;
         return new Vector3f(
             x * (c + ux * ux * oc) + y * (ux * uy * oc - uz * s) + z * (ux * uz * oc + uy * s),
             x * (uy * ux * oc + uz * s) + y * (c + uy * uy * oc) + z * (uy * uz * oc - ux * s),
