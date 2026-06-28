@@ -6,10 +6,10 @@
 
 | Requirement        | Minimum                                                             |
 |--------------------|---------------------------------------------------------------------|
-| **Java**           | 26+ (for `--enable-preview` and `jdk.incubator.vector`)             |
-| **Math Core**      | Java 26+                                                            |
-| **Math Incubator** | Java 26+ with `--add-modules jdk.incubator.vector --enable-preview` |
-| **Build**          | Gradle 8.x+ (included wrapper)                                      |
+| **Java**           | 25+ (for `--enable-preview` and `jdk.incubator.vector`)             |
+| **Math Core**      | Java 25+                                                            |
+| **Math Incubator** | Java 25+ with `--add-modules jdk.incubator.vector --enable-preview` |
+| **Build**          | Gradle 9.x+ (included wrapper)                                      |
 
 [![build](https://github.com/ExodusCoder9/Jamma/actions/workflows/build.yml/badge.svg)](https://github.com/ExodusCoder9/Jamma/actions/workflows/build.yml)
 
@@ -63,7 +63,7 @@ All dot products, lerps, and matrix multiply accumulations use `Math.fma` (fused
 - `jdk.incubator.vector.DoubleVector` for SIMD
 - `StructuredTaskScope` for parallel decomposition
 - JPMS `module-info.java` for proper encapsulation
-- `Math.clamp` (JDK 26) for all vector and matrix clamping operations
+- `Math.clamp` (JDK 25) for all vector and matrix clamping operations
 
 ---
 
