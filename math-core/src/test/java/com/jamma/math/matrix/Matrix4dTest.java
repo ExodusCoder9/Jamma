@@ -119,6 +119,13 @@ class Matrix4dTest {
         assertEquals(0.0, p.x(), 1e-12); assertEquals(0.0, p.y(), 1e-12); assertEquals(0.0, p.z(), 1e-12);
     }
 
+    @Test void invert_roundTrip() {
+        Matrix4d m = new Matrix4d().translate(2, 3, 4).rotateY(PI / 3).scale(2, 3, 4);
+        Matrix4d inv = new Matrix4d(m).invert();
+        Matrix4d result = new Matrix4d(m).multiply(inv);
+        assertTrue(result.isIdentity(1e-12));
+    }
+
     @Test void invert_singular() { assertThrows(ArithmeticException.class, () -> new Matrix4d().zero().invert()); }
 
     @Test void transpose() {
@@ -130,6 +137,13 @@ class Matrix4dTest {
         Matrix4d m = new Matrix4d().set(new double[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}).transpose3x3();
         assertEquals(2.0, m.m10, 1e-12); assertEquals(5.0, m.m01, 1e-12);
         assertEquals(16.0, m.m33, 1e-12);
+    }
+
+    @Test void transposeTwiceIdentity() {
+        Matrix4d m = new Matrix4d().set(new double[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
+        Matrix4d original = new Matrix4d(m);
+        m.transpose().transpose();
+        assertEquals(original, m);
     }
 
     @Test void adjugate() {
@@ -174,6 +188,13 @@ class Matrix4dTest {
         m.m00(1.0 + 1e-14);
         assertTrue(m.isIdentity(1e-12));
         assertFalse(m.isIdentity(1e-15));
+    }
+
+    @Test void rotateZeroAxisNoop() {
+        Matrix4d m = new Matrix4d();
+        Matrix4d original = new Matrix4d(m);
+        m.rotate(PI / 2, 0.0, 0.0, 0.0);
+        assertEquals(original, m);
     }
 
     @Test void lerp() {

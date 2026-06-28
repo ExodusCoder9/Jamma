@@ -91,6 +91,14 @@ class Matrix2dTest {
     }
 
     @Test
+    void transposeTwiceIdentity() {
+        Matrix2d m = new Matrix2d(new double[]{1, 2, 3, 4});
+        Matrix2d original = new Matrix2d(m);
+        m.transpose().transpose();
+        assertEquals(original, m);
+    }
+
+    @Test
     void transpose() {
         Matrix2d m = new Matrix2d(new double[]{1, 2, 3, 4});
         m.transpose();

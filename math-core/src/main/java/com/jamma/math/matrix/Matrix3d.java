@@ -76,7 +76,11 @@ public class Matrix3d implements Serializable {
     }
 
     public Matrix3d rotate(double angle, double x, double y, double z) {
-        double invLen = 1.0 / Math.sqrt(x * x + y * y + z * z);
+        double axisLenSq = x * x + y * y + z * z;
+        if (axisLenSq == 0.0) {
+            return this;
+        }
+        double invLen = 1.0 / Math.sqrt(axisLenSq);
         double nx = x * invLen;
         double ny = y * invLen;
         double nz = z * invLen;

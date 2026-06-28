@@ -164,6 +164,22 @@ class Matrix3dTest {
     }
 
     @Test
+    void transposeTwiceIdentity() {
+        Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
+        Matrix3d original = new Matrix3d(m);
+        m.transpose().transpose();
+        assertEquals(original, m);
+    }
+
+    @Test
+    void rotateZeroAxisNoop() {
+        Matrix3d m = new Matrix3d();
+        Matrix3d original = new Matrix3d(m);
+        m.rotate(Math.PI / 2.0, 0.0, 0.0, 0.0);
+        assertEquals(original, m);
+    }
+
+    @Test
     void transpose() {
         Matrix3d m = new Matrix3d(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
         m.transpose();

@@ -83,6 +83,18 @@ JOML compatibility adapter. Provides mutable, `return this` adapter classes with
 
 ---
 
+## Quality & Verification
+
+- Java 25 is the supported baseline for the workspace and CI.
+- GitHub Actions builds and tests the project on JDK 25.
+- The math layer has been hardened against common degenerate inputs:
+  - zero-length projection targets return zero vectors
+  - degenerate line segments return their endpoint as the closest point
+  - zero rotation axes are treated as no-op rotations
+- Matrix regression coverage now includes identity checks, transpose involution, and inverse round-trips.
+
+---
+
 ## Vector Types
 
 ### Precision Variants
@@ -943,14 +955,14 @@ A drop-in bridge for projects migrating from JOML to Jamma. Provides mutable ada
 
 ### Adapter Types
 
-| Adapter class         | JOML equivalent      | Key API coverage                                      |
-|-----------------------|----------------------|-------------------------------------------------------|
-| `Vector3f` / `Vector3d` | `org.joml.Vector3f/d` | set, add, sub, mul, div, normalize, cross, dot, reflect, rotate, transform matrix/quat, mulPosition/Direction, fma, MemorySegment load/store |
-| `Vector4f` / `Vector4d` | `org.joml.Vector4f/d` | set, add, sub, mul, div, normalize, dot, mul(Matrix4f/d), mulPosition, mulDirection |
-| `Vector2f` / `Vector2d` | `org.joml.Vector2f/d` | set, add, sub, mul, div, normalize, dot, cross, rotate, angle, perpendicular |
-| `Quaternionf` / `Quaterniond` | `org.joml.Quaternionf/d` | normalize, conjugate, invert, mul, premul, slerp, nlerp, fromAxisAngle, fromEulerAnglesXYZ |
-| `Matrix4f` / `Matrix4d` | `org.joml.Matrix4f/d` | identity, mul, translate, scale, rotateX/Y/Z, transpose, invert, determinant, perspective, lookAt, transformPosition/Direction |
-| `JomlCompat`          | —                    | Static `toJamma()` / `toJoml()` between JOML, adapter, and native Jamma types |
+| Adapter class                 | JOML equivalent          | Key API coverage                                                                                                                             |
+|-------------------------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `Vector3f` / `Vector3d`       | `org.joml.Vector3f/d`    | set, add, sub, mul, div, normalize, cross, dot, reflect, rotate, transform matrix/quat, mulPosition/Direction, fma, MemorySegment load/store |
+| `Vector4f` / `Vector4d`       | `org.joml.Vector4f/d`    | set, add, sub, mul, div, normalize, dot, mul(Matrix4f/d), mulPosition, mulDirection                                                          |
+| `Vector2f` / `Vector2d`       | `org.joml.Vector2f/d`    | set, add, sub, mul, div, normalize, dot, cross, rotate, angle, perpendicular                                                                 |
+| `Quaternionf` / `Quaterniond` | `org.joml.Quaternionf/d` | normalize, conjugate, invert, mul, premul, slerp, nlerp, fromAxisAngle, fromEulerAnglesXYZ                                                   |
+| `Matrix4f` / `Matrix4d`       | `org.joml.Matrix4f/d`    | identity, mul, translate, scale, rotateX/Y/Z, transpose, invert, determinant, perspective, lookAt, transformPosition/Direction               |
+| `JomlCompat`                  | —                        | Static `toJamma()` / `toJoml()` between JOML, adapter, and native Jamma types                                                                |
 
 ### Example
 
