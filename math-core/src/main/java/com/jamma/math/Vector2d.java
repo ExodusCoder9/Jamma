@@ -74,9 +74,23 @@ public record Vector2d(double x, double y) implements Serializable {
     public double distance(double x, double y) { return Math.sqrt(distanceSquared(x, y)); }
     public double distanceSquared(Vector2d v) { return distanceSquared(v.x, v.y); }
     public double distanceSquared(double x, double y) { return Math.fma(this.x - x, this.x - x, (this.y - y) * (this.y - y)); }
-    public Vector2d normalize() { double len = length(); return new Vector2d(x / len, y / len); }
-    public Vector2d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector2d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
+    public Vector2d normalize() {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector2d(0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector2d(x * invLen, y * invLen);
+    }
+    public Vector2d normalize(double length) {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector2d(0.0, 0.0);
+        return scale(length / Math.sqrt(lenSq));
+    }
+    public double angle(Vector2d v) {
+        double lenSq = lengthSquared();
+        double otherLenSq = v.lengthSquared();
+        if (lenSq == 0.0 || otherLenSq == 0.0) return 0.0;
+        return Math.acos(Math.clamp(dot(v) / Math.sqrt(lenSq * otherLenSq), -1.0, 1.0));
+    }
     public double angleSigned(Vector2d v) { return Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2d reflect(Vector2d normal) { double d = 2.0 * dot(normal); return new Vector2d(x - d * normal.x, y - d * normal.y); }
     public Vector2d project(Vector2d onto) {

@@ -134,7 +134,11 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
     }
 
     public Quaterniond invert() {
-        double invLenSq = 1.0 / lengthSquared();
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) {
+            return IDENTITY;
+        }
+        double invLenSq = 1.0 / lenSq;
         return new Quaterniond(-x * invLenSq, -y * invLenSq, -z * invLenSq, w * invLenSq);
     }
 
@@ -147,7 +151,10 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
     }
 
     public double angle() {
-        return 2.0 * Math.acos(w);
+        if (lengthSquared() == 0.0) {
+            return 0.0;
+        }
+        return 2.0 * Math.acos(Math.clamp(w, -1.0, 1.0));
     }
 
     public Quaterniond mul(Quaterniond q) {
@@ -332,8 +339,13 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
     }
 
     public double angle(Quaterniond q) {
-        double cosHalfAngle = Math.abs(dot(q)) / (length() * q.length());
-        return 2.0 * Math.acos(Math.min(1.0, cosHalfAngle));
+        double lenSq = lengthSquared();
+        double otherLenSq = q.lengthSquared();
+        if (lenSq == 0.0 || otherLenSq == 0.0) {
+            return 0.0;
+        }
+        double cosHalfAngle = Math.abs(dot(q)) / Math.sqrt(lenSq * otherLenSq);
+        return 2.0 * Math.acos(Math.clamp(cosHalfAngle, -1.0, 1.0));
     }
 
     public Quaterniond log() {

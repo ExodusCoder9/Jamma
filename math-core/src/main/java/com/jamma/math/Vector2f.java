@@ -75,9 +75,24 @@ public record Vector2f(float x, float y) implements Serializable {
     public float distance(float x, float y) { return (float) Math.sqrt(distanceSquared(x, y)); }
     public float distanceSquared(Vector2f v) { return Math.fma(this.x - v.x, this.x - v.x, (this.y - v.y) * (this.y - v.y)); }
     public float distanceSquared(float x, float y) { return Math.fma(this.x - x, this.x - x, (this.y - y) * (this.y - y)); }
-    public Vector2f normalize() { float len = length(); return new Vector2f(x / len, y / len); }
-    public Vector2f normalize(float length) { float len = length(); float s = length / len; return new Vector2f(x * s, y * s); }
-    public float angle(Vector2f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
+    public Vector2f normalize() {
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) return new Vector2f(0.0f, 0.0f);
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
+        return new Vector2f(x * invLen, y * invLen);
+    }
+    public Vector2f normalize(float length) {
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) return new Vector2f(0.0f, 0.0f);
+        float s = length / (float) Math.sqrt(lenSq);
+        return new Vector2f(x * s, y * s);
+    }
+    public float angle(Vector2f v) {
+        float lenSq = lengthSquared();
+        float otherLenSq = v.lengthSquared();
+        if (lenSq == 0.0f || otherLenSq == 0.0f) return 0.0f;
+        return (float) Math.acos(Math.clamp(dot(v) / (float) Math.sqrt(lenSq * otherLenSq), -1.0f, 1.0f));
+    }
     public float angleSigned(Vector2f v) { return (float) Math.atan2(x * v.y - y * v.x, dot(v)); }
     public Vector2f reflect(Vector2f normal) { float d = 2.0f * dot(normal); return new Vector2f(x - d * normal.x, y - d * normal.y); }
     public Vector2f project(Vector2f onto) {

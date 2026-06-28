@@ -119,20 +119,26 @@ public final class VectorMathf {
     }
 
     public static Vector2f normalize(Vector2f v) {
-        float len = length(v);
-        return new Vector2f(v.x() / len, v.y() / len);
+        float lenSq = lengthSquared(v);
+        if (lenSq == 0.0f) return new Vector2f(0.0f, 0.0f);
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
+        return new Vector2f(v.x() * invLen, v.y() * invLen);
     }
     public static Vector3f normalize(Vector3f v) {
-        float len = length(v);
-        return new Vector3f(v.x() / len, v.y() / len, v.z() / len);
+        float lenSq = lengthSquared(v);
+        if (lenSq == 0.0f) return new Vector3f(0.0f, 0.0f, 0.0f);
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
+        return new Vector3f(v.x() * invLen, v.y() * invLen, v.z() * invLen);
     }
     public static void normalize(Vector3f v, float[] dest, int offset) {
         float invLen = 1.0f / length(v);
         dest[offset] = v.x() * invLen; dest[offset + 1] = v.y() * invLen; dest[offset + 2] = v.z() * invLen;
     }
     public static Vector4f normalize(Vector4f v) {
-        float len = length(v);
-        return new Vector4f(v.x() / len, v.y() / len, v.z() / len, v.w() / len);
+        float lenSq = lengthSquared(v);
+        if (lenSq == 0.0f) return new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
+        return new Vector4f(v.x() * invLen, v.y() * invLen, v.z() * invLen, v.w() * invLen);
     }
 
     public static Vector2f safeNormalize(Vector2f v, Vector2f fallback) {
@@ -276,16 +282,26 @@ public final class VectorMathf {
     }
 
     public static float angle(Vector2f a, Vector2f b) {
-        return (float) Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
+        float lenSq = lengthSquared(a);
+        float otherLenSq = lengthSquared(b);
+        if (lenSq == 0.0f || otherLenSq == 0.0f) return 0.0f;
+        return (float) Math.acos(Math.clamp(dot(a, b) / (float) Math.sqrt(lenSq * otherLenSq), -1.0f, 1.0f));
     }
     public static float angle(Vector3f a, Vector3f b) {
-        return (float) Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0f, 1.0f));
+        float lenSq = lengthSquared(a);
+        float otherLenSq = lengthSquared(b);
+        if (lenSq == 0.0f || otherLenSq == 0.0f) return 0.0f;
+        return (float) Math.acos(Math.clamp(dot(a, b) / (float) Math.sqrt(lenSq * otherLenSq), -1.0f, 1.0f));
     }
     public static float angleSigned(Vector2f a, Vector2f b) {
         return (float) Math.atan2(cross2D(a, b), dot(a, b));
     }
     public static float angleSigned(Vector3f a, Vector3f b, Vector3f normal) {
-        float d = dot(a, b) / (length(a) * length(b));
+        float lenSq = lengthSquared(a);
+        float otherLenSq = lengthSquared(b);
+        float normalLenSq = lengthSquared(normal);
+        if (lenSq == 0.0f || otherLenSq == 0.0f || normalLenSq == 0.0f) return 0.0f;
+        float d = dot(a, b) / (float) Math.sqrt(lenSq * otherLenSq);
         Vector3f c = cross(a, b);
         float sign = dot(c, normal) >= 0.0f ? 1.0f : -1.0f;
         return sign * (float) Math.acos(Math.clamp(d, -1.0f, 1.0f));

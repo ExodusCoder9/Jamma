@@ -1,6 +1,6 @@
 # Jamma Math Library
 
-> A modern, immutable-first Java math library for graphics, simulation, and game development. Designed as a ground-up replacement for JOML with Java records, Foreign Function & Memory API support, SIMD acceleration, and a vastly broader mathematical scope.
+> A modern Java math library for graphics, simulation, and game development. Vectors, quaternions, dual numbers, axis-angle types, planes, and spheres are immutable records; matrices and a few geometry types stay mutable where that helps performance. Designed as a ground-up replacement for JOML with Java records, Foreign Function & Memory API support, SIMD acceleration, and a broader mathematical scope.
 
 ## Requirements
 
@@ -53,6 +53,7 @@ Vectors, quaternions, dual numbers, axis-angle, planes, and spheres are **Java r
 
 ### Mutability Where It Matters
 Matrices (`Matrix4d`, `Matrix4f`, etc.), `AABB`, `Ray`, and `FrustumIntersection` are **mutable classes** with fluent `return this` setters. Matrix operations are the performance-critical path where mutation avoids allocation, and matrices are rarely shared across threads.
+Use the `identityMatrix()` factory on matrix classes when you need a fresh writable identity instance; the legacy `IDENTITY` fields remain for compatibility.
 
 ### `Math.fma` Everywhere
 All dot products, lerps, and matrix multiply accumulations use `Math.fma` (fused multiply-add) for higher precision and (where available) hardware acceleration.

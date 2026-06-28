@@ -1514,7 +1514,18 @@ public class Matrix4d implements Serializable {
         return new Matrix4d().rotateTowardsXY(x, y);
     }
 
+    /**
+     * Mutable shared identity instance.
+     * <p>
+     * Prefer {@link #identityMatrix()} or constructing a new matrix when you need
+     * a writable instance.
+     */
+    @Deprecated(since = "0.0.0", forRemoval = false)
     public static final Matrix4d IDENTITY = new Matrix4d();
+
+    public static Matrix4d identityMatrix() {
+        return new Matrix4d();
+    }
 
     public Matrix4d reflect(double nx, double ny, double nz, double d) {
         double invLen = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);

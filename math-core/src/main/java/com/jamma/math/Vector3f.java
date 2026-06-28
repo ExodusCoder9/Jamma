@@ -99,10 +99,28 @@ public record Vector3f(float x, float y, float z) implements Serializable {
     public float distance(float x, float y, float z) { return (float) Math.sqrt(Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z)))); }
     public float distanceSquared(Vector3f v) { return distanceSquared(v.x, v.y, v.z); }
     public float distanceSquared(float x, float y, float z) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z))); }
-    public Vector3f normalize() { float len = length(); return new Vector3f(x / len, y / len, z / len); }
-    public Vector3f normalize(float length) { float len = length(); float s = length / len; return new Vector3f(x * s, y * s, z * s); }
-    public float angle(Vector3f v) { return (float) Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0f, 1.0f)); }
-    public float angleSigned(Vector3f v, Vector3f normal) { return (float) Math.atan2(cross(v).dot(normal), dot(v)); }
+    public Vector3f normalize() {
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) return ZERO;
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
+        return new Vector3f(x * invLen, y * invLen, z * invLen);
+    }
+    public Vector3f normalize(float length) {
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) return ZERO;
+        float s = length / (float) Math.sqrt(lenSq);
+        return new Vector3f(x * s, y * s, z * s);
+    }
+    public float angle(Vector3f v) {
+        float lenSq = lengthSquared();
+        float otherLenSq = v.lengthSquared();
+        if (lenSq == 0.0f || otherLenSq == 0.0f) return 0.0f;
+        return (float) Math.acos(Math.clamp(dot(v) / (float) Math.sqrt(lenSq * otherLenSq), -1.0f, 1.0f));
+    }
+    public float angleSigned(Vector3f v, Vector3f normal) {
+        if (lengthSquared() == 0.0f || v.lengthSquared() == 0.0f || normal.lengthSquared() == 0.0f) return 0.0f;
+        return (float) Math.atan2(cross(v).dot(normal), dot(v));
+    }
     public Vector3f reflect(Vector3f normal) { float d = 2.0f * dot(normal); return new Vector3f(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
     public Vector3f project(Vector3f onto) {
         float denom = onto.dot(onto);

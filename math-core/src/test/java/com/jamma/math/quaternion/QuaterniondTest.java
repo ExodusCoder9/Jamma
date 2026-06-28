@@ -153,12 +153,23 @@ class QuaterniondTest {
     }
 
     @Test
+    void invertZeroQuaternion() {
+        assertEquals(Quaterniond.IDENTITY, new Quaterniond(0, 0, 0, 0).invert());
+    }
+
+    @Test
     void normalize() {
         Quaterniond q = new Quaterniond(3, 4, 0, 0);
         double len = Math.sqrt(q.x() * q.x() + q.y() * q.y() + q.z() * q.z() + q.w() * q.w());
         Quaterniond n = new Quaterniond(q.x() / len, q.y() / len, q.z() / len, q.w() / len);
         double nLen = Math.sqrt(n.x() * n.x() + n.y() * n.y() + n.z() * n.z() + n.w() * n.w());
         assertEquals(1.0, nLen, 1e-15);
+    }
+
+    @Test
+    void angleZeroQuaternion() {
+        assertEquals(0.0, new Quaterniond(0, 0, 0, 0).angle(), 1e-15);
+        assertEquals(0.0, new Quaterniond(0, 0, 0, 0).angle(new Quaterniond(0, 0, 0, 0)), 1e-15);
     }
 
     @Test

@@ -102,16 +102,22 @@ public final class VectorMath {
     }
 
     public static Vector2d normalize(Vector2d v) {
-        double len = length(v);
-        return new Vector2d(v.x() / len, v.y() / len);
+        double lenSq = lengthSquared(v);
+        if (lenSq == 0.0) return new Vector2d(0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector2d(v.x() * invLen, v.y() * invLen);
     }
     public static Vector3d normalize(Vector3d v) {
-        double len = length(v);
-        return new Vector3d(v.x() / len, v.y() / len, v.z() / len);
+        double lenSq = lengthSquared(v);
+        if (lenSq == 0.0) return new Vector3d(0.0, 0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector3d(v.x() * invLen, v.y() * invLen, v.z() * invLen);
     }
     public static Vector4d normalize(Vector4d v) {
-        double len = length(v);
-        return new Vector4d(v.x() / len, v.y() / len, v.z() / len, v.w() / len);
+        double lenSq = lengthSquared(v);
+        if (lenSq == 0.0) return new Vector4d(0.0, 0.0, 0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector4d(v.x() * invLen, v.y() * invLen, v.z() * invLen, v.w() * invLen);
     }
 
     public static Vector2d safeNormalize(Vector2d v, Vector2d fallback) {
@@ -250,16 +256,26 @@ public final class VectorMath {
     }
 
     public static double angle(Vector2d a, Vector2d b) {
-        return Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
+        double lenSq = lengthSquared(a);
+        double otherLenSq = lengthSquared(b);
+        if (lenSq == 0.0 || otherLenSq == 0.0) return 0.0;
+        return Math.acos(Math.clamp(dot(a, b) / Math.sqrt(lenSq * otherLenSq), -1.0, 1.0));
     }
     public static double angle(Vector3d a, Vector3d b) {
-        return Math.acos(Math.clamp(dot(a, b) / (length(a) * length(b)), -1.0, 1.0));
+        double lenSq = lengthSquared(a);
+        double otherLenSq = lengthSquared(b);
+        if (lenSq == 0.0 || otherLenSq == 0.0) return 0.0;
+        return Math.acos(Math.clamp(dot(a, b) / Math.sqrt(lenSq * otherLenSq), -1.0, 1.0));
     }
     public static double angleSigned(Vector2d a, Vector2d b) {
         return Math.atan2(cross2D(a, b), dot(a, b));
     }
     public static double angleSigned(Vector3d a, Vector3d b, Vector3d normal) {
-        double d = dot(a, b) / (length(a) * length(b));
+        double lenSq = lengthSquared(a);
+        double otherLenSq = lengthSquared(b);
+        double normalLenSq = lengthSquared(normal);
+        if (lenSq == 0.0 || otherLenSq == 0.0 || normalLenSq == 0.0) return 0.0;
+        double d = dot(a, b) / Math.sqrt(lenSq * otherLenSq);
         Vector3d c = cross(a, b);
         double sign = dot(c, normal) >= 0.0 ? 1.0 : -1.0;
         return sign * Math.acos(Math.clamp(d, -1.0, 1.0));

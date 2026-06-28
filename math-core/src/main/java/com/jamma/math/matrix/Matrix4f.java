@@ -20,7 +20,18 @@ import java.lang.foreign.ValueLayout;
  */
 public class Matrix4f implements Serializable {
 
+    /**
+     * Mutable shared identity instance.
+     * <p>
+     * Prefer {@link #identityMatrix()} or constructing a new matrix when you need
+     * a writable instance.
+     */
+    @Deprecated(since = "0.0.0", forRemoval = false)
     public static final Matrix4f IDENTITY = new Matrix4f();
+
+    public static Matrix4f identityMatrix() {
+        return new Matrix4f();
+    }
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -127,7 +138,11 @@ public class Matrix4f implements Serializable {
         return setTranslation(v.x(), v.y(), v.z());
     }
     public Matrix4f rotate(float angle, float x, float y, float z) {
-        float invLen = 1.0f / (float) Math.sqrt(x * x + y * y + z * z);
+        float axisLenSq = x * x + y * y + z * z;
+        if (axisLenSq == 0.0f) {
+            return this;
+        }
+        float invLen = 1.0f / (float) Math.sqrt(axisLenSq);
         float nx = x * invLen;
         float ny = y * invLen;
         float nz = z * invLen;

@@ -16,7 +16,11 @@ public record Plane(Vector3d normal, double d) implements Serializable {
     }
 
     public static Plane fromPointNormal(Vector3d point, Vector3d normal) {
-        double invLen = 1.0 / Math.sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
+        double lenSq = normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z();
+        if (lenSq == 0.0) {
+            return new Plane(0.0, 0.0, 0.0, 0.0);
+        }
+        double invLen = 1.0 / Math.sqrt(lenSq);
         double nx = normal.x() * invLen;
         double ny = normal.y() * invLen;
         double nz = normal.z() * invLen;
@@ -29,7 +33,11 @@ public record Plane(Vector3d normal, double d) implements Serializable {
         double nx = aby * acz - abz * acy;
         double ny = abz * acx - abx * acz;
         double nz = abx * acy - aby * acx;
-        double invLen = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+        double lenSq = nx * nx + ny * ny + nz * nz;
+        if (lenSq == 0.0) {
+            return new Plane(0.0, 0.0, 0.0, 0.0);
+        }
+        double invLen = 1.0 / Math.sqrt(lenSq);
         nx *= invLen;
         ny *= invLen;
         nz *= invLen;
@@ -48,7 +56,11 @@ public record Plane(Vector3d normal, double d) implements Serializable {
     }
 
     public Plane normalize() {
-        double invLen = 1.0 / Math.sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
+        double lenSq = normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z();
+        if (lenSq == 0.0) {
+            return this;
+        }
+        double invLen = 1.0 / Math.sqrt(lenSq);
         return new Plane(normal.x() * invLen, normal.y() * invLen, normal.z() * invLen, d * invLen);
     }
 

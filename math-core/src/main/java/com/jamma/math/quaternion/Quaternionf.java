@@ -144,12 +144,20 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public Quaternionf invert() {
-        float invLenSq = 1.0f / lengthSquared();
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) {
+            return IDENTITY;
+        }
+        float invLenSq = 1.0f / lenSq;
         return new Quaternionf(-x * invLenSq, -y * invLenSq, -z * invLenSq, w * invLenSq);
     }
 
     public Quaternionf difference(Quaternionf q) {
-        float invLenSq = 1.0f / lengthSquared();
+        float lenSq = lengthSquared();
+        if (lenSq == 0.0f) {
+            return IDENTITY;
+        }
+        float invLenSq = 1.0f / lenSq;
         float ix = -x * invLenSq, iy = -y * invLenSq, iz = -z * invLenSq, iw = w * invLenSq;
         return new Quaternionf(
             Math.fma(iw, q.x, Math.fma(ix, q.w, Math.fma(iy, q.z, -iz * q.y))),
@@ -164,7 +172,10 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public float angle() {
-        return 2.0f * (float) Math.acos(w);
+        if (lengthSquared() == 0.0f) {
+            return 0.0f;
+        }
+        return 2.0f * (float) Math.acos(Math.clamp(w, -1.0f, 1.0f));
     }
 
     public Quaternionf mul(Quaternionf q) {
@@ -351,8 +362,13 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
     }
 
     public float angle(Quaternionf q) {
-        float cosHalfAngle = Math.abs(dot(q)) / (length() * q.length());
-        return 2.0f * (float) Math.acos(Math.min(1.0f, cosHalfAngle));
+        float lenSq = lengthSquared();
+        float otherLenSq = q.lengthSquared();
+        if (lenSq == 0.0f || otherLenSq == 0.0f) {
+            return 0.0f;
+        }
+        float cosHalfAngle = Math.abs(dot(q)) / (float) Math.sqrt(lenSq * otherLenSq);
+        return 2.0f * (float) Math.acos(Math.clamp(cosHalfAngle, -1.0f, 1.0f));
     }
 
     public Quaternionf log() {

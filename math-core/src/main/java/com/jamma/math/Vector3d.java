@@ -82,10 +82,27 @@ public record Vector3d(double x, double y, double z) implements Serializable {
     public double distance(double x, double y, double z) { return Math.sqrt(distanceSquared(x, y, z)); }
     public double distanceSquared(Vector3d v) { return distanceSquared(v.x, v.y, v.z); }
     public double distanceSquared(double x, double y, double z) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, (this.z - z) * (this.z - z))); }
-    public Vector3d normalize() { double len = length(); return new Vector3d(x / len, y / len, z / len); }
-    public Vector3d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector3d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
-    public double angleSigned(Vector3d v, Vector3d normal) { return Math.atan2(cross(v).dot(normal), dot(v)); }
+    public Vector3d normalize() {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector3d(0.0, 0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector3d(x * invLen, y * invLen, z * invLen);
+    }
+    public Vector3d normalize(double length) {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector3d(0.0, 0.0, 0.0);
+        return scale(length / Math.sqrt(lenSq));
+    }
+    public double angle(Vector3d v) {
+        double lenSq = lengthSquared();
+        double otherLenSq = v.lengthSquared();
+        if (lenSq == 0.0 || otherLenSq == 0.0) return 0.0;
+        return Math.acos(Math.clamp(dot(v) / Math.sqrt(lenSq * otherLenSq), -1.0, 1.0));
+    }
+    public double angleSigned(Vector3d v, Vector3d normal) {
+        if (lengthSquared() == 0.0 || v.lengthSquared() == 0.0 || normal.lengthSquared() == 0.0) return 0.0;
+        return Math.atan2(cross(v).dot(normal), dot(v));
+    }
     public Vector3d reflect(Vector3d normal) { double d = 2.0 * dot(normal); return new Vector3d(x - d * normal.x, y - d * normal.y, z - d * normal.z); }
     public Vector3d project(Vector3d onto) {
         double denom = onto.dot(onto);

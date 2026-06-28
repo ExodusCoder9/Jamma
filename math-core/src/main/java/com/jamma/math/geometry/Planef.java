@@ -16,7 +16,11 @@ public record Planef(Vector3f normal, float d) implements Serializable {
     }
 
     public static Planef fromPointNormal(Vector3f point, Vector3f normal) {
-        float invLen = 1.0f / (float) Math.sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
+        float lenSq = normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z();
+        if (lenSq == 0.0f) {
+            return new Planef(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
         float nx = normal.x() * invLen;
         float ny = normal.y() * invLen;
         float nz = normal.z() * invLen;
@@ -29,7 +33,11 @@ public record Planef(Vector3f normal, float d) implements Serializable {
         float nx = aby * acz - abz * acy;
         float ny = abz * acx - abx * acz;
         float nz = abx * acy - aby * acx;
-        float invLen = 1.0f / (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
+        float lenSq = nx * nx + ny * ny + nz * nz;
+        if (lenSq == 0.0f) {
+            return new Planef(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
         nx *= invLen;
         ny *= invLen;
         nz *= invLen;
@@ -48,7 +56,11 @@ public record Planef(Vector3f normal, float d) implements Serializable {
     }
 
     public Planef normalize() {
-        float invLen = 1.0f / (float) Math.sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
+        float lenSq = normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z();
+        if (lenSq == 0.0f) {
+            return this;
+        }
+        float invLen = 1.0f / (float) Math.sqrt(lenSq);
         return new Planef(normal.x() * invLen, normal.y() * invLen, normal.z() * invLen, d * invLen);
     }
 

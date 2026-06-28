@@ -18,7 +18,11 @@ public final class GeometryUtils {
         Vector3f edge2 = p3.sub(p1);
         Vector2f duv1 = uv2.sub(uv1);
         Vector2f duv2 = uv3.sub(uv1);
-        float f = 1.0f / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
+        float denom = duv1.x() * duv2.y() - duv2.x() * duv1.y();
+        if (denom == 0.0f) {
+            return new Vector3f(0.0f, 0.0f, 0.0f);
+        }
+        float f = 1.0f / denom;
         float tx = f * (duv2.y() * edge1.x() - duv1.y() * edge2.x());
         float ty = f * (duv2.y() * edge1.y() - duv1.y() * edge2.y());
         float tz = f * (duv2.y() * edge1.z() - duv1.y() * edge2.z());
@@ -33,7 +37,11 @@ public final class GeometryUtils {
         Vector3f edge2 = p3.sub(p1);
         Vector2f duv1 = uv2.sub(uv1);
         Vector2f duv2 = uv3.sub(uv1);
-        float f = 1.0f / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
+        float denom = duv1.x() * duv2.y() - duv2.x() * duv1.y();
+        if (denom == 0.0f) {
+            return new Vector3f(0.0f, 0.0f, 0.0f);
+        }
+        float f = 1.0f / denom;
         float bx = f * (-duv2.x() * edge1.x() + duv1.x() * edge2.x());
         float by = f * (-duv2.x() * edge1.y() + duv1.x() * edge2.y());
         float bz = f * (-duv2.x() * edge1.z() + duv1.x() * edge2.z());
@@ -69,7 +77,11 @@ public final class GeometryUtils {
         Vector3d edge2 = p3.sub(p1);
         Vector2d duv1 = uv2.sub(uv1);
         Vector2d duv2 = uv3.sub(uv1);
-        double f = 1.0 / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
+        double denom = duv1.x() * duv2.y() - duv2.x() * duv1.y();
+        if (denom == 0.0) {
+            return new Vector3d(0.0, 0.0, 0.0);
+        }
+        double f = 1.0 / denom;
         double tx = f * (duv2.y() * edge1.x() - duv1.y() * edge2.x());
         double ty = f * (duv2.y() * edge1.y() - duv1.y() * edge2.y());
         double tz = f * (duv2.y() * edge1.z() - duv1.y() * edge2.z());
@@ -84,7 +96,11 @@ public final class GeometryUtils {
         Vector3d edge2 = p3.sub(p1);
         Vector2d duv1 = uv2.sub(uv1);
         Vector2d duv2 = uv3.sub(uv1);
-        double f = 1.0 / (duv1.x() * duv2.y() - duv2.x() * duv1.y());
+        double denom = duv1.x() * duv2.y() - duv2.x() * duv1.y();
+        if (denom == 0.0) {
+            return new Vector3d(0.0, 0.0, 0.0);
+        }
+        double f = 1.0 / denom;
         double bx = f * (-duv2.x() * edge1.x() + duv1.x() * edge2.x());
         double by = f * (-duv2.x() * edge1.y() + duv1.x() * edge2.y());
         double bz = f * (-duv2.x() * edge1.z() + duv1.x() * edge2.z());
@@ -140,7 +156,11 @@ public final class GeometryUtils {
         double dot02 = v0.dot(v2);
         double dot11 = v1.dot(v1);
         double dot12 = v1.dot(v2);
-        double invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+        double denom = dot00 * dot11 - dot01 * dot01;
+        if (denom == 0.0) {
+            return new Vector3d(0.0, 0.0, 0.0);
+        }
+        double invDenom = 1.0 / denom;
         double v = (dot11 * dot02 - dot01 * dot12) * invDenom;
         double w = (dot00 * dot12 - dot01 * dot02) * invDenom;
         double u = 1.0 - v - w;

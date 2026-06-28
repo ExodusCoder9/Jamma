@@ -49,6 +49,10 @@ class VectorTest {
         assertEquals(1, n.x(), F); assertEquals(0, n.y(), F);
         assertEquals(1, n.length(), F);
     }
+    @Test void v2fNormalizeZero() {
+        assertEquals(new Vector2f(0, 0), new Vector2f(0, 0).normalize());
+        assertEquals(new Vector2f(0, 0), new Vector2f(0, 0).normalize(5));
+    }
     @Test void v2fNormalizeLength() {
         Vector2f n = new Vector2f(3, 0).normalize(5);
         assertEquals(5, n.x(), F); assertEquals(0, n.y(), F);
@@ -56,6 +60,10 @@ class VectorTest {
     @Test void v2fAngle() {
         assertEquals(0, new Vector2f(1, 0).angle(new Vector2f(1, 0)), F);
         assertEquals((float) Math.PI / 2, new Vector2f(1, 0).angle(new Vector2f(0, 1)), F);
+    }
+    @Test void v2fAngleZero() {
+        assertEquals(0, new Vector2f(0, 0).angle(new Vector2f(1, 0)), F);
+        assertEquals(0, new Vector2f(1, 0).angle(new Vector2f(0, 0)), F);
     }
     @Test void v2fAngleSigned() {
         assertEquals((float) Math.PI / 2, new Vector2f(1, 0).angleSigned(new Vector2f(0, 1)), F);
@@ -175,9 +183,20 @@ class VectorTest {
         Vector3f n = new Vector3f(3, 0, 0).normalize();
         assertEquals(1, n.x(), F); assertEquals(0, n.y(), F); assertEquals(0, n.z(), F);
     }
+    @Test void v3fNormalizeZero() {
+        assertEquals(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0).normalize());
+        assertEquals(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0).normalize(5));
+    }
     @Test void v3fAngle() {
         assertEquals(0, new Vector3f(1, 0, 0).angle(new Vector3f(1, 0, 0)), F);
         assertEquals((float) Math.PI / 2, new Vector3f(1, 0, 0).angle(new Vector3f(0, 1, 0)), F);
+    }
+    @Test void v3fAngleZero() {
+        assertEquals(0, new Vector3f(0, 0, 0).angle(new Vector3f(1, 0, 0)), F);
+        assertEquals(0, new Vector3f(1, 0, 0).angle(new Vector3f(0, 0, 0)), F);
+    }
+    @Test void v3fAngleSignedZero() {
+        assertEquals(0, new Vector3f(0, 0, 0).angleSigned(new Vector3f(1, 0, 0), new Vector3f(0, 0, 1)), F);
     }
     @Test void v3fAngleSigned() {
         float a = new Vector3f(1, 0, 0).angleSigned(new Vector3f(0, 1, 0), new Vector3f(0, 0, 1));
@@ -340,6 +359,10 @@ class VectorTest {
         Vector2d n = new Vector2d(3, 0).normalize();
         assertEquals(1, n.x(), D); assertEquals(0, n.y(), D);
     }
+    @Test void v2dNormalizeZero() {
+        assertEquals(new Vector2d(0, 0), new Vector2d(0, 0).normalize());
+        assertEquals(new Vector2d(0, 0), new Vector2d(0, 0).normalize(5));
+    }
     @Test void v2dReflect() {
         Vector2d r = new Vector2d(1, -1).reflect(new Vector2d(0, 1));
         assertEquals(1, r.x(), D); assertEquals(1, r.y(), D);
@@ -373,6 +396,10 @@ class VectorTest {
         Vector3d n = new Vector3d(3, 0, 0).normalize();
         assertEquals(1, n.x(), D);
     }
+    @Test void v3dNormalizeZero() {
+        assertEquals(new Vector3d(0, 0, 0), new Vector3d(0, 0, 0).normalize());
+        assertEquals(new Vector3d(0, 0, 0), new Vector3d(0, 0, 0).normalize(5));
+    }
     @Test void v3dReflect() {
         Vector3d r = new Vector3d(0, -1, 0).reflect(new Vector3d(0, 1, 0));
         assertEquals(0, r.x(), D); assertEquals(1, r.y(), D); assertEquals(0, r.z(), D);
@@ -396,6 +423,10 @@ class VectorTest {
     @Test void v4dNormalize() {
         Vector4d n = new Vector4d(3, 0, 0, 0).normalize();
         assertEquals(1, n.x(), D); assertEquals(1, n.length(), D);
+    }
+    @Test void v4dNormalizeZero() {
+        assertEquals(new Vector4d(0, 0, 0, 0), new Vector4d(0, 0, 0, 0).normalize());
+        assertEquals(new Vector4d(0, 0, 0, 0), new Vector4d(0, 0, 0, 0).normalize(5));
     }
     @Test void v4dSwizzle() {
         assertEquals(new Vector2d(1, 2), new Vector4d(1, 2, 3, 4).xy());

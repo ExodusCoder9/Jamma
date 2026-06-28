@@ -84,9 +84,23 @@ public record Vector4d(double x, double y, double z, double w) implements Serial
     public double distance(double x, double y, double z, double w) { return Math.sqrt(distanceSquared(x, y, z, w)); }
     public double distanceSquared(Vector4d v) { return distanceSquared(v.x, v.y, v.z, v.w); }
     public double distanceSquared(double x, double y, double z, double w) { return Math.fma(this.x - x, this.x - x, Math.fma(this.y - y, this.y - y, Math.fma(this.z - z, this.z - z, (this.w - w) * (this.w - w)))); }
-    public Vector4d normalize() { double len = length(); return new Vector4d(x / len, y / len, z / len, w / len); }
-    public Vector4d normalize(double length) { return scale(length / length()); }
-    public double angle(Vector4d v) { return Math.acos(Math.clamp(dot(v) / (length() * v.length()), -1.0, 1.0)); }
+    public Vector4d normalize() {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector4d(0.0, 0.0, 0.0, 0.0);
+        double invLen = 1.0 / Math.sqrt(lenSq);
+        return new Vector4d(x * invLen, y * invLen, z * invLen, w * invLen);
+    }
+    public Vector4d normalize(double length) {
+        double lenSq = lengthSquared();
+        if (lenSq == 0.0) return new Vector4d(0.0, 0.0, 0.0, 0.0);
+        return scale(length / Math.sqrt(lenSq));
+    }
+    public double angle(Vector4d v) {
+        double lenSq = lengthSquared();
+        double otherLenSq = v.lengthSquared();
+        if (lenSq == 0.0 || otherLenSq == 0.0) return 0.0;
+        return Math.acos(Math.clamp(dot(v) / Math.sqrt(lenSq * otherLenSq), -1.0, 1.0));
+    }
     public Vector4d lerp(Vector4d other, double t) { return new Vector4d(Math.fma(t, other.x - x, x), Math.fma(t, other.y - y, y), Math.fma(t, other.z - z, z), Math.fma(t, other.w - w, w)); }
     public Vector4d ceil() { return new Vector4d(Math.ceil(x), Math.ceil(y), Math.ceil(z), Math.ceil(w)); }
     public Vector4d floor() { return new Vector4d(Math.floor(x), Math.floor(y), Math.floor(z), Math.floor(w)); }
