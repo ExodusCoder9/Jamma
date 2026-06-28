@@ -75,6 +75,9 @@ The main library. No dependencies beyond the JDK. All production types: vectors,
 ### `math-incubator`
 Experimental features requiring `--add-modules jdk.incubator.vector` and `--enable-preview`. SIMD-accelerated vector ops, parallel batch processing, and off-heap memory management.
 
+### `math-graphics`
+Graphics-oriented utilities layered on top of `math-core`: camera, transform, viewport, frustum, ray-building, and color helpers for scene math and rendering workflows.
+
 ### `lwjgl-jamma`
 LWJGL 3 interop module. Provides zero-allocation `put`/`get` methods that write Jamma types directly into `FloatBuffer`, `DoubleBuffer`, and `MemorySegment` — ready for GL/Vulkan native calls. Integrates with `MemoryStack` for fast stack-allocated uniforms and vertex buffers.
 
