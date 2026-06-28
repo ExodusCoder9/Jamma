@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/joml-adapter" />
             <option value="$PROJECT_DIR$/lwjgl-jamma" />
             <option value="$PROJECT_DIR$/math-core" />
+            <option value="$PROJECT_DIR$/math-graphics" />
             <option value="$PROJECT_DIR$/math-incubator" />
           </set>
         </option>

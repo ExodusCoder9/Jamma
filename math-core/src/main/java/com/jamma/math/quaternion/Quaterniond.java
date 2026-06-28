@@ -233,9 +233,9 @@ public record Quaterniond(double x, double y, double z, double w) implements Ser
         double yz = y * z, yw = y * w, zw = z * w;
         double vx = v.x(), vy = v.y(), vz = v.z();
         return new Vector3d(
-            Math.fma(2.0, xx - 0.5 * (yy + zz), vx) + Math.fma(2.0, xy - zw, vy) + Math.fma(2.0, xz + yw, vz),
-            Math.fma(2.0, xy + zw, vx) + Math.fma(2.0, yy - 0.5 * (xx + zz), vy) + Math.fma(2.0, yz - xw, vz),
-            Math.fma(2.0, xz - yw, vx) + Math.fma(2.0, yz + xw, vy) + Math.fma(2.0, zz - 0.5 * (xx + yy), vz)
+            Math.fma(1.0 - 2.0 * (yy + zz), vx, Math.fma(2.0 * (xy - zw), vy, 2.0 * (xz + yw) * vz)),
+            Math.fma(2.0 * (xy + zw), vx, Math.fma(1.0 - 2.0 * (xx + zz), vy, 2.0 * (yz - xw) * vz)),
+            Math.fma(2.0 * (xz - yw), vx, Math.fma(2.0 * (yz + xw), vy, (1.0 - 2.0 * (xx + yy)) * vz))
         );
     }
 

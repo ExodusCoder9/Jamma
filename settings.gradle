@@ -1,5 +1,6 @@
 rootProject.name = 'Jamma'
 include 'math-core'
 include 'math-incubator'
+include 'math-graphics'
 include 'lwjgl-jamma'
 include 'joml-adapter'

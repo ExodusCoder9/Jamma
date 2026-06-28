@@ -250,9 +250,9 @@ public record Quaternionf(float x, float y, float z, float w) implements Seriali
         float yz = y * z, yw = y * w, zw = z * w;
         float vx = v.x(), vy = v.y(), vz = v.z();
         return new Vector3f(
-            Math.fma(2.0f, xx - 0.5f * (yy + zz), vx) + Math.fma(2.0f, xy - zw, vy) + Math.fma(2.0f, xz + yw, vz),
-            Math.fma(2.0f, xy + zw, vx) + Math.fma(2.0f, yy - 0.5f * (xx + zz), vy) + Math.fma(2.0f, yz - xw, vz),
-            Math.fma(2.0f, xz - yw, vx) + Math.fma(2.0f, yz + xw, vy) + Math.fma(2.0f, zz - 0.5f * (xx + yy), vz)
+            Math.fma(1.0f - 2.0f * (yy + zz), vx, Math.fma(2.0f * (xy - zw), vy, 2.0f * (xz + yw) * vz)),
+            Math.fma(2.0f * (xy + zw), vx, Math.fma(1.0f - 2.0f * (xx + zz), vy, 2.0f * (yz - xw) * vz)),
+            Math.fma(2.0f * (xz - yw), vx, Math.fma(2.0f * (yz + xw), vy, (1.0f - 2.0f * (xx + yy)) * vz))
         );
     }
 
